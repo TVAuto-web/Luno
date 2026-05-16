@@ -3104,7 +3104,8 @@ function aTab(t,el){
 
 // ══ INIT ══
 E('tr-date').value=today();
-bootApp();
+// Différé : bootApp() doit s'exécuter APRÈS toutes les déclarations `let` du script (appProfile, editClIdx, etc.) sinon TDZ.
+if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', () => setTimeout(bootApp, 0)); } else { setTimeout(bootApp, 0); }
 let _persistInterval = setInterval(()=>{ if(me) persistUserData(); }, 30000);
 
 function doLogin(){
