@@ -6181,5 +6181,341 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
 </script>
 
 
+<!-- ════════════════════════════════════════════════════════════════
+     UX-V4-BLOCK-MARKER : couleur marque étendue, undo import,
+     activité récente, count-up KPI, polish cartes
+══════════════════════════════════════════════════════════════════ -->
+<style>
+/* ─── Étendre la couleur de marque aux boutons existants (opt-in via body.has-brand) ─── */
+body.has-brand .btn.btn-gr,
+body.has-brand button.btn-gr {
+  background: var(--ux-brand, #1D9E75) !important;
+  border-color: var(--ux-brand, #1D9E75) !important;
+}
+body.has-brand .btn.btn-gr:hover,
+body.has-brand button.btn-gr:hover { filter: brightness(1.08); }
+body.has-brand a[style*="color:var(--gr)"], body.has-brand a[style*="color: var(--gr)"] { color: var(--ux-brand) !important; }
+/* Indicateurs primaires (badges, dots) */
+body.has-brand .sc-v[style*="color:var(--gr)"], body.has-brand .sc-v[style*="color: var(--gr)"] { color: var(--ux-brand) !important; }
+
+/* ─── Animation count-up sur les KPI du dashboard ─── */
+.ux-count-pop { animation: uxCountPop .55s cubic-bezier(.4,0,.2,1); }
+@keyframes uxCountPop {
+  0%   { transform: translateY(6px); opacity: 0; }
+  60%  { transform: translateY(-2px); opacity: 1; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+
+/* ─── Polish hover sur les cartes du dashboard ─── */
+#p-dashboard .card, #p-dashboard .sc {
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+#p-dashboard .sc:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.06);
+}
+#p-dashboard .card:hover {
+  border-color: var(--bd2, #bdb9ab);
+}
+
+/* ─── Widget Activité récente (injecté dans le dashboard) ─── */
+.ux-act-card{
+  background: var(--bg0,#fff); border: 1px solid var(--bd,#dddad0); border-radius: 14px;
+  margin-top: 1rem; overflow: hidden;
+}
+.ux-act-hd{
+  padding: .85rem 1.25rem; border-bottom: 1px solid var(--bd,#dddad0);
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 14px; font-weight: 700; color: var(--tx0,#1a1a18);
+}
+.ux-act-hd .more{ font-size: 11px; color: var(--tx2,#999582); font-weight: 500; cursor: pointer; }
+.ux-act-hd .more:hover{ color: var(--ux-brand, #1D9E75); }
+.ux-act-list{ padding: .25rem 0; max-height: 260px; overflow-y: auto; }
+.ux-act-row{
+  display: flex; align-items: center; gap: .75rem;
+  padding: .65rem 1.25rem; font-size: 13px;
+  border-bottom: 1px solid transparent;
+  transition: background .12s;
+}
+.ux-act-row:hover{ background: var(--bg2, #f6f6f4); }
+.ux-act-row .dot{
+  flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ux-brand, var(--gr,#1D9E75));
+}
+.ux-act-row .dot.er{ background: #e74c3c; }
+.ux-act-row .dot.wa, .ux-act-row .dot.am{ background: #f5a623; }
+.ux-act-row .dot.inf{ background: #5b9bd5; }
+.ux-act-row .dot.pu2{ background: #8b3a8b; }
+.ux-act-row .body{ flex: 1; min-width: 0; }
+.ux-act-row .msg{ color: var(--tx0,#1a1a18); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ux-act-row .meta{ font-size: 11px; color: var(--tx2,#999582); margin-top: 2px; }
+.ux-act-row .type{
+  font-size: 9px; padding: 2px 7px; border-radius: 999px;
+  background: var(--bg2,#f6f6f4); color: var(--tx1,#62604b);
+  text-transform: uppercase; letter-spacing: .4px; font-weight: 700; flex-shrink: 0;
+}
+.ux-act-empty{ padding: 2rem 1rem; text-align: center; color: var(--tx2,#999582); font-size: 13px; }
+.ux-act-empty .illu{ font-size: 34px; opacity: .25; display: block; margin-bottom: .35rem; }
+
+/* ─── Toast undo (import) ─── */
+.ux-toast{
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: #1a1a18; color: #fff; padding: 14px 18px;
+  border-radius: 12px; font-size: 13px; font-family: Inter, system-ui, sans-serif;
+  box-shadow: 0 16px 48px rgba(0,0,0,.32);
+  display: flex; align-items: center; gap: 14px;
+  z-index: 10002; opacity: 0; transition: all .25s cubic-bezier(.4,0,.2,1);
+}
+.ux-toast.on{ transform: translateX(-50%) translateY(0); opacity: 1; }
+.ux-toast .check{ width: 22px; height: 22px; border-radius: 50%; background: var(--gr,#1D9E75); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.ux-toast .lbl{ font-weight: 600; }
+.ux-toast .lbl .sub{ display: block; font-size: 11px; color: rgba(255,255,255,.6); font-weight: 400; margin-top: 2px; }
+.ux-toast button{
+  background: rgba(255,255,255,.12); color: #fff; border: none;
+  padding: 7px 14px; border-radius: 8px; cursor: pointer; font-family: inherit;
+  font-size: 12px; font-weight: 700;
+}
+.ux-toast button:hover{ background: rgba(255,255,255,.2); }
+.ux-toast button.dismiss{ background: transparent; padding: 6px 10px; opacity: .6; font-weight: 500; }
+.ux-toast button.dismiss:hover{ opacity: 1; }
+</style>
+
+<div class="ux-toast" id="ux-toast">
+  <div class="check">✓</div>
+  <div class="lbl" id="ux-toast-lbl">Action réussie<span class="sub" id="ux-toast-sub"></span></div>
+  <button id="ux-toast-action" style="display:none;">Annuler</button>
+  <button class="dismiss" onclick="uxToastHide()">×</button>
+</div>
+
+<script>
+(function(){
+  // ════════ HELPER ════════
+  function curUser(){
+    try {
+      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      if(!s) return null;
+      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      return us.find(u => u.email === s.email) || null;
+    } catch(e){ return null; }
+  }
+  function fmtAgo(d){
+    if(!d) return '';
+    const t = (typeof d === 'string') ? Date.parse(d.replace(' ','T')) : d;
+    if(isNaN(t)) return d;
+    const sec = Math.floor((Date.now() - t)/1000);
+    if(sec < 60) return 'à l\'instant';
+    if(sec < 3600) return 'il y a ' + Math.floor(sec/60) + ' min';
+    if(sec < 86400) return 'il y a ' + Math.floor(sec/3600) + ' h';
+    return 'il y a ' + Math.floor(sec/86400) + ' j';
+  }
+
+  // ════════ 1. APPLIQUER COULEUR DE MARQUE AUX BOUTONS NATIFS ════════
+  // Étend la fonction applyBrandColor existante (définie en V3) pour ajouter la classe body.has-brand
+  function applyBrand(){
+    const u = curUser();
+    if(u && u.settings && u.settings.brandColor){
+      document.documentElement.style.setProperty('--ux-brand', u.settings.brandColor);
+      document.body.classList.add('has-brand');
+    } else {
+      document.body.classList.remove('has-brand');
+    }
+  }
+  // Hook sur uxSettingsSave pour réappliquer après save
+  setInterval(applyBrand, 2000);
+  setTimeout(applyBrand, 600);
+
+  // ════════ 2. ANIMATION COUNT-UP SUR LES KPI ════════
+  function parseNumeric(text){
+    if(!text) return null;
+    // Extrait les chiffres en gérant espaces, virgules, €, %, etc.
+    const m = String(text).replace(/[ \s]/g,'').match(/-?\d+([.,]\d+)?/);
+    if(!m) return null;
+    return parseFloat(m[0].replace(',','.'));
+  }
+  function animateNumber(el, finalText, durationMs){
+    if(!el) return;
+    const finalNum = parseNumeric(finalText);
+    if(finalNum === null || Math.abs(finalNum) < 1){ el.textContent = finalText; return; }
+    const startTime = Date.now();
+    const startNum = 0;
+    function step(){
+      const t = Math.min(1, (Date.now() - startTime) / durationMs);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const cur = startNum + (finalNum - startNum) * eased;
+      // Reproduit le format original (€, %, espaces)
+      const formatted = finalText.replace(/-?\d+([.,]\d+)?/, formatNumber(cur, finalText));
+      el.textContent = formatted;
+      if(t < 1) requestAnimationFrame(step);
+      else el.textContent = finalText;
+    }
+    requestAnimationFrame(step);
+  }
+  function formatNumber(n, template){
+    const hasComma = template.includes(',') && /\d,\d/.test(template);
+    const isInt = !template.match(/\d[.,]\d/);
+    const v = Math.round(n * (isInt ? 1 : 100)) / (isInt ? 1 : 100);
+    const parts = String(Math.abs(v)).split('.');
+    const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' '); // espace insécable
+    let out = (v < 0 ? '-' : '') + intPart + (parts[1] ? (hasComma ? ',' : '.') + parts[1].padEnd(2,'0') : (isInt ? '' : (hasComma?',00':'.00')));
+    return out;
+  }
+  function runKpiAnim(){
+    if(!document.querySelector('#p-dashboard.on')) return;
+    ['d-ca','d-tva','d-treso','d-net'].forEach(id => {
+      const el = document.getElementById(id);
+      if(!el || el.dataset.animated) return;
+      const t = el.textContent.trim();
+      if(t === '—' || !parseNumeric(t)) return;
+      el.dataset.animated = '1';
+      animateNumber(el, t, 900);
+      el.classList.add('ux-count-pop');
+      setTimeout(() => el.classList.remove('ux-count-pop'), 600);
+    });
+  }
+  // Hook après renderDash
+  const origRenderDash = window.renderDash;
+  if(typeof origRenderDash === 'function'){
+    window.renderDash = function(){
+      const r = origRenderDash.apply(this, arguments);
+      // Reset le flag pour re-animer
+      ['d-ca','d-tva','d-treso','d-net'].forEach(id => { const el = document.getElementById(id); if(el) delete el.dataset.animated; });
+      setTimeout(runKpiAnim, 80);
+      return r;
+    };
+  }
+
+  // ════════ 3. WIDGET ACTIVITÉ RÉCENTE SUR DASHBOARD ════════
+  // On lit hist via accès direct (let in same page → script scope partagé)
+  function readHist(){
+    try { return (typeof hist !== 'undefined' && Array.isArray(hist)) ? hist : []; } catch(e){ return []; }
+  }
+  function ensureActivityWidget(){
+    const dash = document.getElementById('p-dashboard');
+    if(!dash) return;
+    let card = document.getElementById('ux-act-card');
+    if(!card){
+      card = document.createElement('div');
+      card.id = 'ux-act-card';
+      card.className = 'ux-act-card';
+      card.innerHTML = '<div class="ux-act-hd">⏰ Activité récente <span class="more" id="ux-act-more">Voir tout l\'historique →</span></div><div class="ux-act-list" id="ux-act-list"></div>';
+      dash.appendChild(card);
+      card.querySelector('#ux-act-more').onclick = () => {
+        if(typeof nav === 'function'){
+          const el = document.querySelector('[onclick*="nav(\'historique\'"]');
+          el ? nav('historique', el) : nav('historique');
+        }
+      };
+    }
+    renderActivity();
+  }
+  function renderActivity(){
+    const list = document.getElementById('ux-act-list');
+    if(!list) return;
+    const h = readHist().slice(0, 7);
+    if(!h.length){
+      list.innerHTML = '<div class="ux-act-empty"><span class="illu">⏰</span>Aucune activité récente — vos prochaines actions apparaîtront ici.</div>';
+      return;
+    }
+    list.innerHTML = h.map(it => 
+      '<div class="ux-act-row">' +
+      '<div class="dot ' + (it.color||'ok') + '"></div>' +
+      '<div class="body"><div class="msg">' + (it.msg||'').replace(/</g,'&lt;') + '</div>' +
+      '<div class="meta">' + (it.date||'') + ' · ' + (it.user||'—') + '</div></div>' +
+      '<span class="type">' + (it.type||'') + '</span></div>'
+    ).join('');
+  }
+  // Hook sur addH pour rafraîchir l'activité quand un nouvel item est ajouté
+  const origAddH = window.addH;
+  if(typeof origAddH === 'function'){
+    window.addH = function(){
+      const r = origAddH.apply(this, arguments);
+      setTimeout(renderActivity, 20);
+      return r;
+    };
+  }
+  // Inject when dashboard becomes active
+  setInterval(() => { if(document.querySelector('#p-dashboard.on')) ensureActivityWidget(); }, 1500);
+
+  // ════════ 4. TOAST UNDO (générique, utilisé par l'import CSV) ════════
+  let toastTimer = null;
+  let toastCountdownTimer = null;
+  window.uxToast = function(opts){
+    // opts = { msg, sub?, action?, actionLabel?, countdown? }
+    clearTimeout(toastTimer); clearInterval(toastCountdownTimer);
+    const t = document.getElementById('ux-toast');
+    document.getElementById('ux-toast-lbl').firstChild.textContent = opts.msg || '';
+    document.getElementById('ux-toast-sub').textContent = opts.sub || '';
+    const btn = document.getElementById('ux-toast-action');
+    if(opts.action){
+      btn.style.display = '';
+      let remaining = opts.countdown || 10;
+      btn.textContent = (opts.actionLabel || 'Annuler') + ' (' + remaining + 's)';
+      btn.onclick = () => { try{ opts.action(); } catch(e){ console.warn(e); } uxToastHide(); };
+      toastCountdownTimer = setInterval(() => {
+        remaining--;
+        if(remaining <= 0){ uxToastHide(); return; }
+        btn.textContent = (opts.actionLabel || 'Annuler') + ' (' + remaining + 's)';
+      }, 1000);
+      toastTimer = setTimeout(uxToastHide, (opts.countdown || 10) * 1000);
+    } else {
+      btn.style.display = 'none';
+      toastTimer = setTimeout(uxToastHide, 4000);
+    }
+    t.classList.add('on');
+  };
+  window.uxToastHide = function(){
+    clearTimeout(toastTimer); clearInterval(toastCountdownTimer);
+    document.getElementById('ux-toast').classList.remove('on');
+  };
+
+  // ════════ 5. UNDO IMPORT CSV : hook sur uxImportGo ════════
+  const origImportGo = window.uxImportGo;
+  if(typeof origImportGo === 'function'){
+    window.uxImportGo = function(){
+      // Compte les clients avant
+      const u = curUser();
+      const before = (u && u.data && Array.isArray(u.data.clients)) ? u.data.clients.length : 0;
+      // Hook : appelé après le traitement
+      const r = origImportGo.apply(this, arguments);
+      // Persiste pour avoir le bon comptage après
+      setTimeout(() => {
+        try { if(typeof persistUserData === 'function') persistUserData(); } catch(e){}
+        const u2 = curUser();
+        const after = (u2 && u2.data && Array.isArray(u2.data.clients)) ? u2.data.clients.length : 0;
+        const added = after - before;
+        if(added > 0){
+          uxToast({
+            msg: '✓ ' + added + ' client' + (added>1?'s':'') + ' importé' + (added>1?'s':''),
+            sub: 'Vous pouvez encore annuler cette opération',
+            action: function(){ undoImport(added); },
+            actionLabel: 'Annuler',
+            countdown: 12
+          });
+        }
+      }, 400);
+      return r;
+    };
+  }
+  function undoImport(count){
+    if(typeof delClient !== 'function'){ if(typeof notif==='function') notif('Annulation impossible'); return; }
+    const origConfirm = window.confirm; window.confirm = () => true;
+    let removed = 0;
+    for(let i = 0; i < count; i++){
+      try {
+        const u = curUser();
+        const len = (u && u.data && Array.isArray(u.data.clients)) ? u.data.clients.length : 0;
+        if(len === 0) break;
+        delClient(len - 1);
+        if(typeof persistUserData === 'function') persistUserData();
+        removed++;
+      } catch(e){ console.warn(e); break; }
+    }
+    window.confirm = origConfirm;
+    if(typeof notif === 'function') notif('Import annulé · ' + removed + ' client' + (removed>1?'s':'') + ' supprimé' + (removed>1?'s':''));
+  }
+})();
+</script>
+
+
 </body>
 </html>
