@@ -4336,7 +4336,7 @@ document.head.appendChild(cabStyle);
 <div class="ov" id="ov-onb-logo"><div class="modal">
   <div class="mh"><span>🎨 Ajouter votre logo</span><button class="btn btn-sm" onclick="closeOv('ov-onb-logo')">✕</button></div>
   <div class="fg">
-    <div class="fgg full"><label>Image (PNG/JPG, max 500 Ko)</label><input type="file" id="onb-logo-file" accept="image/png,image/jpeg,image/svg+xml" onchange="onbLogoPreview(event)"></div>
+    <div class="fgg full"><label>Image (PNG/JPG/SVG, max 500 Ko)</label><input type="file" id="onb-logo-file" accept="image/png,image/jpeg,image/svg+xml" onchange="onbLogoPreview(event)"></div>
     <div class="fgg full"><label>Aperçu</label><div id="onb-logo-prev" style="min-height:80px;padding:1rem;background:var(--bg3);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--tx2);font-size:12px;">Aucun logo sélectionné</div></div>
   </div>
   <div class="mf"><button class="btn" onclick="closeOv('ov-onb-logo')">Annuler</button><button class="btn btn-gr" onclick="onbLogoSave()">Enregistrer le logo</button></div>
@@ -4362,10 +4362,22 @@ document.head.appendChild(cabStyle);
     { id:'logo',     emoji:'🎨', label:'Ajouter votre logo',            go:'onbGoLogo'    },
     { id:'tva',      emoji:'%',  label:'Configurer la TVA',             go:'onbGoTva'     }
   ];
-  function key(){ return 'cpme_onboarding_' + ((window.me && me.email) || 'anon'); }
-  function get(){ return Object.assign({company:false,client:false,invoice:false,logo:false,tva:false,dismissed:false}, lsGet(key()) || {}); }
-  function set(s){ lsSet(key(), s); }
+
+  // ─ Helper : récupère le user courant depuis localStorage (let me=null pas exposé sur window) ─
+  function currentUser(){
+    try {
+      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      if(!s) return null;
+      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      return us.find(u => u.email === s.email) || null;
+    } catch(e){ return null; }
+  }
+
+  function key(){ const u = currentUser(); return 'cpme_onboarding_' + (u ? u.email : 'anon'); }
+  function get(){ return Object.assign({company:false,client:false,invoice:false,logo:false,tva:false,dismissed:false}, JSON.parse(localStorage.getItem(key())||'null') || {}); }
+  function set(s){ localStorage.setItem(key(), JSON.stringify(s)); }
   function countDone(s){ return STEPS.filter(st => s[st.id]).length; }
+
   function render(){
     const s = get();
     const done = countDone(s), total = STEPS.length;
@@ -4382,6 +4394,7 @@ document.head.appendChild(cabStyle);
       list.innerHTML = STEPS.map(st => '<div class="onb-item ' + (s[st.id]?'done':'') + '" onclick="' + st.go + '()"><div class="onb-check">' + (s[st.id]?'✓':st.emoji) + '</div><div class="onb-text">' + st.label + '</div><div class="onb-go">Aller →</div></div>').join('');
     }
   }
+
   function mark(id){
     const s = get();
     if(s[id]) return;
@@ -4392,6 +4405,7 @@ document.head.appendChild(cabStyle);
       setTimeout(() => { if(typeof notif === 'function') notif('🎉 Guide terminé — bravo !'); }, 700);
     }
   }
+
   window.onbToggle = function(){ const p = document.getElementById('onb-panel'); if(p) p.classList.toggle('open'); };
   window.onbSkip = function(){
     if(!confirm('Masquer le guide ? Il reste accessible via le bouton 🎯 en bas à droite.')) return;
@@ -4399,7 +4413,7 @@ document.head.appendChild(cabStyle);
     const p = document.getElementById('onb-panel'); if(p) p.classList.remove('open');
   };
   window.onbGoCompany = function(){
-    document.getElementById('onb-panel').classList.remove('open');
+    const p = document.getElementById('onb-panel'); if(p) p.classList.remove('open');
     if(typeof nav === 'function'){
       const el = document.querySelector("[onclick*=\"nav('multi-company'\"]");
       if(el) nav('multi-company', el); else nav('multi-company');
@@ -4407,7 +4421,7 @@ document.head.appendChild(cabStyle);
     setTimeout(() => { if(typeof openOv==='function') openOv('ov-add-company'); }, 150);
   };
   window.onbGoClient = function(){
-    document.getElementById('onb-panel').classList.remove('open');
+    const p = document.getElementById('onb-panel'); if(p) p.classList.remove('open');
     if(typeof nav === 'function'){
       const el = document.querySelector("[onclick*=\"nav('clients'\"]");
       if(el) nav('clients', el); else nav('clients');
@@ -4415,8 +4429,10 @@ document.head.appendChild(cabStyle);
     setTimeout(() => { if(typeof openClientModal==='function') openClientModal(-1); }, 150);
   };
   window.onbGoInvoice = function(){
-    document.getElementById('onb-panel').classList.remove('open');
-    if((window.clients||[]).length === 0){
+    const p = document.getElementById('onb-panel'); if(p) p.classList.remove('open');
+    const u = currentUser();
+    const hasClient = u && u.data && Array.isArray(u.data.clients) && u.data.clients.length > 0;
+    if(!hasClient){
       if(typeof notif === 'function') notif('Ajoutez d\'abord un client');
       return window.onbGoClient();
     }
@@ -4427,13 +4443,14 @@ document.head.appendChild(cabStyle);
     setTimeout(() => { if(typeof openFactureModal==='function') openFactureModal(-1); }, 150);
   };
   window.onbGoLogo = function(){
-    document.getElementById('onb-panel').classList.remove('open');
+    const p = document.getElementById('onb-panel'); if(p) p.classList.remove('open');
     if(typeof openOv==='function') openOv('ov-onb-logo');
   };
   window.onbGoTva = function(){
-    document.getElementById('onb-panel').classList.remove('open');
+    const p = document.getElementById('onb-panel'); if(p) p.classList.remove('open');
     if(typeof openOv==='function') openOv('ov-onb-tva');
   };
+
   let pendingLogo = null;
   window.onbLogoPreview = function(e){
     const f = e.target.files && e.target.files[0];
@@ -4449,13 +4466,13 @@ document.head.appendChild(cabStyle);
   };
   window.onbLogoSave = function(){
     if(!pendingLogo){ alert('Choisissez une image'); return; }
-    if(window.me){
-      me.logo = pendingLogo;
-      const users = (typeof getUsers==='function' ? getUsers() : (lsGet('cpme_users')||[]));
-      const idx = users.findIndex(u => u.email === me.email);
-      if(idx >= 0){ users[idx].logo = pendingLogo; if(typeof saveUsers==='function') saveUsers(users); else lsSet('cpme_users', users); }
+    const u = currentUser();
+    if(u){
+      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const idx = us.findIndex(x => x.email === u.email);
+      if(idx >= 0){ us[idx].logo = pendingLogo; localStorage.setItem('cpme_users', JSON.stringify(us)); }
     }
-    closeOv('ov-onb-logo');
+    if(typeof closeOv==='function') closeOv('ov-onb-logo');
     mark('logo');
     pendingLogo = null;
     const f = document.getElementById('onb-logo-file'); if(f) f.value = '';
@@ -4467,15 +4484,16 @@ document.head.appendChild(cabStyle);
       period: document.getElementById('onb-tva-period').value,
       num:    document.getElementById('onb-tva-num').value.trim()
     };
-    if(window.me){
-      me.tva = cfg;
-      const users = (typeof getUsers==='function' ? getUsers() : (lsGet('cpme_users')||[]));
-      const idx = users.findIndex(u => u.email === me.email);
-      if(idx >= 0){ users[idx].tva = cfg; if(typeof saveUsers==='function') saveUsers(users); else lsSet('cpme_users', users); }
+    const u = currentUser();
+    if(u){
+      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const idx = us.findIndex(x => x.email === u.email);
+      if(idx >= 0){ us[idx].tva = cfg; localStorage.setItem('cpme_users', JSON.stringify(us)); }
     }
-    closeOv('ov-onb-tva');
+    if(typeof closeOv==='function') closeOv('ov-onb-tva');
     mark('tva');
   };
+
   function wrap(name, after){
     const orig = window[name];
     if(typeof orig !== 'function') return;
@@ -4485,22 +4503,35 @@ document.head.appendChild(cabStyle);
       return r;
     };
   }
-  wrap('saveCompany', function(){ if((window.companies||[]).length > 0) mark('company'); });
-  wrap('saveClient',  function(){ if((window.clients ||[]).length > 0) mark('client');  });
-  wrap('saveFac',     function(){ if((window.factures||[]).length > 0) mark('invoice'); });
+  // Save hooks : marquage auto à chaque création
+  wrap('saveCompany', function(){ mark('company'); });
+  wrap('saveClient',  function(){ mark('client');  });
+  wrap('saveFac',     function(){ mark('invoice'); });
+
   window.cpmeOnboardingInit = function(user){
+    user = user || currentUser();
     const s = get();
-    if((window.companies||[]).length > 0) s.company = true;
-    if((window.clients ||[]).length > 0) s.client  = true;
-    if((window.factures||[]).length > 0) s.invoice = true;
     if(user && user.logo) s.logo = true;
     if(user && user.tva)  s.tva  = true;
+    const d = (user && user.data) || {};
+    if(Array.isArray(d.clients)  && d.clients.length  > 0) s.client  = true;
+    if(Array.isArray(d.factures) && d.factures.length > 0) s.invoice = true;
     set(s);
     render();
     if(!s.dismissed && countDone(s) === 0){
       setTimeout(() => { const p = document.getElementById('onb-panel'); if(p) p.classList.add('open'); }, 900);
     }
   };
+
+  // Auto-bootstrap : launchApp peut avoir déjà tourné AVANT que mon script soit parsé
+  function selfBoot(){ const u = currentUser(); if(u) window.cpmeOnboardingInit(u); else render(); }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', () => setTimeout(selfBoot, 250));
+  } else {
+    setTimeout(selfBoot, 100);
+  }
+  // Hook launchApp pour les logins ultérieurs (depuis le formulaire)
+  setTimeout(() => wrap('launchApp', function(user){ try { window.cpmeOnboardingInit(user); } catch(e){} }), 50);
 })();
 </script>
 
