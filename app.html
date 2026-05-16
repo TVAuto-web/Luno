@@ -2129,6 +2129,7 @@ function launchApp(user,status){
   setTimeout(applySidebarLocks, 80);
   setTimeout(()=>{ if(typeof backupHistory!=='undefined'&&backupHistory.length===0) createAutoSave(); }, 150);
   renderDash();
+  if(typeof cpmeOnboardingInit==='function') cpmeOnboardingInit(user);
 }
 
 function loadUserData(email){
@@ -4284,5 +4285,224 @@ cabStyle.textContent=`
 `;
 document.head.appendChild(cabStyle);
 </script>
+
+<!-- ════ GUIDE DE DÉMARRAGE (première connexion) ════ -->
+<style>
+.onb-fab{position:fixed;bottom:24px;right:24px;z-index:9998;background:var(--gr);color:#fff;border:none;padding:11px 16px;border-radius:999px;cursor:pointer;box-shadow:0 8px 24px rgba(29,158,117,.35);font:600 13px Inter,system-ui,sans-serif;display:none;align-items:center;gap:8px;transition:transform .15s,box-shadow .15s;}
+.onb-fab:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(29,158,117,.45);}
+.onb-fab-count{background:rgba(255,255,255,.22);padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;}
+.onb-panel{position:fixed;bottom:88px;right:24px;width:380px;max-width:calc(100vw - 48px);background:var(--bg0);border:1px solid var(--bd);border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,.22);z-index:9999;font-family:Inter,system-ui,sans-serif;display:none;flex-direction:column;overflow:hidden;}
+.onb-panel.open{display:flex;animation:onbIn .22s ease;}
+@keyframes onbIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.onb-head{padding:1rem 1.25rem;border-bottom:1px solid var(--bd);position:relative;}
+.onb-title{font-size:15px;font-weight:700;color:var(--tx0);margin-bottom:4px;}
+.onb-sub{font-size:12px;color:var(--tx1);}
+.onb-progress{height:5px;background:var(--bg2);border-radius:3px;margin-top:.75rem;overflow:hidden;}
+.onb-bar{height:100%;background:linear-gradient(90deg,var(--gr),#26b385);width:0;transition:width .35s ease;}
+.onb-list{padding:.5rem;max-height:380px;overflow-y:auto;}
+.onb-item{display:flex;align-items:center;gap:.75rem;padding:.7rem .85rem;border-radius:10px;cursor:pointer;transition:background .12s;}
+.onb-item:hover{background:var(--bg3);}
+.onb-item.done{opacity:.55;}
+.onb-check{flex-shrink:0;width:24px;height:24px;border:2px solid var(--bd2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--bg0);}
+.onb-item.done .onb-check{background:var(--gr);border-color:var(--gr);color:#fff;}
+.onb-text{flex:1;font-size:13px;font-weight:500;color:var(--tx0);line-height:1.3;}
+.onb-item.done .onb-text{text-decoration:line-through;color:var(--tx1);}
+.onb-go{font-size:11px;color:var(--gr);font-weight:700;letter-spacing:.3px;}
+.onb-item.done .onb-go{display:none;}
+.onb-foot{padding:.7rem 1.25rem;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;gap:.5rem;}
+.onb-skip{background:none;border:none;color:var(--tx1);font-size:12px;cursor:pointer;font-family:inherit;padding:0;}
+.onb-skip:hover{color:var(--tx0);text-decoration:underline;}
+.onb-msg{font-size:11px;color:var(--tx2);}
+.onb-x{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--tx2);font-size:18px;cursor:pointer;width:28px;height:28px;border-radius:6px;}
+.onb-x:hover{background:var(--bg3);color:var(--tx0);}
+</style>
+
+<button class="onb-fab" id="onb-fab" onclick="onbToggle()">🎯 Guide démarrage <span class="onb-fab-count" id="onb-fab-count">0/5</span></button>
+
+<div class="onb-panel" id="onb-panel">
+  <button class="onb-x" onclick="onbToggle()" aria-label="Fermer">×</button>
+  <div class="onb-head">
+    <div class="onb-title">Bienvenue dans ComptaPME Pro 👋</div>
+    <div class="onb-sub">Lancez-vous en 5 étapes — environ 3 min.</div>
+    <div class="onb-progress"><div class="onb-bar" id="onb-bar"></div></div>
+  </div>
+  <div class="onb-list" id="onb-list"></div>
+  <div class="onb-foot">
+    <button class="onb-skip" onclick="onbSkip()">Masquer le guide</button>
+    <span class="onb-msg" id="onb-msg"></span>
+  </div>
+</div>
+
+<div class="ov" id="ov-onb-logo"><div class="modal">
+  <div class="mh"><span>🎨 Ajouter votre logo</span><button class="btn btn-sm" onclick="closeOv('ov-onb-logo')">✕</button></div>
+  <div class="fg">
+    <div class="fgg full"><label>Image (PNG/JPG, max 500 Ko)</label><input type="file" id="onb-logo-file" accept="image/png,image/jpeg,image/svg+xml" onchange="onbLogoPreview(event)"></div>
+    <div class="fgg full"><label>Aperçu</label><div id="onb-logo-prev" style="min-height:80px;padding:1rem;background:var(--bg3);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--tx2);font-size:12px;">Aucun logo sélectionné</div></div>
+  </div>
+  <div class="mf"><button class="btn" onclick="closeOv('ov-onb-logo')">Annuler</button><button class="btn btn-gr" onclick="onbLogoSave()">Enregistrer le logo</button></div>
+</div></div>
+
+<div class="ov" id="ov-onb-tva"><div class="modal">
+  <div class="mh"><span>% Configurer la TVA</span><button class="btn btn-sm" onclick="closeOv('ov-onb-tva')">✕</button></div>
+  <div class="fg">
+    <div class="fgg full"><label>Régime fiscal</label><select id="onb-tva-regime"><option value="franchise">Franchise en base (pas de TVA)</option><option value="reel" selected>Régime réel (TVA collectée)</option><option value="simplifie">Régime simplifié</option></select></div>
+    <div class="fgg"><label>Taux par défaut</label><select id="onb-tva-taux"><option value="20" selected>20 % (normal)</option><option value="10">10 % (intermédiaire)</option><option value="5.5">5,5 % (réduit)</option><option value="2.1">2,1 % (super réduit)</option><option value="0">0 % (exonéré)</option></select></div>
+    <div class="fgg"><label>Périodicité déclaration</label><select id="onb-tva-period"><option value="mensuelle">Mensuelle</option><option value="trimestrielle" selected>Trimestrielle</option><option value="annuelle">Annuelle</option></select></div>
+    <div class="fgg full"><label>N° TVA intracommunautaire (optionnel)</label><input type="text" id="onb-tva-num" placeholder="FR12345678901"></div>
+  </div>
+  <div class="mf"><button class="btn" onclick="closeOv('ov-onb-tva')">Annuler</button><button class="btn btn-gr" onclick="onbTvaSave()">Enregistrer la TVA</button></div>
+</div></div>
+
+<script>
+(function(){
+  const STEPS = [
+    { id:'company',  emoji:'🏢', label:'Créer votre entreprise',       go:'onbGoCompany' },
+    { id:'client',   emoji:'👥', label:'Ajouter votre premier client',  go:'onbGoClient'  },
+    { id:'invoice',  emoji:'📄', label:'Créer votre première facture',  go:'onbGoInvoice' },
+    { id:'logo',     emoji:'🎨', label:'Ajouter votre logo',            go:'onbGoLogo'    },
+    { id:'tva',      emoji:'%',  label:'Configurer la TVA',             go:'onbGoTva'     }
+  ];
+  function key(){ return 'cpme_onboarding_' + ((window.me && me.email) || 'anon'); }
+  function get(){ return Object.assign({company:false,client:false,invoice:false,logo:false,tva:false,dismissed:false}, lsGet(key()) || {}); }
+  function set(s){ lsSet(key(), s); }
+  function countDone(s){ return STEPS.filter(st => s[st.id]).length; }
+  function render(){
+    const s = get();
+    const done = countDone(s), total = STEPS.length;
+    const fab = document.getElementById('onb-fab');
+    const cnt = document.getElementById('onb-fab-count');
+    const bar = document.getElementById('onb-bar');
+    const msg = document.getElementById('onb-msg');
+    const list = document.getElementById('onb-list');
+    if(fab) fab.style.display = (done === total) ? 'none' : 'inline-flex';
+    if(cnt) cnt.textContent = done + '/' + total;
+    if(bar) bar.style.width = (100 * done / total) + '%';
+    if(msg) msg.textContent = done === total ? '🎉 Bravo, tout est fait !' : (done > 0 ? done + ' / ' + total + ' validées' : '');
+    if(list){
+      list.innerHTML = STEPS.map(st => '<div class="onb-item ' + (s[st.id]?'done':'') + '" onclick="' + st.go + '()"><div class="onb-check">' + (s[st.id]?'✓':st.emoji) + '</div><div class="onb-text">' + st.label + '</div><div class="onb-go">Aller →</div></div>').join('');
+    }
+  }
+  function mark(id){
+    const s = get();
+    if(s[id]) return;
+    s[id] = true; set(s); render();
+    const label = (STEPS.find(x=>x.id===id)||{}).label || id;
+    if(typeof notif === 'function') notif('✓ ' + label);
+    if(countDone(s) === STEPS.length){
+      setTimeout(() => { if(typeof notif === 'function') notif('🎉 Guide terminé — bravo !'); }, 700);
+    }
+  }
+  window.onbToggle = function(){ const p = document.getElementById('onb-panel'); if(p) p.classList.toggle('open'); };
+  window.onbSkip = function(){
+    if(!confirm('Masquer le guide ? Il reste accessible via le bouton 🎯 en bas à droite.')) return;
+    const s = get(); s.dismissed = true; set(s);
+    const p = document.getElementById('onb-panel'); if(p) p.classList.remove('open');
+  };
+  window.onbGoCompany = function(){
+    document.getElementById('onb-panel').classList.remove('open');
+    if(typeof nav === 'function'){
+      const el = document.querySelector("[onclick*=\"nav('multi-company'\"]");
+      if(el) nav('multi-company', el); else nav('multi-company');
+    }
+    setTimeout(() => { if(typeof openOv==='function') openOv('ov-add-company'); }, 150);
+  };
+  window.onbGoClient = function(){
+    document.getElementById('onb-panel').classList.remove('open');
+    if(typeof nav === 'function'){
+      const el = document.querySelector("[onclick*=\"nav('clients'\"]");
+      if(el) nav('clients', el); else nav('clients');
+    }
+    setTimeout(() => { if(typeof openClientModal==='function') openClientModal(-1); }, 150);
+  };
+  window.onbGoInvoice = function(){
+    document.getElementById('onb-panel').classList.remove('open');
+    if((window.clients||[]).length === 0){
+      if(typeof notif === 'function') notif('Ajoutez d\'abord un client');
+      return window.onbGoClient();
+    }
+    if(typeof nav === 'function'){
+      const el = document.querySelector("[onclick*=\"nav('factures'\"]");
+      if(el) nav('factures', el); else nav('factures');
+    }
+    setTimeout(() => { if(typeof openFactureModal==='function') openFactureModal(-1); }, 150);
+  };
+  window.onbGoLogo = function(){
+    document.getElementById('onb-panel').classList.remove('open');
+    if(typeof openOv==='function') openOv('ov-onb-logo');
+  };
+  window.onbGoTva = function(){
+    document.getElementById('onb-panel').classList.remove('open');
+    if(typeof openOv==='function') openOv('ov-onb-tva');
+  };
+  let pendingLogo = null;
+  window.onbLogoPreview = function(e){
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    if(f.size > 500*1024){ alert('Image trop lourde (max 500 Ko)'); e.target.value=''; return; }
+    const r = new FileReader();
+    r.onload = ev => {
+      pendingLogo = ev.target.result;
+      const prev = document.getElementById('onb-logo-prev');
+      if(prev) prev.innerHTML = '<img src="' + pendingLogo + '" style="max-width:200px;max-height:100px;object-fit:contain;">';
+    };
+    r.readAsDataURL(f);
+  };
+  window.onbLogoSave = function(){
+    if(!pendingLogo){ alert('Choisissez une image'); return; }
+    if(window.me){
+      me.logo = pendingLogo;
+      const users = (typeof getUsers==='function' ? getUsers() : (lsGet('cpme_users')||[]));
+      const idx = users.findIndex(u => u.email === me.email);
+      if(idx >= 0){ users[idx].logo = pendingLogo; if(typeof saveUsers==='function') saveUsers(users); else lsSet('cpme_users', users); }
+    }
+    closeOv('ov-onb-logo');
+    mark('logo');
+    pendingLogo = null;
+    const f = document.getElementById('onb-logo-file'); if(f) f.value = '';
+  };
+  window.onbTvaSave = function(){
+    const cfg = {
+      regime: document.getElementById('onb-tva-regime').value,
+      taux:   parseFloat(document.getElementById('onb-tva-taux').value) || 20,
+      period: document.getElementById('onb-tva-period').value,
+      num:    document.getElementById('onb-tva-num').value.trim()
+    };
+    if(window.me){
+      me.tva = cfg;
+      const users = (typeof getUsers==='function' ? getUsers() : (lsGet('cpme_users')||[]));
+      const idx = users.findIndex(u => u.email === me.email);
+      if(idx >= 0){ users[idx].tva = cfg; if(typeof saveUsers==='function') saveUsers(users); else lsSet('cpme_users', users); }
+    }
+    closeOv('ov-onb-tva');
+    mark('tva');
+  };
+  function wrap(name, after){
+    const orig = window[name];
+    if(typeof orig !== 'function') return;
+    window[name] = function(){
+      const r = orig.apply(this, arguments);
+      try { after.apply(this, arguments); } catch(e){ console.warn('onb hook', name, e); }
+      return r;
+    };
+  }
+  wrap('saveCompany', function(){ if((window.companies||[]).length > 0) mark('company'); });
+  wrap('saveClient',  function(){ if((window.clients ||[]).length > 0) mark('client');  });
+  wrap('saveFac',     function(){ if((window.factures||[]).length > 0) mark('invoice'); });
+  window.cpmeOnboardingInit = function(user){
+    const s = get();
+    if((window.companies||[]).length > 0) s.company = true;
+    if((window.clients ||[]).length > 0) s.client  = true;
+    if((window.factures||[]).length > 0) s.invoice = true;
+    if(user && user.logo) s.logo = true;
+    if(user && user.tva)  s.tva  = true;
+    set(s);
+    render();
+    if(!s.dismissed && countDone(s) === 0){
+      setTimeout(() => { const p = document.getElementById('onb-panel'); if(p) p.classList.add('open'); }, 900);
+    }
+  };
+})();
+</script>
+
 </body>
 </html>
