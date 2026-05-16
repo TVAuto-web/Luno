@@ -5144,5 +5144,479 @@ document.head.appendChild(cabStyle);
 </script>
 
 
+<!-- ════════════════════════════════════════════════════════════════
+     UX-V2-BLOCK-MARKER : empty states, autosave forms, tour guidé,
+     CTA premium contextuels, fix positionnement toolbar V1
+══════════════════════════════════════════════════════════════════ -->
+<style>
+/* ─── FIX V1 : toolbar en écran moyen (820–1200 px) → icône seule ─── */
+@media (max-width: 1200px) and (min-width: 821px){
+  .ux-search-btn .ph, .ux-search-btn .ux-kbd { display: none !important; }
+  .ux-search-btn { min-width: auto !important; padding: 8px !important; }
+}
+
+/* ─── EMPTY STATES (couvre les tables existantes sans toucher au JS) ─── */
+tbody tr:only-child td[colspan]{
+  padding: 2.5rem 1rem !important;
+  position: relative;
+}
+tbody tr:only-child td[colspan]::before{
+  display: block;
+  font-size: 42px;
+  opacity: .25;
+  margin-bottom: .75rem;
+  line-height: 1;
+}
+/* Icônes contextuelles selon la table */
+#cl-tbl   tbody tr:only-child td[colspan]::before{ content:'👥'; }
+#fac-tbl  tbody tr:only-child td[colspan]::before{ content:'📄'; }
+#fo-tbl   tbody tr:only-child td[colspan]::before{ content:'🏭'; }
+#dv-tbl   tbody tr:only-child td[colspan]::before{ content:'📝'; }
+#ac-tbl   tbody tr:only-child td[colspan]::before{ content:'🧾'; }
+#sal-tbl  tbody tr:only-child td[colspan]::before{ content:'👔'; }
+#j-tbl    tbody tr:only-child td[colspan]::before{ content:'📚'; }
+#plan-tbl tbody tr:only-child td[colspan]::before{ content:'📒'; }
+#tr-tbl   tbody tr:only-child td[colspan]::before{ content:'💰'; }
+/* Fallback générique */
+tbody tr:only-child td[colspan]:not([data-emptyset])::before{ content:'📭'; }
+tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-size: 14px; }
+
+/* ─── BROUILLONS BANNIÈRE (autosave restore prompt) ─── */
+.ux-draft-banner{
+  margin: -6px -6px 8px;
+  padding: 8px 12px;
+  background: #fef9e7;
+  border: 1px solid #f5d76e;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #7a5a00;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.ux-draft-banner button{
+  font-size: 11px; padding: 4px 10px; border-radius: 6px; border: 1px solid transparent;
+  cursor: pointer; font-family: inherit; font-weight: 600;
+}
+.ux-draft-banner .restore{ background: #BA7517; color: #fff; }
+.ux-draft-banner .discard{ background: transparent; color: #7a5a00; border-color: #d4b85a; }
+
+/* ─── TOUR GUIDÉ OVERLAY ─── */
+.ux-tour-mask{
+  position: fixed; inset: 0; z-index: 10001;
+  background: rgba(15,25,35,.6); backdrop-filter: blur(2px);
+  display: none;
+}
+.ux-tour-mask.open{ display: block; animation: uxFadeIn .25s; }
+.ux-tour-spot{
+  position: absolute; border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(15,25,35,.6), 0 0 0 3px var(--gr,#1D9E75), 0 0 32px rgba(29,158,117,.5);
+  transition: all .35s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+}
+.ux-tour-card{
+  position: absolute; width: 320px; max-width: calc(100vw - 32px);
+  background: var(--bg0,#fff); border-radius: 14px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.35);
+  padding: 1.1rem 1.25rem; font-family: Inter,system-ui,sans-serif;
+  transition: all .35s cubic-bezier(.4,0,.2,1);
+}
+.ux-tour-card h3{ font-size: 15px; font-weight: 700; color: var(--tx0,#1a1a18); margin-bottom: .4rem; }
+.ux-tour-card p { font-size: 13px; color: var(--tx1,#62604b); line-height: 1.5; margin-bottom: .9rem; }
+.ux-tour-card .step{ font-size: 10px; color: var(--tx2,#999582); letter-spacing: .6px; text-transform: uppercase; font-weight: 700; margin-bottom: .4rem; }
+.ux-tour-foot{ display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ux-tour-foot .skip{ background: none; border: none; color: var(--tx2,#999582); font-size: 12px; cursor: pointer; padding: 4px 8px; font-family: inherit; }
+.ux-tour-foot .skip:hover{ color: var(--tx0,#1a1a18); }
+.ux-tour-foot .nav{ display: flex; gap: 6px; }
+.ux-tour-foot button.btn-go{
+  padding: 7px 14px; font-size: 12px; font-weight: 700; border-radius: 8px;
+  background: var(--gr,#1D9E75); color: #fff; border: none; cursor: pointer; font-family: inherit;
+}
+.ux-tour-foot button.btn-back{
+  padding: 7px 14px; font-size: 12px; font-weight: 600; border-radius: 8px;
+  background: transparent; color: var(--tx1,#62604b); border: 1px solid var(--bd,#dddad0); cursor: pointer; font-family: inherit;
+}
+.ux-tour-dots{ display: flex; gap: 5px; margin-top: 4px; }
+.ux-tour-dot{ width: 6px; height: 6px; border-radius: 50%; background: var(--bd,#dddad0); transition: all .2s; }
+.ux-tour-dot.on{ background: var(--gr,#1D9E75); width: 18px; border-radius: 3px; }
+
+/* ─── CTA PREMIUM contextuel ─── */
+.ux-prem-overlay{
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,.5);
+  display: none; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.ux-prem-overlay.open{ display: flex; animation: uxFadeIn .2s; }
+.ux-prem-card{
+  width: 460px; max-width: 100%;
+  background: var(--bg0,#fff); border-radius: 16px; padding: 1.75rem;
+  box-shadow: 0 32px 64px rgba(0,0,0,.4);
+  font-family: Inter,system-ui,sans-serif;
+}
+.ux-prem-card .badge{
+  display: inline-block; padding: 4px 10px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; letter-spacing: .4px; margin-bottom: 1rem;
+}
+.ux-prem-card .badge.plus    { background: #faeeda; color: #BA7517; }
+.ux-prem-card .badge.premium { background: #f5e6f5; color: #8b3a8b; }
+.ux-prem-card h2{ font-size: 22px; font-weight: 700; color: var(--tx0,#1a1a18); margin-bottom: .5rem; line-height: 1.25; }
+.ux-prem-card .sub{ font-size: 13px; color: var(--tx1,#62604b); margin-bottom: 1.25rem; line-height: 1.5; }
+.ux-prem-card ul{ list-style: none; padding: 0; margin: 0 0 1.25rem; }
+.ux-prem-card ul li{ padding: .35rem 0; font-size: 13px; color: var(--tx0,#1a1a18); display: flex; align-items: flex-start; gap: .55rem; }
+.ux-prem-card ul li::before{ content: '✓'; color: var(--gr,#1D9E75); font-weight: 700; flex-shrink: 0; }
+.ux-prem-card .actions{ display: flex; gap: 8px; flex-wrap: wrap; }
+.ux-prem-card .actions .primary{
+  flex: 1; padding: 11px; font-size: 13px; font-weight: 700; border-radius: 10px;
+  background: var(--gr,#1D9E75); color: #fff; border: none; cursor: pointer; font-family: inherit;
+}
+.ux-prem-card .actions .primary.premium-cta{ background: linear-gradient(135deg,#8b3a8b,#BA7517); }
+.ux-prem-card .actions .secondary{
+  padding: 11px 16px; font-size: 13px; font-weight: 600; border-radius: 10px;
+  background: var(--bg2,#f6f6f4); color: var(--tx1,#62604b); border: 1px solid var(--bd,#dddad0); cursor: pointer; font-family: inherit;
+}
+.ux-prem-card .price{
+  background: var(--bg2,#f6f6f4); padding: .85rem 1rem; border-radius: 10px;
+  font-size: 12px; color: var(--tx1,#62604b); margin-bottom: 1.25rem;
+}
+.ux-prem-card .price strong{ font-size: 18px; color: var(--tx0,#1a1a18); display: block; margin-bottom: 2px; }
+</style>
+
+<!-- HTML : tour, draft banner, premium CTA -->
+<div class="ux-tour-mask" id="ux-tour-mask">
+  <div class="ux-tour-spot" id="ux-tour-spot"></div>
+  <div class="ux-tour-card" id="ux-tour-card">
+    <div class="step" id="ux-tour-step">Étape 1 / 4</div>
+    <h3 id="ux-tour-title"></h3>
+    <p id="ux-tour-body"></p>
+    <div class="ux-tour-foot">
+      <button class="skip" onclick="uxTourSkip()">Passer le tour</button>
+      <div class="nav">
+        <button class="btn-back" id="ux-tour-back" onclick="uxTourPrev()" style="display:none;">← Retour</button>
+        <button class="btn-go" id="ux-tour-next" onclick="uxTourNext()">Suivant →</button>
+      </div>
+    </div>
+    <div class="ux-tour-dots" id="ux-tour-dots"></div>
+  </div>
+</div>
+
+<div class="ux-prem-overlay" id="ux-prem-overlay" onclick="if(event.target===this) uxPremClose()">
+  <div class="ux-prem-card">
+    <div class="badge" id="ux-prem-badge">PLUS</div>
+    <h2 id="ux-prem-title">Fonctionnalité PLUS</h2>
+    <div class="sub" id="ux-prem-sub"></div>
+    <ul id="ux-prem-list"></ul>
+    <div class="price" id="ux-prem-price"></div>
+    <div class="actions">
+      <button class="secondary" onclick="uxPremClose()">Plus tard</button>
+      <button class="primary" id="ux-prem-primary" onclick="uxPremGo()">Passer au plan supérieur →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ════════ HELPER ════════
+  function curUser(){
+    try {
+      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      if(!s) return null;
+      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      return us.find(u => u.email === s.email) || null;
+    } catch(e){ return null; }
+  }
+
+  // ════════ 1. AUTOSAVE BROUILLONS FORMULAIRES ════════
+  // Stratégie : sur chaque input/textarea/select dans une .ov, on debounce et persiste.
+  // Sur openOv(), si un brouillon existe, on propose la restauration via une bannière.
+  // Sur save réussi (saveClient/saveFac/etc.), on clear le brouillon.
+
+  const DRAFT_PREFIX = 'cpme_draft_';
+  let draftDebounce = null;
+
+  function draftKey(ovId){ const u = curUser(); return DRAFT_PREFIX + (u?u.email:'anon') + '_' + ovId; }
+
+  function collectFormState(ov){
+    const data = {};
+    ov.querySelectorAll('input, textarea, select').forEach(el => {
+      if(!el.id) return;
+      if(el.type === 'file' || el.type === 'button' || el.type === 'submit') return;
+      if(el.type === 'checkbox' || el.type === 'radio') data[el.id] = el.checked;
+      else data[el.id] = el.value;
+    });
+    return data;
+  }
+  function applyFormState(ov, data){
+    if(!data) return;
+    Object.entries(data).forEach(([id,v]) => {
+      const el = document.getElementById(id);
+      if(!el || !ov.contains(el)) return;
+      if(el.type === 'checkbox' || el.type === 'radio') el.checked = !!v;
+      else el.value = v;
+    });
+  }
+  function isEmptyState(d){
+    if(!d) return true;
+    return !Object.values(d).some(v => v && String(v).trim() !== '' && v !== 0 && v !== '0');
+  }
+
+  // Hook input events globalement sur .ov
+  document.addEventListener('input', function(e){
+    const ov = e.target.closest && e.target.closest('.ov.open');
+    if(!ov || !ov.id) return;
+    if(['ov-onb-logo','ov-onb-tva'].includes(ov.id)) return; // onboarding modaux gérés ailleurs
+    clearTimeout(draftDebounce);
+    draftDebounce = setTimeout(() => {
+      try {
+        const state = collectFormState(ov);
+        if(isEmptyState(state)){ localStorage.removeItem(draftKey(ov.id)); }
+        else { localStorage.setItem(draftKey(ov.id), JSON.stringify({state, ts: Date.now()})); }
+      } catch(e){}
+    }, 500);
+  });
+
+  function showDraftBanner(ov, draft){
+    // Remove existing
+    const existing = ov.querySelector('.ux-draft-banner'); if(existing) existing.remove();
+    const banner = document.createElement('div');
+    banner.className = 'ux-draft-banner';
+    const ago = Math.floor((Date.now() - draft.ts)/60000);
+    const agoStr = ago < 1 ? 'à l\'instant' : (ago < 60 ? 'il y a ' + ago + ' min' : 'il y a ' + Math.floor(ago/60) + ' h');
+    banner.innerHTML = '<span>💾 Brouillon trouvé (' + agoStr + ')</span><span><button class="discard">Ignorer</button> <button class="restore">Restaurer</button></span>';
+    const target = ov.querySelector('.fg') || ov.querySelector('.modal') || ov;
+    target.insertBefore(banner, target.firstChild);
+    banner.querySelector('.restore').onclick = () => { applyFormState(ov, draft.state); banner.remove(); if(typeof notif==='function') notif('Brouillon restauré ✓'); };
+    banner.querySelector('.discard').onclick = () => { localStorage.removeItem(draftKey(ov.id)); banner.remove(); };
+  }
+
+  // Wrap openOv et closeOv
+  function wrap(name, before, after){
+    const orig = window[name];
+    if(typeof orig !== 'function') return;
+    window[name] = function(){
+      try { if(before) before.apply(this, arguments); } catch(e){}
+      const r = orig.apply(this, arguments);
+      try { if(after) after.apply(this, arguments); } catch(e){}
+      return r;
+    };
+  }
+
+  wrap('openOv', null, function(id){
+    setTimeout(() => {
+      const ov = document.getElementById(id);
+      if(!ov || ['ov-onb-logo','ov-onb-tva','ov-onb-tour'].includes(id)) return;
+      // Détecte "nouveau" (formulaire vide) : on regarde si tous les champs sont vides
+      const state = collectFormState(ov);
+      const isNew = isEmptyState(state) || Object.values(state).filter(v => v && String(v).trim() !== '').length <= 2;
+      if(!isNew) return; // édition d'un item existant — pas de restore proposé
+      const stored = localStorage.getItem(draftKey(id));
+      if(!stored) return;
+      try {
+        const draft = JSON.parse(stored);
+        if(draft && draft.state && !isEmptyState(draft.state)) showDraftBanner(ov, draft);
+      } catch(e){}
+    }, 60);
+  });
+  // Clear draft après save réussi
+  function clearDraft(ovId){ try { localStorage.removeItem(draftKey(ovId)); } catch(e){} }
+  ['saveClient','saveFac','saveFourn','saveDevis','saveCompany'].forEach(fn => {
+    const orig = window[fn];
+    if(typeof orig !== 'function') return;
+    window[fn] = function(){
+      const r = orig.apply(this, arguments);
+      // Inspecter quel modal vient d'être fermé
+      ['ov-client','ov-fac','ov-fourn','ov-devis','ov-add-company'].forEach(clearDraft);
+      return r;
+    };
+  });
+
+  // ════════ 2. TOUR GUIDÉ (premier login uniquement) ════════
+  const TOUR_STEPS = [
+    {
+      target: '#sidebar-entreprise .nl, #sidebar-cabinet .nl, .sidebar',
+      pos: 'right',
+      title: 'Bienvenue ! 👋',
+      body: 'C\'est votre menu principal. Toutes les pages — tableau de bord, clients, factures, TVA — sont à un clic.'
+    },
+    {
+      target: '#ux-search-trigger',
+      pos: 'bottom',
+      title: 'Trouvez tout en 1 seconde 🔍',
+      body: 'Tapez <kbd>Ctrl + K</kbd> à tout moment pour chercher un client, une facture, une page. Ça change la vie.'
+    },
+    {
+      target: '#ux-bell-btn',
+      pos: 'bottom',
+      title: 'Restez sur les rails 🔔',
+      body: 'Les notifications vous alertent : factures en retard, déclaration TVA à faire, échéances. Cliquez la cloche dès qu\'il y a un nombre rouge.'
+    },
+    {
+      target: '#onb-fab',
+      pos: 'top',
+      title: 'Lancez-vous en 5 étapes 🎯',
+      body: 'Le guide démarrage en bas à droite vous accompagne pour configurer votre entreprise. Cliquez dessus quand vous êtes prêt.'
+    }
+  ];
+  let tourIdx = 0;
+
+  function tourKey(){ const u = curUser(); return 'cpme_tour_done_' + (u?u.email:'anon'); }
+  function tourShouldRun(){
+    if(!curUser()) return false;
+    if(localStorage.getItem(tourKey())) return false;
+    // Ne pas afficher si le user est encore sur l'écran auth
+    const wrap = document.getElementById('app-wrap');
+    return wrap && wrap.style.display !== 'none';
+  }
+  function findTourEl(sel){
+    for(const s of sel.split(',')){
+      const el = document.querySelector(s.trim());
+      if(el && el.offsetParent !== null) return el;
+    }
+    return null;
+  }
+  function tourPositionCard(targetRect, pos){
+    const card = document.getElementById('ux-tour-card');
+    const spot = document.getElementById('ux-tour-spot');
+    const pad = 8;
+    spot.style.left = (targetRect.left - pad) + 'px';
+    spot.style.top  = (targetRect.top  - pad) + 'px';
+    spot.style.width  = (targetRect.width + pad*2) + 'px';
+    spot.style.height = (targetRect.height + pad*2) + 'px';
+    const cw = 320, ch = card.offsetHeight || 200;
+    let l, t;
+    if(pos === 'right'){
+      l = targetRect.right + 16;
+      t = targetRect.top;
+      if(l + cw > window.innerWidth - 16){ pos = 'bottom'; }
+    }
+    if(pos === 'bottom'){
+      l = targetRect.left;
+      t = targetRect.bottom + 16;
+      if(t + ch > window.innerHeight - 16){ pos = 'top'; }
+    }
+    if(pos === 'top'){
+      l = targetRect.left + targetRect.width/2 - cw/2;
+      t = targetRect.top - ch - 16;
+    }
+    if(pos === 'left'){
+      l = targetRect.left - cw - 16;
+      t = targetRect.top;
+    }
+    l = Math.max(16, Math.min(l, window.innerWidth - cw - 16));
+    t = Math.max(16, Math.min(t, window.innerHeight - ch - 16));
+    card.style.left = l + 'px';
+    card.style.top  = t + 'px';
+  }
+  function renderTour(){
+    const step = TOUR_STEPS[tourIdx];
+    if(!step){ uxTourFinish(); return; }
+    const el = findTourEl(step.target);
+    const card = document.getElementById('ux-tour-card');
+    const dots = document.getElementById('ux-tour-dots');
+    document.getElementById('ux-tour-step').textContent = 'Étape ' + (tourIdx+1) + ' / ' + TOUR_STEPS.length;
+    document.getElementById('ux-tour-title').textContent = step.title;
+    document.getElementById('ux-tour-body').innerHTML = step.body;
+    document.getElementById('ux-tour-back').style.display = tourIdx === 0 ? 'none' : '';
+    document.getElementById('ux-tour-next').textContent = tourIdx === TOUR_STEPS.length-1 ? 'Terminer ✓' : 'Suivant →';
+    dots.innerHTML = TOUR_STEPS.map((_,i) => '<div class="ux-tour-dot ' + (i===tourIdx?'on':'') + '"></div>').join('');
+    if(el){
+      const r = el.getBoundingClientRect();
+      tourPositionCard(r, step.pos);
+      document.getElementById('ux-tour-spot').style.display = '';
+    } else {
+      // Pas d'élément cible → carte centrée
+      document.getElementById('ux-tour-spot').style.display = 'none';
+      card.style.left = (window.innerWidth/2 - 160) + 'px';
+      card.style.top  = (window.innerHeight/2 - 100) + 'px';
+    }
+  }
+  window.uxTourNext = function(){
+    if(tourIdx < TOUR_STEPS.length-1){ tourIdx++; renderTour(); }
+    else { uxTourFinish(); }
+  };
+  window.uxTourPrev = function(){ if(tourIdx > 0){ tourIdx--; renderTour(); } };
+  window.uxTourSkip = function(){
+    localStorage.setItem(tourKey(), '1');
+    document.getElementById('ux-tour-mask').classList.remove('open');
+  };
+  function uxTourFinish(){
+    localStorage.setItem(tourKey(), '1');
+    document.getElementById('ux-tour-mask').classList.remove('open');
+    if(typeof notif === 'function') notif('Tour terminé — bonne route ! 🎉');
+  }
+  window.uxStartTour = function(){
+    tourIdx = 0;
+    document.getElementById('ux-tour-mask').classList.add('open');
+    setTimeout(renderTour, 80);
+  };
+  // Auto-lancement au premier login (après que tout se soit chargé)
+  function tryStartTour(){
+    if(!tourShouldRun()) return;
+    setTimeout(() => { if(tourShouldRun()) uxStartTour(); }, 1500);
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', tryStartTour);
+  } else {
+    tryStartTour();
+  }
+  // Au resize, reposition
+  window.addEventListener('resize', function(){
+    const mask = document.getElementById('ux-tour-mask');
+    if(mask && mask.classList.contains('open')) renderTour();
+  });
+
+  // ════════ 3. CTA PREMIUM contextuel ════════
+  const PREM_VALUES = {
+    signature:   { tier:'plus', title:'Signature électronique', sub:'Faites signer vos devis en 30 secondes — par email, sécurisé, opposable.', bullets:['Signature légalement valide (eIDAS)','Tracking complet (vu / signé / refusé)','Modèles personnalisables','Sans logiciel à installer'] },
+    relances:    { tier:'plus', title:'Relances automatiques', sub:'Vos factures impayées vous coûtent du temps. Automatisez les relances et améliorez votre trésorerie.', bullets:['Règles : J+7, J+15, J+30…','Modèles d\'email personnalisables','Suivi des paiements après relance','Tableau de bord encours'] },
+    banque:      { tier:'plus', title:'Synchronisation bancaire', sub:'Vos opérations bancaires importées en temps réel, rapprochées automatiquement. Plus de saisie manuelle.', bullets:['Connexion sécurisée à 300+ banques','Catégorisation IA des dépenses','Rapprochement facture ↔ paiement','Mise à jour quotidienne'] },
+    ocr:         { tier:'plus', title:'OCR & Reconnaissance IA', sub:'Photographiez une facture, on extrait tout. Le scan papier devient une donnée comptable en 1 clic.', bullets:['Photo → écriture comptable','Multi-format (PDF, image)','Détection automatique TVA, total, fournisseur','50 documents/mois inclus'] },
+    analytics:   { tier:'premium', title:'Analytics avancé', sub:'Tableaux de bord détaillés, prévisions de trésorerie, KPIs métier. Pilotez votre activité avec précision.', bullets:['Prévisions de trésorerie à 90 jours','KPI par client, produit, période','Comparaisons multi-exercices','Export Excel automatisé'] },
+    'multi-company': { tier:'premium', title:'Multi-entreprises', sub:'Gérez plusieurs sociétés en un seul abonnement. Idéal pour les holdings et groupes.', bullets:['Jusqu\'à 5 entreprises','Vue consolidée','Bascule rapide entre dossiers','TVA et bilans séparés'] },
+    api:         { tier:'premium', title:'API publique', sub:'Connectez ComptaPME à votre stack. Webhooks, REST, lecture/écriture sécurisée.', bullets:['REST API complète','Webhooks événements','Tokens scoped','Documentation interactive'] },
+    'sauvegarde-avancee': { tier:'premium', title:'Sauvegardes avancées', sub:'Continuité d\'activité maximale. Vos données protégées avec une rétention longue durée.', bullets:['Rétention 1 an minimum','Sauvegardes chiffrées multi-régions','Restauration ponctuelle','Audit complet'] }
+  };
+  const PRICES = {
+    plus:    { label:'Plan PLUS — à partir de 7,90 € HT / mois', cta:'Passer au plan PLUS →', cls:'' },
+    premium: { label:'Plan PREMIUM — à partir de 15,90 € HT / mois', cta:'Passer au plan PREMIUM →', cls:'premium-cta' }
+  };
+  function uxPremShow(featureId){
+    const info = PREM_VALUES[featureId];
+    if(!info){ if(typeof showPaywall==='function') showPaywall(null); return; }
+    const tier = info.tier;
+    document.getElementById('ux-prem-badge').textContent = tier === 'plus' ? 'PLUS' : 'PREMIUM';
+    document.getElementById('ux-prem-badge').className = 'badge ' + tier;
+    document.getElementById('ux-prem-title').textContent = info.title;
+    document.getElementById('ux-prem-sub').textContent = info.sub;
+    document.getElementById('ux-prem-list').innerHTML = info.bullets.map(b => '<li>' + b + '</li>').join('');
+    document.getElementById('ux-prem-price').innerHTML = '<strong>Débloquez maintenant</strong>' + (PRICES[tier]?PRICES[tier].label:'');
+    const primary = document.getElementById('ux-prem-primary');
+    primary.textContent = (PRICES[tier]||{}).cta || 'Voir les plans →';
+    primary.className = 'primary' + (tier==='premium' ? ' premium-cta' : '');
+    document.getElementById('ux-prem-overlay').classList.add('open');
+  }
+  window.uxPremClose = function(){ document.getElementById('ux-prem-overlay').classList.remove('open'); };
+  window.uxPremGo = function(){ uxPremClose(); if(typeof showPaywall==='function') showPaywall(null); };
+  // Wrap navGated : si l'user a accès, on laisse passer ; sinon on affiche notre CTA
+  const origNavGated = window.navGated;
+  if(typeof origNavGated === 'function'){
+    window.navGated = function(page, tier, el){
+      // Détermine si l'user a accès
+      const u = curUser();
+      let hasAccess = false;
+      try {
+        if(typeof getStatus === 'function' && u){
+          const st = getStatus(u);
+          const plan = st && st.plan;
+          if(tier === 'plus' && ['plus','premium','trial','starter','pro','entreprise'].includes(plan)) hasAccess = true;
+          if(tier === 'premium' && ['premium','trial','pro','entreprise'].includes(plan)) hasAccess = true;
+        }
+      } catch(e){ hasAccess = false; }
+      if(hasAccess){ return origNavGated.apply(this, arguments); }
+      uxPremShow(page);
+    };
+  }
+})();
+</script>
+
+
 </body>
 </html>
