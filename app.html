@@ -5618,5 +5618,568 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
 </script>
 
 
+<!-- ════════════════════════════════════════════════════════════════
+     UX-V3-BLOCK-MARKER : switcher société, personnalisation,
+     import CSV clients
+══════════════════════════════════════════════════════════════════ -->
+<style>
+/* ─── Switcher entreprise dans la toolbar ─── */
+.ux-co-switcher{
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--bg0,#fff); border: 1px solid var(--bd,#dddad0);
+  border-radius: 10px; padding: 6px 10px;
+  font-size: 12px; color: var(--tx0,#1a1a18); cursor: pointer;
+  transition: all .15s; max-width: 220px;
+  font-family: Inter, system-ui, sans-serif;
+}
+.ux-co-switcher:hover{ background: var(--bg2,#f6f6f4); border-color: var(--bd2,#bdb9ab); }
+.ux-co-switcher .ico{ font-size: 14px; }
+.ux-co-switcher .nm{ flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; max-width: 140px; }
+.ux-co-switcher .ch{ font-size: 10px; color: var(--tx2,#999582); }
+
+/* ─── Settings modal (personnalisation entreprise) ─── */
+.ux-settings-overlay, .ux-import-overlay{
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,.45); display: none;
+  align-items: center; justify-content: center; padding: 1rem;
+}
+.ux-settings-overlay.open, .ux-import-overlay.open{ display: flex; animation: uxFadeIn .2s; }
+.ux-settings-panel, .ux-import-panel{
+  width: 560px; max-width: 100%; max-height: 85vh; overflow: hidden;
+  background: var(--bg0,#fff); border-radius: 16px;
+  box-shadow: 0 32px 64px rgba(0,0,0,.35);
+  font-family: Inter, system-ui, sans-serif;
+  display: flex; flex-direction: column;
+}
+.ux-settings-hd, .ux-import-hd{
+  padding: 1rem 1.25rem; border-bottom: 1px solid var(--bd,#dddad0);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.ux-settings-hd h3, .ux-import-hd h3{ font-size: 16px; font-weight: 700; color: var(--tx0,#1a1a18); margin: 0; }
+.ux-settings-tabs{
+  display: flex; gap: 4px; padding: .5rem 1rem; border-bottom: 1px solid var(--bd,#dddad0);
+  background: var(--bg2,#f6f6f4);
+}
+.ux-tab{
+  padding: 7px 14px; font-size: 12px; font-weight: 600; border-radius: 8px;
+  background: transparent; border: none; cursor: pointer; color: var(--tx1,#62604b);
+  font-family: inherit;
+}
+.ux-tab.on{ background: var(--bg0,#fff); color: var(--gr,#1D9E75); box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.ux-settings-body, .ux-import-body{
+  flex: 1; overflow-y: auto; padding: 1.25rem;
+}
+.ux-settings-section{ display: none; }
+.ux-settings-section.on{ display: block; animation: uxFadeIn .15s; }
+.ux-settings-section .fld{ margin-bottom: 1rem; }
+.ux-settings-section label{
+  display: block; font-size: 11px; font-weight: 600; color: var(--tx1,#62604b);
+  margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px;
+}
+.ux-settings-section input[type="text"], .ux-settings-section select, .ux-settings-section textarea{
+  width: 100%; padding: 9px 12px; border: 1px solid var(--bd,#dddad0); border-radius: 8px;
+  background: var(--bg0,#fff); color: var(--tx0,#1a1a18); font-size: 13px; box-sizing: border-box;
+  font-family: inherit;
+}
+.ux-settings-section input[type="color"]{
+  width: 50px; height: 38px; border: 1px solid var(--bd,#dddad0); border-radius: 8px; cursor: pointer;
+}
+.ux-color-row{ display: flex; align-items: center; gap: 12px; }
+.ux-color-row .swatch-preset{ display: flex; gap: 6px; }
+.ux-color-row .sw{ width: 24px; height: 24px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: border .15s; }
+.ux-color-row .sw:hover{ border-color: var(--bd,#dddad0); }
+.ux-settings-preview{
+  margin-top: 1rem; padding: 1rem; background: var(--bg2,#f6f6f4); border-radius: 10px; font-size: 12px;
+}
+.ux-settings-preview h5{ font-size: 11px; color: var(--tx2,#999582); text-transform: uppercase; margin-bottom: .5rem; }
+.ux-foot{ padding: .85rem 1.25rem; border-top: 1px solid var(--bd,#dddad0); display: flex; justify-content: flex-end; gap: 8px; }
+.ux-foot .btn-cancel{
+  padding: 8px 16px; font-size: 12px; font-weight: 600; border-radius: 8px;
+  background: transparent; color: var(--tx1,#62604b); border: 1px solid var(--bd,#dddad0); cursor: pointer; font-family: inherit;
+}
+.ux-foot .btn-save{
+  padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 8px;
+  background: var(--gr,#1D9E75); color: #fff; border: none; cursor: pointer; font-family: inherit;
+}
+.ux-foot .btn-save:disabled{ opacity: .4; cursor: not-allowed; }
+
+/* ─── Import CSV ─── */
+.ux-drop{
+  border: 2px dashed var(--bd2,#bdb9ab); border-radius: 12px;
+  padding: 2.5rem 1rem; text-align: center; cursor: pointer;
+  transition: all .18s; color: var(--tx1,#62604b);
+}
+.ux-drop:hover, .ux-drop.dragover{
+  background: rgba(29,158,117,.06); border-color: var(--gr,#1D9E75); color: var(--gr,#1D9E75);
+}
+.ux-drop .illu{ font-size: 38px; opacity: .35; margin-bottom: .5rem; display: block; }
+.ux-drop .ttl{ font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--tx0,#1a1a18); }
+.ux-drop .sub{ font-size: 11px; color: var(--tx2,#999582); }
+.ux-import-stats{ display: flex; gap: 12px; margin: 1rem 0; }
+.ux-import-stat{ flex: 1; padding: .75rem; background: var(--bg2,#f6f6f4); border-radius: 10px; text-align: center; }
+.ux-import-stat .v{ font-size: 22px; font-weight: 700; color: var(--tx0,#1a1a18); }
+.ux-import-stat .l{ font-size: 10px; color: var(--tx2,#999582); text-transform: uppercase; letter-spacing: .4px; margin-top: 2px; }
+.ux-import-stat.ok .v{ color: var(--gr,#1D9E75); }
+.ux-import-stat.warn .v{ color: #f5a623; }
+.ux-import-table{ max-height: 280px; overflow-y: auto; border: 1px solid var(--bd,#dddad0); border-radius: 10px; font-size: 12px; }
+.ux-import-table table{ width: 100%; border-collapse: collapse; }
+.ux-import-table th{ background: var(--bg2,#f6f6f4); padding: 8px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .4px; color: var(--tx2,#999582); position: sticky; top: 0; }
+.ux-import-table td{ padding: 8px 10px; border-top: 1px solid var(--bd,#dddad0); color: var(--tx0,#1a1a18); }
+.ux-import-table tr.invalid td{ color: var(--tx2,#999582); background: rgba(231,76,60,.05); }
+.ux-import-help{ font-size: 11px; color: var(--tx2,#999582); padding: .75rem; background: var(--bg2,#f6f6f4); border-radius: 8px; margin-top: 1rem; line-height: 1.5; }
+.ux-import-help code{ background: var(--bg0,#fff); padding: 1px 5px; border-radius: 3px; border: 1px solid var(--bd,#dddad0); font-size: 11px; }
+
+/* Bouton "📥 Importer" injecté à côté de "+ Nouveau client" */
+.ux-import-btn{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; margin-left: 8px;
+  background: var(--bg0,#fff); border: 1px solid var(--bd,#dddad0); border-radius: 8px;
+  font-size: 12px; font-weight: 600; color: var(--tx1,#62604b); cursor: pointer;
+  font-family: inherit; transition: all .15s;
+}
+.ux-import-btn:hover{ background: var(--bg2,#f6f6f4); border-color: var(--bd2,#bdb9ab); color: var(--tx0,#1a1a18); }
+</style>
+
+<!-- Settings modal -->
+<div class="ux-settings-overlay" id="ux-settings-overlay" onclick="if(event.target===this) uxSettingsClose()">
+  <div class="ux-settings-panel">
+    <div class="ux-settings-hd">
+      <h3>⚙ Personnalisation de l'entreprise</h3>
+      <button class="btn btn-sm" onclick="uxSettingsClose()">✕</button>
+    </div>
+    <div class="ux-settings-tabs">
+      <button class="ux-tab on" data-tab="apparence" onclick="uxSettingsTab('apparence')">🎨 Apparence</button>
+      <button class="ux-tab"    data-tab="documents" onclick="uxSettingsTab('documents')">📄 Documents</button>
+      <button class="ux-tab"    data-tab="devise"    onclick="uxSettingsTab('devise')">💱 Devise & format</button>
+    </div>
+    <div class="ux-settings-body">
+      <div class="ux-settings-section on" id="ux-sec-apparence">
+        <div class="fld">
+          <label>Couleur de marque (CTAs, en-têtes documents)</label>
+          <div class="ux-color-row">
+            <input type="color" id="ux-brand-color" value="#1D9E75" oninput="uxBrandPreview()">
+            <div class="swatch-preset">
+              <div class="sw" style="background:#1D9E75" onclick="uxSetColor('#1D9E75')" title="Vert sage (défaut)"></div>
+              <div class="sw" style="background:#0c4a6e" onclick="uxSetColor('#0c4a6e')" title="Bleu marine"></div>
+              <div class="sw" style="background:#7c2d12" onclick="uxSetColor('#7c2d12')" title="Terracotta"></div>
+              <div class="sw" style="background:#581c87" onclick="uxSetColor('#581c87')" title="Violet"></div>
+              <div class="sw" style="background:#1a1a18" onclick="uxSetColor('#1a1a18')" title="Noir"></div>
+            </div>
+            <span style="font-size:11px;color:var(--tx2,#999582);" id="ux-brand-hex">#1D9E75</span>
+          </div>
+        </div>
+        <div class="ux-settings-preview">
+          <h5>Aperçu</h5>
+          <button id="ux-prev-btn" style="padding:8px 16px;border-radius:8px;border:none;color:#fff;font-weight:700;font-family:inherit;cursor:default;font-size:12px;background:#1D9E75;">Bouton primaire</button>
+          <span id="ux-prev-bdg" style="display:inline-block;margin-left:8px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(29,158,117,.15);color:#1D9E75;">Badge marque</span>
+        </div>
+      </div>
+      <div class="ux-settings-section" id="ux-sec-documents">
+        <div class="fld">
+          <label>En-tête personnalisé (visible sur les factures et devis PDF)</label>
+          <textarea id="ux-doc-header" rows="3" placeholder="ComptaPME Pro\n123 rue de la République, 75001 Paris\nSIRET 123 456 789 00012"></textarea>
+        </div>
+        <div class="fld">
+          <label>Mention de pied de page (facultative)</label>
+          <input type="text" id="ux-doc-footer" placeholder="Merci de votre confiance — TVA non applicable (art. 293 B du CGI)">
+        </div>
+        <div class="ux-settings-preview">
+          <h5>Aperçu</h5>
+          <div id="ux-doc-preview" style="background:#fff;border:1px solid var(--bd,#dddad0);padding:.75rem;border-radius:8px;font-size:11px;color:#333;white-space:pre-wrap;font-family:Georgia,serif;line-height:1.5;">Renseignez votre en-tête ci-dessus pour voir l'aperçu.</div>
+        </div>
+      </div>
+      <div class="ux-settings-section" id="ux-sec-devise">
+        <div class="fld">
+          <label>Devise par défaut</label>
+          <select id="ux-currency">
+            <option value="EUR" selected>EUR — Euro (€)</option>
+            <option value="USD">USD — Dollar US ($)</option>
+            <option value="GBP">GBP — Livre sterling (£)</option>
+            <option value="CHF">CHF — Franc suisse (CHF)</option>
+            <option value="CAD">CAD — Dollar canadien ($)</option>
+            <option value="JPY">JPY — Yen japonais (¥)</option>
+          </select>
+        </div>
+        <div class="fld">
+          <label>Séparateur décimal</label>
+          <select id="ux-decimal">
+            <option value="comma" selected>, (virgule — convention française)</option>
+            <option value="dot">. (point — convention anglo-saxonne)</option>
+          </select>
+        </div>
+        <div class="ux-settings-preview">
+          <h5>Aperçu d'un montant</h5>
+          <span style="font-size:18px;font-weight:700;color:var(--gr,#1D9E75);" id="ux-curr-preview">1 234,56 €</span>
+        </div>
+      </div>
+    </div>
+    <div class="ux-foot">
+      <button class="btn-cancel" onclick="uxSettingsClose()">Annuler</button>
+      <button class="btn-save" onclick="uxSettingsSave()">Enregistrer les réglages</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import CSV modal -->
+<div class="ux-import-overlay" id="ux-import-overlay" onclick="if(event.target===this) uxImportClose()">
+  <div class="ux-import-panel">
+    <div class="ux-import-hd">
+      <h3>📥 Importer des clients depuis un CSV</h3>
+      <button class="btn btn-sm" onclick="uxImportClose()">✕</button>
+    </div>
+    <div class="ux-import-body">
+      <div id="ux-import-step1">
+        <div class="ux-drop" id="ux-drop" onclick="document.getElementById('ux-csv-file').click()">
+          <span class="illu">📥</span>
+          <div class="ttl">Glissez un fichier CSV ici</div>
+          <div class="sub">ou cliquez pour parcourir · max 1 Mo</div>
+          <input type="file" id="ux-csv-file" accept=".csv,text/csv" style="display:none;" onchange="uxImportFile(event)">
+        </div>
+        <div class="ux-import-help">
+          <strong>Format attendu :</strong> 1ère ligne = en-têtes. Colonnes reconnues automatiquement :<br>
+          <code>Nom</code> (obligatoire), <code>Email</code>, <code>Téléphone</code>, <code>SIRET</code>, <code>Adresse</code>, <code>CP</code>, <code>Ville</code>, <code>Contact</code>, <code>TVA</code>, <code>Délai</code><br>
+          Séparateur supporté : virgule <code>,</code> ou point-virgule <code>;</code>
+        </div>
+      </div>
+      <div id="ux-import-step2" style="display:none;">
+        <div class="ux-import-stats">
+          <div class="ux-import-stat ok"><div class="v" id="ux-stat-valid">0</div><div class="l">Valides</div></div>
+          <div class="ux-import-stat warn"><div class="v" id="ux-stat-invalid">0</div><div class="l">Ignorés</div></div>
+          <div class="ux-import-stat"><div class="v" id="ux-stat-total">0</div><div class="l">Total</div></div>
+        </div>
+        <div class="ux-import-table" id="ux-import-table"></div>
+        <div class="ux-import-help" id="ux-import-mapping" style="margin-top:.75rem;"></div>
+      </div>
+    </div>
+    <div class="ux-foot">
+      <button class="btn-cancel" onclick="uxImportClose()">Annuler</button>
+      <button class="btn-save" id="ux-import-go" onclick="uxImportGo()" disabled>Importer 0 client</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ════════ HELPERS (reprises de V1/V2) ════════
+  function curUser(){
+    try {
+      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      if(!s) return null;
+      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      return us.find(u => u.email === s.email) || null;
+    } catch(e){ return null; }
+  }
+  function saveUserField(field, value){
+    const u = curUser(); if(!u) return;
+    const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+    const i = us.findIndex(x => x.email === u.email);
+    if(i >= 0){ us[i][field] = value; localStorage.setItem('cpme_users', JSON.stringify(us)); }
+  }
+
+  // ════════ 1. SWITCHER ENTREPRISE (toolbar) ════════
+  function injectCompanySwitcher(){
+    if(document.getElementById('ux-co-switcher')) return;
+    const toolbar = document.getElementById('ux-toolbar');
+    if(!toolbar) return;
+    const u = curUser(); if(!u) return;
+    const sw = document.createElement('button');
+    sw.id = 'ux-co-switcher';
+    sw.className = 'ux-co-switcher';
+    sw.title = 'Changer d\'entreprise / Voir mes entreprises';
+    sw.innerHTML = '<span class="ico">🏢</span><span class="nm" id="ux-co-nm">' + (u.societe || '—') + '</span><span class="ch">▾</span>';
+    sw.onclick = function(){
+      if(typeof nav === 'function'){
+        const el = document.querySelector('[onclick*="nav(\'multi-company\'"]');
+        el ? nav('multi-company', el) : nav('multi-company');
+      }
+    };
+    toolbar.insertBefore(sw, toolbar.firstChild);
+  }
+  // Refresh nom société dynamiquement
+  setInterval(() => {
+    const el = document.getElementById('ux-co-nm');
+    const u = curUser();
+    if(el && u && u.societe && el.textContent !== u.societe) el.textContent = u.societe;
+  }, 2000);
+
+  // ════════ 2. BOUTON SETTINGS (toolbar) ════════
+  function injectSettingsBtn(){
+    if(document.getElementById('ux-settings-btn')) return;
+    const toolbar = document.getElementById('ux-toolbar');
+    if(!toolbar) return;
+    const btn = document.createElement('button');
+    btn.id = 'ux-settings-btn';
+    btn.className = 'ux-icon-btn';
+    btn.title = 'Personnaliser mon entreprise';
+    btn.innerHTML = '⚙';
+    btn.onclick = window.uxSettingsOpen;
+    // Insert before the bell (ux-bell-btn)
+    const bell = document.getElementById('ux-bell-btn');
+    if(bell) toolbar.insertBefore(btn, bell);
+    else toolbar.appendChild(btn);
+  }
+
+  // ════════ 3. MODAL PERSONNALISATION ════════
+  window.uxSettingsOpen = function(){
+    // Charger valeurs depuis user
+    const u = curUser(); if(!u) return;
+    const s = u.settings || {};
+    document.getElementById('ux-brand-color').value = s.brandColor || '#1D9E75';
+    document.getElementById('ux-brand-hex').textContent = s.brandColor || '#1D9E75';
+    document.getElementById('ux-doc-header').value = s.docHeader || '';
+    document.getElementById('ux-doc-footer').value = s.docFooter || '';
+    document.getElementById('ux-currency').value = s.currency || 'EUR';
+    document.getElementById('ux-decimal').value = s.decimal || 'comma';
+    uxBrandPreview();
+    uxDocPreview();
+    uxCurrPreview();
+    document.getElementById('ux-settings-overlay').classList.add('open');
+  };
+  window.uxSettingsClose = function(){
+    document.getElementById('ux-settings-overlay').classList.remove('open');
+  };
+  window.uxSettingsTab = function(tab){
+    document.querySelectorAll('.ux-tab').forEach(t => t.classList.toggle('on', t.dataset.tab === tab));
+    document.querySelectorAll('.ux-settings-section').forEach(s => s.classList.remove('on'));
+    document.getElementById('ux-sec-' + tab).classList.add('on');
+  };
+  window.uxSetColor = function(c){
+    document.getElementById('ux-brand-color').value = c;
+    uxBrandPreview();
+  };
+  window.uxBrandPreview = function(){
+    const c = document.getElementById('ux-brand-color').value;
+    document.getElementById('ux-brand-hex').textContent = c;
+    const btn = document.getElementById('ux-prev-btn');
+    const bdg = document.getElementById('ux-prev-bdg');
+    if(btn) btn.style.background = c;
+    if(bdg){
+      bdg.style.background = c + '26'; // 15% alpha hex
+      bdg.style.color = c;
+    }
+  };
+  window.uxDocPreview = function(){
+    const h = document.getElementById('ux-doc-header').value;
+    const f = document.getElementById('ux-doc-footer').value;
+    const p = document.getElementById('ux-doc-preview');
+    if(!p) return;
+    if(!h && !f){ p.textContent = 'Renseignez votre en-tête ci-dessus pour voir l\'aperçu.'; return; }
+    p.textContent = h + (f ? '\n\n— — —\n' + f : '');
+  };
+  document.addEventListener('input', function(e){
+    if(e.target && (e.target.id === 'ux-doc-header' || e.target.id === 'ux-doc-footer')) uxDocPreview();
+    if(e.target && (e.target.id === 'ux-currency' || e.target.id === 'ux-decimal')) uxCurrPreview();
+  });
+  window.uxCurrPreview = function(){
+    const c = document.getElementById('ux-currency').value;
+    const d = document.getElementById('ux-decimal').value;
+    const sym = {EUR:'€',USD:'$',GBP:'£',CHF:'CHF',CAD:'$',JPY:'¥'}[c] || c;
+    const sep = d === 'comma' ? ',' : '.';
+    const thou = d === 'comma' ? ' ' : ',';
+    const v = '1' + thou + '234' + sep + '56';
+    const el = document.getElementById('ux-curr-preview');
+    if(el) el.textContent = c === 'EUR' || c === 'GBP' ? (v + ' ' + sym) : (sym + v);
+  };
+  window.uxSettingsSave = function(){
+    const s = {
+      brandColor: document.getElementById('ux-brand-color').value,
+      docHeader:  document.getElementById('ux-doc-header').value.trim(),
+      docFooter:  document.getElementById('ux-doc-footer').value.trim(),
+      currency:   document.getElementById('ux-currency').value,
+      decimal:    document.getElementById('ux-decimal').value
+    };
+    saveUserField('settings', s);
+    applyBrandColor(s.brandColor);
+    uxSettingsClose();
+    if(typeof notif === 'function') notif('Réglages enregistrés ✓');
+  };
+  function applyBrandColor(c){
+    if(!c) return;
+    // Applique uniquement à des éléments scope-safe (mes propres CTAs principalement)
+    // Pour ne pas casser le design vert existant, on cible juste les nouveaux éléments
+    document.documentElement.style.setProperty('--ux-brand', c);
+    // Et le bouton .btn-save dans mes modaux + bouton primaire (.primary)
+    const css = document.getElementById('ux-brand-css') || document.createElement('style');
+    css.id = 'ux-brand-css';
+    css.textContent = '.ux-prem-card .actions .primary:not(.premium-cta){background:' + c + '!important;} .ux-tab.on{color:' + c + '!important;} .ux-foot .btn-save{background:' + c + '!important;}';
+    if(!css.parentNode) document.head.appendChild(css);
+  }
+  // Appliquer la couleur dès chargement si stockée
+  setTimeout(() => { const u = curUser(); if(u && u.settings && u.settings.brandColor) applyBrandColor(u.settings.brandColor); }, 400);
+
+  // ════════ 4. IMPORT CSV CLIENTS ════════
+  // Bouton "Importer" injecté à côté de "+ Nouveau client" sur la page Clients
+  function injectImportBtn(){
+    const newBtn = document.querySelector('#p-clients .ph .btn.btn-gr[onclick*="openClientModal"]');
+    if(!newBtn || document.getElementById('ux-import-btn')) return;
+    const btn = document.createElement('button');
+    btn.id = 'ux-import-btn';
+    btn.className = 'ux-import-btn';
+    btn.innerHTML = '📥 Importer CSV';
+    btn.onclick = window.uxImportOpen;
+    newBtn.parentNode.insertBefore(btn, newBtn.nextSibling);
+  }
+  // Observer pour ré-injecter si DOM se re-render
+  new MutationObserver(injectImportBtn).observe(document.body, {childList: true, subtree: true});
+
+  const FIELD_MAP = {
+    'nom':'cl-nom','société':'cl-nom','societe':'cl-nom','company':'cl-nom','client':'cl-nom','raison sociale':'cl-nom',
+    'email':'cl-email','e-mail':'cl-email','courriel':'cl-email','mail':'cl-email',
+    'tel':'cl-tel','telephone':'cl-tel','téléphone':'cl-tel','phone':'cl-tel','tél':'cl-tel',
+    'siret':'cl-siret','siren':'cl-siret',
+    'adresse':'cl-adr','address':'cl-adr','rue':'cl-adr',
+    'cp':'cl-cp','code postal':'cl-cp','zip':'cl-cp','postal code':'cl-cp',
+    'ville':'cl-ville','city':'cl-ville',
+    'contact':'cl-contact','interlocuteur':'cl-contact',
+    'tva':'cl-tva-num','tva intra':'cl-tva-num','tva intracom':'cl-tva-num','tva intracommunautaire':'cl-tva-num','vat':'cl-tva-num',
+    'delai':'cl-delai','délai':'cl-delai','delai paiement':'cl-delai','délai paiement':'cl-delai','jours':'cl-delai',
+    'notes':'cl-notes','commentaire':'cl-notes'
+  };
+
+  let importParsed = null; // { headers, rows: [...{cols, mapped, valid, reason}] }
+
+  window.uxImportOpen = function(){
+    document.getElementById('ux-import-step1').style.display = '';
+    document.getElementById('ux-import-step2').style.display = 'none';
+    document.getElementById('ux-csv-file').value = '';
+    document.getElementById('ux-import-go').disabled = true;
+    document.getElementById('ux-import-go').textContent = 'Importer 0 client';
+    importParsed = null;
+    document.getElementById('ux-import-overlay').classList.add('open');
+  };
+  window.uxImportClose = function(){ document.getElementById('ux-import-overlay').classList.remove('open'); };
+
+  function parseCsv(text){
+    // CSV parser simple : gère ; et , et les guillemets
+    const lines = [];
+    let cur = '', inQ = false, row = [];
+    for(let i = 0; i < text.length; i++){
+      const ch = text[i];
+      if(ch === '"'){
+        if(inQ && text[i+1] === '"'){ cur += '"'; i++; }
+        else inQ = !inQ;
+      } else if((ch === ',' || ch === ';') && !inQ){
+        row.push(cur); cur = '';
+      } else if((ch === '\n' || ch === '\r') && !inQ){
+        if(cur || row.length){ row.push(cur); lines.push(row); }
+        cur = ''; row = [];
+        if(ch === '\r' && text[i+1] === '\n') i++;
+      } else {
+        cur += ch;
+      }
+    }
+    if(cur || row.length) { row.push(cur); lines.push(row); }
+    return lines;
+  }
+
+  window.uxImportFile = function(e){
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    if(f.size > 1024*1024){ alert('Fichier trop volumineux (max 1 Mo)'); return; }
+    const r = new FileReader();
+    r.onload = ev => {
+      const rows = parseCsv(ev.target.result.trim());
+      if(rows.length < 2){ alert('Le CSV ne contient pas de données.'); return; }
+      const headers = rows[0].map(h => String(h).trim().toLowerCase().replace(/^"|"$/g,''));
+      const colMap = headers.map(h => FIELD_MAP[h] || null);
+      // Parse data rows
+      const dataRows = rows.slice(1).map(cols => {
+        const mapped = {};
+        cols.forEach((v,i) => {
+          const target = colMap[i];
+          if(target){ mapped[target] = String(v).trim().replace(/^"|"$/g,''); }
+        });
+        const valid = !!(mapped['cl-nom'] && mapped['cl-nom'].trim());
+        return { cols, mapped, valid, reason: valid ? '' : 'Nom manquant' };
+      });
+      importParsed = { headers, colMap, rows: dataRows };
+      renderImportPreview();
+    };
+    r.readAsText(f, 'utf-8');
+  };
+
+  // Drag & drop
+  const drop = document.getElementById('ux-drop');
+  if(drop){
+    ['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('dragover'); }));
+    ['dragleave','drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('dragover'); }));
+    drop.addEventListener('drop', e => {
+      const f = e.dataTransfer.files && e.dataTransfer.files[0];
+      if(f){
+        document.getElementById('ux-csv-file').files = e.dataTransfer.files;
+        uxImportFile({target:{files:[f]}});
+      }
+    });
+  }
+
+  function renderImportPreview(){
+    if(!importParsed) return;
+    document.getElementById('ux-import-step1').style.display = 'none';
+    document.getElementById('ux-import-step2').style.display = '';
+    const valid = importParsed.rows.filter(r => r.valid).length;
+    const invalid = importParsed.rows.length - valid;
+    document.getElementById('ux-stat-valid').textContent = valid;
+    document.getElementById('ux-stat-invalid').textContent = invalid;
+    document.getElementById('ux-stat-total').textContent = importParsed.rows.length;
+    // Mapping summary
+    const mapped = importParsed.colMap.map((t,i) => t ? importParsed.headers[i] + ' → ' + (({'cl-nom':'Nom','cl-email':'Email','cl-tel':'Téléphone','cl-siret':'SIRET','cl-adr':'Adresse','cl-cp':'CP','cl-ville':'Ville','cl-contact':'Contact','cl-tva-num':'TVA','cl-delai':'Délai','cl-notes':'Notes'})[t]) : null).filter(Boolean);
+    const unmapped = importParsed.colMap.map((t,i) => t ? null : importParsed.headers[i]).filter(Boolean);
+    document.getElementById('ux-import-mapping').innerHTML =
+      '<strong>Mapping détecté :</strong> ' + mapped.join(' · ') +
+      (unmapped.length ? '<br><strong style="color:#f5a623;">Colonnes non reconnues (ignorées) :</strong> ' + unmapped.join(', ') : '');
+    // Preview table (15 first rows)
+    const sample = importParsed.rows.slice(0, 15);
+    const tbl = '<table><thead><tr>' + importParsed.headers.map(h => '<th>' + h.replace(/</g,'&lt;') + '</th>').join('') + '<th>Statut</th></tr></thead><tbody>' +
+      sample.map(r => '<tr class="' + (r.valid?'':'invalid') + '">' + r.cols.map(c => '<td>' + String(c).replace(/</g,'&lt;') + '</td>').join('') + '<td>' + (r.valid ? '✓' : '⚠ ' + r.reason) + '</td></tr>').join('') +
+      '</tbody></table>';
+    document.getElementById('ux-import-table').innerHTML = tbl + (importParsed.rows.length > 15 ? '<div style="padding:8px;font-size:11px;color:var(--tx2,#999582);text-align:center;">… et ' + (importParsed.rows.length - 15) + ' ligne(s) supplémentaire(s)</div>' : '');
+    const btn = document.getElementById('ux-import-go');
+    btn.disabled = valid === 0;
+    btn.textContent = 'Importer ' + valid + ' client' + (valid>1?'s':'');
+  }
+
+  window.uxImportGo = function(){
+    if(!importParsed) return;
+    const validRows = importParsed.rows.filter(r => r.valid);
+    if(!validRows.length) return;
+    if(!confirm('Importer ' + validRows.length + ' client' + (validRows.length>1?'s':'') + ' ? Cette action est définitive.')) return;
+    if(typeof openClientModal !== 'function' || typeof saveClient !== 'function'){
+      alert('Fonction d\'ajout indisponible'); return;
+    }
+    // Désactiver temporairement alert() pour ne pas spammer si erreur (le saveClient affiche alert si nom manquant — on a déjà filtré)
+    const origAlert = window.alert; let alertCount = 0;
+    window.alert = function(){ alertCount++; };
+    let added = 0; let failed = 0;
+    validRows.forEach(r => {
+      try {
+        openClientModal(-1);
+        const ids = ['cl-nom','cl-email','cl-tel','cl-siret','cl-adr','cl-cp','cl-ville','cl-contact','cl-tva-num','cl-delai','cl-notes'];
+        ids.forEach(id => { const el = document.getElementById(id); if(el) el.value = r.mapped[id] || (id === 'cl-delai' ? '30' : ''); });
+        saveClient();
+        added++;
+      } catch(e){ failed++; console.warn('Import row failed', e); }
+    });
+    window.alert = origAlert;
+    uxImportClose();
+    if(typeof notif === 'function') notif('✓ ' + added + ' client' + (added>1?'s':'') + ' importé' + (added>1?'s':'') + (failed?' ('+failed+' échec'+(failed>1?'s':'')+')':''));
+  };
+
+  // ════════ INIT ════════
+  function init(){
+    setTimeout(injectCompanySwitcher, 600);
+    setTimeout(injectSettingsBtn,     650);
+    setTimeout(injectImportBtn,       700);
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  // Re-essai régulier au cas où la toolbar V1 mette du temps à apparaître
+  setInterval(() => { injectCompanySwitcher(); injectSettingsBtn(); injectImportBtn(); }, 2500);
+})();
+</script>
+
+
 </body>
 </html>
