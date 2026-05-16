@@ -1141,7 +1141,7 @@ function doLogin() {
     : `✓ Bienvenue ${user.prenom} ! Plan ${planLabel} actif.`;
   showOk(msg);
 
-  setTimeout(() => { window.location.href = 'compta_app.html'; }, 1000);
+  setTimeout(() => { window.location.href = '/app'; }, 1000);
 }
 
 // ══ SIREN LOOKUP (API Annuaire des Entreprises — data.gouv.fr) ══
@@ -1344,7 +1344,7 @@ function doRegister() {
   const users = getUsers(); users.push(newUser); saveUsers(users);
   lsSet('cpme_session', { email: newUser.email, ts: now });
   showOk(`🎉 Bienvenue ${prenom} ! Votre essai gratuit de 15 jours démarre maintenant.`);
-  setTimeout(() => { window.location.href = 'compta_app.html'; }, 1200);
+  setTimeout(() => { window.location.href = '/app'; }, 1200);
 }
 
 // ── MURS DE PAIEMENT (essai expiré dans la modale) ──
@@ -1412,7 +1412,7 @@ function simulatePay(email) {
       <div style="width:40px;height:40px;border:3px solid #1d7a5f;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto;"></div>
       <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
     </div>`;
-  setTimeout(() => { window.location.href = 'compta_app.html'; }, 1800);
+  setTimeout(() => { window.location.href = '/app'; }, 1800);
 }
 
 // ── BILLING TOGGLE ──
