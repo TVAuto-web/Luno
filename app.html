@@ -6517,5 +6517,401 @@ body.has-brand .sc-v[style*="color:var(--gr)"], body.has-brand .sc-v[style*="col
 </script>
 
 
+<!-- ════════════════════════════════════════════════════════════════
+     UX-V5-BLOCK-MARKER : PDF personnalisés, export CSV, quick create,
+     mémoire recherches récentes
+══════════════════════════════════════════════════════════════════ -->
+<style>
+/* ─── Quick create dropdown ─── */
+.ux-qc-menu{
+  position: fixed; top: 58px; right: 1.25rem; width: 240px;
+  background: var(--bg0,#fff); border: 1px solid var(--bd,#dddad0); border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.18); z-index: 9995; padding: .5rem;
+  display: none; font-family: Inter, system-ui, sans-serif;
+}
+.ux-qc-menu.open{ display: block; animation: uxFadeIn .15s; }
+.ux-qc-item{
+  display: flex; align-items: center; gap: .6rem; padding: .65rem .85rem;
+  border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--tx0,#1a1a18);
+  transition: background .12s;
+}
+.ux-qc-item:hover{ background: rgba(29,158,117,.08); }
+.ux-qc-item .ico{ font-size: 17px; flex-shrink: 0; width: 22px; text-align: center; }
+.ux-qc-item .kbd-hint{ margin-left: auto; font-size: 10px; color: var(--tx2,#999582); }
+
+/* ─── Boutons d'export CSV (injectés) ─── */
+.ux-export-btn{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; margin-left: 6px;
+  background: var(--bg0,#fff); border: 1px solid var(--bd,#dddad0); border-radius: 8px;
+  font-size: 12px; font-weight: 600; color: var(--tx1,#62604b); cursor: pointer;
+  font-family: inherit; transition: all .15s;
+}
+.ux-export-btn:hover{ background: var(--bg2,#f6f6f4); border-color: var(--bd2,#bdb9ab); color: var(--tx0,#1a1a18); }
+
+/* ─── Section recherches récentes dans Ctrl+K ─── */
+.ux-recent-row{
+  display: flex; align-items: center; gap: .6rem;
+  padding: .5rem .75rem; border-radius: 8px; cursor: pointer;
+  font-size: 13px; color: var(--tx1,#62604b);
+}
+.ux-recent-row:hover{ background: var(--bg2,#f6f6f4); color: var(--tx0,#1a1a18); }
+.ux-recent-row .ico{ opacity: .5; }
+.ux-recent-row .clear{ margin-left: auto; font-size: 11px; color: var(--tx2,#999582); }
+.ux-recent-row .clear:hover{ color: #e74c3c; }
+</style>
+
+<!-- Menu Quick Create -->
+<div class="ux-qc-menu" id="ux-qc-menu">
+  <div class="ux-qc-item" onclick="uxQc('client')"><span class="ico">👥</span>Nouveau client<span class="kbd-hint">N</span></div>
+  <div class="ux-qc-item" onclick="uxQc('facture')"><span class="ico">📄</span>Nouvelle facture</div>
+  <div class="ux-qc-item" onclick="uxQc('devis')"><span class="ico">📝</span>Nouveau devis</div>
+  <div class="ux-qc-item" onclick="uxQc('fournisseur')"><span class="ico">🏭</span>Nouveau fournisseur</div>
+  <div style="border-top:1px solid var(--bd,#dddad0);margin:.35rem 0;"></div>
+  <div class="ux-qc-item" onclick="uxQc('achat')"><span class="ico">🧾</span>Saisir un achat</div>
+  <div class="ux-qc-item" onclick="uxQc('societe')"><span class="ico">🏢</span>Ajouter une entreprise</div>
+</div>
+
+<script>
+(function(){
+  function curUser(){
+    try {
+      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      if(!s) return null;
+      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      return us.find(u => u.email === s.email) || null;
+    } catch(e){ return null; }
+  }
+  function userSettings(){ const u = curUser(); return (u && u.settings) || {}; }
+  function brandHex(){ const s = userSettings(); return s.brandColor || '#1D9E75'; }
+  function brandHexLight(){
+    // Convert #RRGGBB to rgba with 0.08 alpha for backgrounds
+    const c = brandHex();
+    const r = parseInt(c.slice(1,3),16), g = parseInt(c.slice(3,5),16), b = parseInt(c.slice(5,7),16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',0.08)';
+  }
+  function escHtml(s){ return String(s||'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c]); }
+  function fmtNumber(n){
+    if(n === null || n === undefined) return '0,00';
+    const s = userSettings();
+    const dec = s.decimal === 'dot' ? '.' : ',';
+    const thou = s.decimal === 'dot' ? ',' : ' ';
+    const v = Math.round((+n || 0) * 100) / 100;
+    const parts = String(Math.abs(v)).split('.');
+    const intP = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thou);
+    return (v < 0 ? '-' : '') + intP + dec + (parts[1] || '00').padEnd(2,'0');
+  }
+  function currencySymbol(){
+    const c = (userSettings().currency || 'EUR');
+    return {EUR:'€',USD:'$',GBP:'£',CHF:'CHF',CAD:'$',JPY:'¥'}[c] || c;
+  }
+
+  // ════════ 1. QUICK CREATE FAB (toolbar) ════════
+  function injectQuickCreate(){
+    if(document.getElementById('ux-qc-btn')) return;
+    const toolbar = document.getElementById('ux-toolbar');
+    if(!toolbar) return;
+    const btn = document.createElement('button');
+    btn.id = 'ux-qc-btn';
+    btn.className = 'ux-icon-btn';
+    btn.style.background = brandHex();
+    btn.style.color = '#fff';
+    btn.style.border = 'none';
+    btn.style.fontSize = '18px';
+    btn.style.fontWeight = '700';
+    btn.title = 'Créer rapidement (+ Nouveau)';
+    btn.innerHTML = '+';
+    btn.onclick = function(e){
+      e.stopPropagation();
+      const m = document.getElementById('ux-qc-menu');
+      // Position le menu sous le bouton
+      const r = btn.getBoundingClientRect();
+      m.style.right = (window.innerWidth - r.right) + 'px';
+      m.style.top = (r.bottom + 8) + 'px';
+      m.classList.toggle('open');
+    };
+    // Ajout en première position de la toolbar (après le switcher si présent)
+    const sw = document.getElementById('ux-co-switcher');
+    if(sw) toolbar.insertBefore(btn, sw.nextSibling);
+    else toolbar.insertBefore(btn, toolbar.firstChild);
+  }
+  // Refresh couleur si la marque change
+  setInterval(() => {
+    const b = document.getElementById('ux-qc-btn');
+    if(b) b.style.background = brandHex();
+  }, 2000);
+
+  window.uxQc = function(type){
+    document.getElementById('ux-qc-menu').classList.remove('open');
+    setTimeout(() => {
+      if(type === 'client' && typeof openClientModal === 'function'){
+        const el = document.querySelector('[onclick*="nav(\'clients\'"]');
+        if(typeof nav === 'function' && el) nav('clients', el);
+        setTimeout(() => openClientModal(-1), 100);
+      } else if(type === 'facture' && typeof openFactureModal === 'function'){
+        const el = document.querySelector('[onclick*="nav(\'factures\'"]');
+        if(typeof nav === 'function' && el) nav('factures', el);
+        setTimeout(() => openFactureModal(-1), 100);
+      } else if(type === 'devis' && typeof openDevisModal === 'function'){
+        const el = document.querySelector('[onclick*="nav(\'devis\'"]');
+        if(typeof nav === 'function' && el) nav('devis', el);
+        setTimeout(() => openDevisModal(-1), 100);
+      } else if(type === 'fournisseur' && typeof openOv === 'function'){
+        const el = document.querySelector('[onclick*="nav(\'fournisseurs\'"]');
+        if(typeof nav === 'function' && el) nav('fournisseurs', el);
+        setTimeout(() => openOv('ov-fourn'), 100);
+      } else if(type === 'achat' && typeof openAchatModal === 'function'){
+        const el = document.querySelector('[onclick*="nav(\'achats\'"]');
+        if(typeof nav === 'function' && el) nav('achats', el);
+        setTimeout(() => openAchatModal(), 100);
+      } else if(type === 'societe' && typeof openOv === 'function'){
+        const el = document.querySelector('[onclick*="nav(\'multi-company\'"]');
+        if(typeof nav === 'function' && el) nav('multi-company', el);
+        setTimeout(() => openOv('ov-add-company'), 100);
+      }
+    }, 80);
+  };
+  // Fermeture au clic extérieur
+  document.addEventListener('click', function(e){
+    const m = document.getElementById('ux-qc-menu');
+    const b = document.getElementById('ux-qc-btn');
+    if(m && m.classList.contains('open') && !m.contains(e.target) && (!b || !b.contains(e.target))){
+      m.classList.remove('open');
+    }
+  });
+
+  // ════════ 2. PDF FACTURE PERSONNALISÉE ════════
+  function buildFacturePdf(f, cl){
+    const u = curUser(); const s = userSettings();
+    const brand = brandHex();
+    const sym = currencySymbol();
+    const logoHtml = u && u.logo ? '<img src="' + u.logo + '" style="max-height:60px;max-width:180px;object-fit:contain;margin-bottom:.75rem;">' : '';
+    const headerHtml = s.docHeader ? '<div style="font-size:11px;color:#666;white-space:pre-wrap;line-height:1.5;margin-top:8px;">' + escHtml(s.docHeader) + '</div>' : '';
+    const footerHtml = s.docFooter ? '<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid #eee;font-size:11px;color:#666;text-align:center;font-style:italic;">' + escHtml(s.docFooter) + '</div>' : '';
+    return '<!DOCTYPE html><html><head><title>Facture ' + escHtml(f.num) + '</title>' +
+      '<style>' +
+      'body{font-family:-apple-system,Segoe UI,sans-serif;padding:2.5rem 2rem;font-size:13px;max-width:780px;margin:auto;color:#1a1a18;line-height:1.5;}' +
+      'h1{color:' + brand + ';font-size:28px;letter-spacing:-.5px;margin:0;}' +
+      '.brand{color:' + brand + ';}' +
+      '.head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;}' +
+      '.parties{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;padding:1.25rem;background:#fafaf7;border-radius:10px;border-left:4px solid ' + brand + ';}' +
+      '.parties .lab{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}' +
+      'table{width:100%;border-collapse:collapse;margin-top:1.5rem;}' +
+      'th{background:#fafaf7;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#888;padding:10px;border-bottom:2px solid ' + brand + ';}' +
+      'td{padding:11px 10px;border-bottom:1px solid #eee;}' +
+      '.tot{font-weight:700;font-size:15px;background:' + brand + ';color:#fff;}' +
+      '.tot td{border:none;padding:14px 10px;}' +
+      '.tot td:last-child{font-size:18px;}' +
+      '.meta{font-size:12px;color:#666;text-align:right;}' +
+      '.meta strong{color:#1a1a18;}' +
+      '.bdg{display:inline-block;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;}' +
+      '.bdg.paid{background:#d1f4e2;color:#1D9E75;}' +
+      '.bdg.pending{background:#fef3c7;color:#92400e;}' +
+      '.bdg.late{background:#fee2e2;color:#b91c1c;}' +
+      '@media print{body{padding:1rem;} .no-print{display:none;}}' +
+      '</style></head><body>' +
+      '<div class="head">' +
+        '<div>' + logoHtml + '<h1>FACTURE</h1>' +
+          '<div style="font-size:24px;font-weight:700;letter-spacing:-.3px;margin-top:4px;" class="brand">' + escHtml(f.num) + '</div>' +
+          headerHtml +
+        '</div>' +
+        '<div class="meta">' +
+          '<div><strong>' + escHtml((u && u.societe) || 'Votre entreprise') + '</strong></div>' +
+          '<div>' + escHtml((u && (u.prenom||'') + ' ' + (u.nom||''))) + '</div>' +
+          '<div style="margin-top:14px;">Émise le : <strong>' + escHtml(f.date) + '</strong></div>' +
+          '<div>Échéance : <strong>' + escHtml(f.due) + '</strong></div>' +
+          '<div style="margin-top:8px;">Statut : <span class="bdg ' + (f.st === 'payée' ? 'paid' : f.st === 'en retard' ? 'late' : 'pending') + '">' + escHtml(f.st) + '</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="parties">' +
+        '<div><div class="lab">Émetteur</div><strong style="font-size:14px;">' + escHtml((u && u.societe) || '—') + '</strong><br>' + escHtml((u && (u.prenom||'') + ' ' + (u.nom||''))) + '</div>' +
+        '<div><div class="lab">Facturer à</div><strong style="font-size:14px;">' + escHtml(cl.nom || '—') + '</strong><br>' +
+          (cl.adr ? escHtml(cl.adr) + '<br>' : '') +
+          (cl.cp || cl.ville ? escHtml((cl.cp||'') + ' ' + (cl.ville||'')) + '<br>' : '') +
+          (cl.email ? escHtml(cl.email) : '') +
+        '</div>' +
+      '</div>' +
+      '<table>' +
+        '<thead><tr><th style="text-align:left;">Description</th><th style="text-align:right;width:90px;">HT</th><th style="text-align:right;width:110px;">TVA (' + escHtml(f.tva) + '%)</th><th style="text-align:right;width:110px;">TTC</th></tr></thead>' +
+        '<tbody><tr><td>' + escHtml(f.desc || 'Prestation de services') + '</td>' +
+          '<td style="text-align:right;">' + fmtNumber(f.ht) + ' ' + sym + '</td>' +
+          '<td style="text-align:right;">' + fmtNumber(f.tvaA) + ' ' + sym + '</td>' +
+          '<td style="text-align:right;font-weight:700;">' + fmtNumber(f.ttc) + ' ' + sym + '</td></tr></tbody>' +
+        '<tfoot><tr class="tot"><td>TOTAL À PAYER</td>' +
+          '<td style="text-align:right;">' + fmtNumber(f.ht) + ' ' + sym + '</td>' +
+          '<td style="text-align:right;">' + fmtNumber(f.tvaA) + ' ' + sym + '</td>' +
+          '<td style="text-align:right;">' + fmtNumber(f.ttc) + ' ' + sym + '</td></tr></tfoot>' +
+      '</table>' +
+      footerHtml +
+      '<div style="margin-top:2.5rem;font-size:10px;color:#aaa;text-align:center;">Document généré par ComptaPME Pro · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
+      '</body></html>';
+  }
+  // Override printFacIdx — toujours utiliser le nouveau template (qui fallback proprement si pas de settings)
+  const origPrintFac = window.printFacIdx;
+  if(typeof origPrintFac === 'function'){
+    window.printFacIdx = function(i){
+      try {
+        const f = (typeof factures !== 'undefined' && factures[i]);
+        const cl = f && (typeof clients !== 'undefined') && clients[f.ci] || {};
+        if(!f) return origPrintFac.apply(this, arguments);
+        if(typeof addH === 'function') addH('export', 'Impression facture ' + f.num, 'inf');
+        const w = window.open('', '_blank');
+        if(!w) return origPrintFac.apply(this, arguments);
+        w.document.write(buildFacturePdf(f, cl));
+        w.document.close();
+        setTimeout(() => { try { w.print(); } catch(e){} }, 200);
+      } catch(e){
+        console.warn('UX V5 printFacIdx fallback', e);
+        return origPrintFac.apply(this, arguments);
+      }
+    };
+  }
+
+  // ════════ 3. EXPORT CSV CLIENTS / FACTURES ════════
+  function csvEscape(v){
+    if(v === null || v === undefined) return '';
+    const s = String(v);
+    return /[,;"\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function downloadCsv(filename, headers, rows){
+    const lines = [headers.map(csvEscape).join(',')].concat(rows.map(r => r.map(csvEscape).join(',')));
+    // BOM UTF-8 pour Excel
+    const blob = new Blob(["﻿" + lines.join('\r\n')], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  }
+  window.uxExportClients = function(){
+    try {
+      const u = curUser();
+      const arr = (u && u.data && Array.isArray(u.data.clients)) ? u.data.clients : (typeof clients !== 'undefined' ? clients : []);
+      if(!arr.length){ if(typeof notif === 'function') notif('Aucun client à exporter'); return; }
+      const headers = ['Nom','Contact','Email','Téléphone','SIRET','TVA','Adresse','CP','Ville','Délai','Notes'];
+      const rows = arr.map(c => [c.nom, c.contact, c.email, c.tel, c.siret, c.tva_num, c.adr, c.cp, c.ville, c.delai, c.notes]);
+      downloadCsv('clients_' + new Date().toISOString().slice(0,10) + '.csv', headers, rows);
+      if(typeof notif === 'function') notif('✓ ' + arr.length + ' client' + (arr.length>1?'s':'') + ' exporté' + (arr.length>1?'s':'') + ' en CSV');
+    } catch(e){ console.warn(e); }
+  };
+  window.uxExportFactures = function(){
+    try {
+      const u = curUser();
+      const facts = (u && u.data && Array.isArray(u.data.factures)) ? u.data.factures : (typeof factures !== 'undefined' ? factures : []);
+      const cls = (u && u.data && Array.isArray(u.data.clients)) ? u.data.clients : (typeof clients !== 'undefined' ? clients : []);
+      if(!facts.length){ if(typeof notif === 'function') notif('Aucune facture à exporter'); return; }
+      const headers = ['Numéro','Client','Date émission','Échéance','HT','TVA (%)','TVA (montant)','TTC','Statut','Description'];
+      const rows = facts.map(f => [f.num, (cls[f.ci]||{}).nom||'', f.date, f.due, f.ht, f.tva, f.tvaA, f.ttc, f.st, f.desc]);
+      downloadCsv('factures_' + new Date().toISOString().slice(0,10) + '.csv', headers, rows);
+      if(typeof notif === 'function') notif('✓ ' + facts.length + ' facture' + (facts.length>1?'s':'') + ' exportée' + (facts.length>1?'s':'') + ' en CSV');
+    } catch(e){ console.warn(e); }
+  };
+  function injectExportBtns(){
+    // Page Clients
+    const clHdr = document.querySelector('#p-clients .ph');
+    if(clHdr && !clHdr.querySelector('.ux-export-clients-btn')){
+      const b = document.createElement('button');
+      b.className = 'ux-export-btn ux-export-clients-btn';
+      b.innerHTML = '📤 Exporter CSV';
+      b.onclick = uxExportClients;
+      clHdr.appendChild(b);
+    }
+    // Page Factures
+    const facHdr = document.querySelector('#p-factures .ph');
+    if(facHdr && !facHdr.querySelector('.ux-export-factures-btn')){
+      const b = document.createElement('button');
+      b.className = 'ux-export-btn ux-export-factures-btn';
+      b.innerHTML = '📤 Exporter CSV';
+      b.onclick = uxExportFactures;
+      facHdr.appendChild(b);
+    }
+  }
+  setInterval(injectExportBtns, 2000);
+
+  // ════════ 4. SEARCH HISTORY (Ctrl+K) ════════
+  const RECENT_KEY = 'cpme_recent_searches';
+  function recentGet(){ try { return JSON.parse(localStorage.getItem(RECENT_KEY)||'[]'); } catch(e){ return []; } }
+  function recentPush(q){
+    if(!q || q.length < 2) return;
+    let list = recentGet().filter(x => x !== q);
+    list.unshift(q);
+    list = list.slice(0,8);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(list));
+  }
+  function recentClear(){ localStorage.removeItem(RECENT_KEY); }
+  window.uxRecentClear = function(){
+    recentClear();
+    const inp = document.getElementById('ux-search-input');
+    if(inp){ inp.dispatchEvent(new Event('input')); }
+    if(typeof notif === 'function') notif('Recherches effacées');
+  };
+
+  // Hook sur l'input pour mémoriser quand l'utilisateur valide
+  // On stocke à chaque keypress après 2s d'inactivité (le temps que ça soit pertinent)
+  let recentDebounce = null;
+  function setupSearchInputHook(){
+    const inp = document.getElementById('ux-search-input');
+    if(!inp || inp.dataset.uxV5Hooked) return;
+    inp.dataset.uxV5Hooked = '1';
+    inp.addEventListener('input', () => {
+      clearTimeout(recentDebounce);
+      const q = inp.value.trim();
+      if(q.length >= 2){
+        recentDebounce = setTimeout(() => recentPush(q), 1500);
+      }
+    });
+    // Aussi : injecter une section "Recherches récentes" en haut quand input vide
+    // Hook : intercepter le render des résultats quand vide
+    const origUxSearchOpen = window.uxSearchOpen;
+    if(typeof origUxSearchOpen === 'function' && !window._uxV5SearchHooked){
+      window._uxV5SearchHooked = true;
+      window.uxSearchOpen = function(){
+        origUxSearchOpen.apply(this, arguments);
+        // After render, if input is empty, prepend recents
+        setTimeout(injectRecentSection, 100);
+      };
+      // Hook input event to update recents on each render
+      inp.addEventListener('input', () => setTimeout(injectRecentSection, 30));
+    }
+  }
+  function injectRecentSection(){
+    const inp = document.getElementById('ux-search-input');
+    const res = document.getElementById('ux-search-results');
+    if(!inp || !res || inp.value.trim().length > 0) return;
+    const recents = recentGet();
+    if(!recents.length) return;
+    // Remove existing recent section
+    const existing = res.querySelector('.ux-recent-section');
+    if(existing) existing.remove();
+    const wrap = document.createElement('div');
+    wrap.className = 'ux-recent-section';
+    wrap.innerHTML = '<div class="ux-search-section" style="display:flex;justify-content:space-between;align-items:center;">Recherches récentes <span class="clear" style="font-size:10px;color:var(--tx2);cursor:pointer;" onclick="uxRecentClear();event.stopPropagation();">Effacer ↻</span></div>' +
+      recents.map(q => '<div class="ux-recent-row" data-q="' + escHtml(q) + '"><span class="ico">🕘</span><span>' + escHtml(q) + '</span></div>').join('');
+    res.insertBefore(wrap, res.firstChild);
+    wrap.querySelectorAll('.ux-recent-row').forEach(el => {
+      el.onclick = function(){
+        inp.value = el.dataset.q;
+        inp.dispatchEvent(new Event('input'));
+      };
+    });
+  }
+  setInterval(setupSearchInputHook, 2000);
+
+  // ════════ INIT ════════
+  function init(){
+    setTimeout(injectQuickCreate, 800);
+    setTimeout(injectExportBtns,  900);
+    setTimeout(setupSearchInputHook, 1000);
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  setInterval(injectQuickCreate, 2500);
+})();
+</script>
+
+
 </body>
 </html>
