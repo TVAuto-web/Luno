@@ -7441,5 +7441,287 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
 </script>
 
 
+<!-- ════════════════════════════════════════════════════════════════
+     SUPABASE-V7-BLOCK-MARKER : intégration Supabase Auth + client
+     SDK CDN + wrap doLogin/doRegister/doLogout + session hydration
+══════════════════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<style>
+.ux-cloud-ind{
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--tx2,#999582);
+  background: var(--bg0,#fff); padding: 6px 10px;
+  border: 1px solid var(--bd,#dddad0); border-radius: 999px;
+  font-family: Inter, system-ui, sans-serif;
+  transition: all .2s;
+}
+.ux-cloud-ind .dot{ width: 6px; height: 6px; border-radius: 50%; background: var(--tx2,#999582); }
+.ux-cloud-ind.connected .dot{ background: #1D9E75; }
+.ux-cloud-ind.connected{ color: #1D9E75; }
+.ux-cloud-ind.error .dot{ background: #e74c3c; }
+.ux-cloud-ind.error{ color: #e74c3c; }
+.ux-cloud-ind:hover{ background: var(--bg2,#f6f6f4); }
+</style>
+
+<script>
+(function(){
+  const SUPABASE_URL  = "https://hysznhfowtzfsbdntsyd.supabase.co";
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh5c3puaGZvd3R6ZnNiZG50c3lkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5NTQ3NjQsImV4cCI6MjA5NDUzMDc2NH0.GsCgONseiOMQqXOyyp3B0iPIqioiE7xox98GpT71hBY";
+
+  // Le SDK Supabase est chargé via UMD → window.supabase.createClient
+  function initSb(){
+    if(!window.supabase || !window.supabase.createClient){
+      // Pas encore prêt, retry
+      setTimeout(initSb, 100); return;
+    }
+    if(window.sb) return; // déjà init
+    window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+        storageKey: 'cpme_sb_auth'
+      }
+    });
+    console.log('[Supabase] Client initialisé');
+    setCloudState('connected');
+    bindSupabaseAuth();
+    hydrateSupabaseSession();
+  }
+  initSb();
+
+  // ─── Indicateur cloud dans la toolbar ───
+  function injectCloudInd(){
+    if(document.getElementById('ux-cloud-ind')) return;
+    const toolbar = document.getElementById('ux-toolbar');
+    if(!toolbar) return;
+    const el = document.createElement('span');
+    el.id = 'ux-cloud-ind';
+    el.className = 'ux-cloud-ind';
+    el.title = 'État de la connexion Supabase';
+    el.innerHTML = '<span class="dot"></span><span>☁ Cloud</span>';
+    // Insère après le save-indicator
+    const save = document.getElementById('ux-save-ind');
+    if(save && save.nextSibling) toolbar.insertBefore(el, save.nextSibling);
+    else toolbar.appendChild(el);
+  }
+  function setCloudState(state){
+    const el = document.getElementById('ux-cloud-ind');
+    if(!el) return;
+    el.classList.remove('connected','error');
+    if(state === 'connected') el.classList.add('connected');
+    if(state === 'error') el.classList.add('error');
+    const lbl = el.querySelector('span:last-child');
+    if(lbl){
+      if(state === 'connected') lbl.textContent = '☁ Sync activé';
+      else if(state === 'error') lbl.textContent = '☁ Erreur cloud';
+      else lbl.textContent = '☁ Local seulement';
+    }
+  }
+  setInterval(injectCloudInd, 1500);
+
+  // ─── Wrap doLogin : essaie Supabase, fallback localStorage ───
+  function bindSupabaseAuth(){
+    const origLogin = window.doLogin;
+    const origRegister = window.doRegister;
+    const origLogout = window.doLogout;
+
+    // --- LOGIN ---
+    if(typeof origLogin === 'function' && !window._sbLoginHooked){
+      window._sbLoginHooked = true;
+      window.doLogin = async function(){
+        const emailEl = document.getElementById('l-email');
+        const pwdEl   = document.getElementById('l-pwd');
+        const errEl   = document.getElementById('lerr');
+        if(!emailEl || !pwdEl){ return origLogin.apply(this, arguments); }
+        const email = emailEl.value.trim().toLowerCase();
+        const pwd = pwdEl.value;
+        if(!email || !pwd){ if(errEl){ errEl.textContent='Email et mot de passe requis.'; errEl.style.display='block'; } return; }
+
+        // Comptes démo → fallback localStorage (pour ne pas casser les comptes de test existants)
+        if(email === 'demo@comptapme.fr' || email === 'test@test.fr' || email.includes('demo')){
+          return origLogin.apply(this, arguments);
+        }
+
+        try {
+          const { data, error } = await window.sb.auth.signInWithPassword({ email, password: pwd });
+          if(error){
+            // Si user pas dans Supabase, tenter le legacy
+            if(error.message && (error.message.includes('Invalid login') || error.message.includes('not found'))){
+              return origLogin.apply(this, arguments);
+            }
+            if(errEl){ errEl.textContent = error.message || 'Connexion impossible'; errEl.style.display='block'; }
+            return;
+          }
+          // Login Supabase OK → hydrater la session
+          await hydrateSupabaseSession();
+        } catch(e){
+          console.warn('[Supabase] Login erreur, fallback localStorage', e);
+          return origLogin.apply(this, arguments);
+        }
+      };
+    }
+
+    // --- REGISTER ---
+    if(typeof origRegister === 'function' && !window._sbRegisterHooked){
+      window._sbRegisterHooked = true;
+      window.doRegister = async function(){
+        const f = id => (document.getElementById(id)||{}).value || '';
+        const email = f('r-email').trim().toLowerCase();
+        const pwd = f('r-pwd');
+        const prenom = f('r-prenom') || f('app-prenom') || '';
+        const nom = f('r-nom') || f('app-nom') || '';
+        const societe = f('r-societe') || f('app-societe-nom') || (window.appSirenData && window.appSirenData.nom) || 'Mon entreprise';
+        const siren = f('r-siren') || (window.appSirenData && window.appSirenData.siren) || null;
+        const errEl = document.getElementById('rerr') || document.getElementById('app-err');
+
+        if(!email || !pwd){
+          if(errEl){ errEl.textContent='Email et mot de passe requis.'; errEl.style.display='block'; }
+          return;
+        }
+        if(pwd.length < 6){
+          if(errEl){ errEl.textContent='Mot de passe : 6 caractères minimum.'; errEl.style.display='block'; }
+          return;
+        }
+
+        try {
+          const { data, error } = await window.sb.auth.signUp({
+            email, password: pwd,
+            options: { data: { prenom, nom, societe, siren, profile_type: window.selectedProfile || 'entreprise' } }
+          });
+          if(error){
+            // Email déjà pris → essai legacy
+            if(error.message && error.message.includes('already')){
+              if(errEl){ errEl.textContent = 'Email déjà utilisé. Essayez de vous connecter.'; errEl.style.display='block'; }
+              return;
+            }
+            if(errEl){ errEl.textContent = error.message || 'Inscription impossible'; errEl.style.display='block'; }
+            return;
+          }
+          if(typeof notif === 'function') notif('✓ Compte créé · vérifiez votre email si demandé');
+          // Si pas de email confirmation requise, la session est créée
+          if(data && data.session){
+            await hydrateSupabaseSession();
+          } else {
+            // Email confirmation requise (par défaut Supabase)
+            if(errEl){
+              errEl.style.color = '#1D9E75';
+              errEl.textContent = '✓ Compte créé. Vérifiez votre email pour confirmer puis revenez vous connecter.';
+              errEl.style.display='block';
+            }
+          }
+        } catch(e){
+          console.warn('[Supabase] Register erreur, fallback', e);
+          return origRegister.apply(this, arguments);
+        }
+      };
+    }
+
+    // --- LOGOUT ---
+    if(typeof origLogout === 'function' && !window._sbLogoutHooked){
+      window._sbLogoutHooked = true;
+      window.doLogout = async function(){
+        try { if(window.sb) await window.sb.auth.signOut(); } catch(e){}
+        return origLogout.apply(this, arguments);
+      };
+    }
+
+    // --- Listener : tout changement d'état auth ---
+    if(window.sb && !window._sbAuthListenerSet){
+      window._sbAuthListenerSet = true;
+      window.sb.auth.onAuthStateChange((event, session) => {
+        console.log('[Supabase] auth event:', event);
+        if(event === 'SIGNED_OUT'){
+          // Le doLogout legacy gère déjà le reset UI
+        }
+      });
+    }
+  }
+
+  // ─── Hydratation : si une session Supabase existe, charger le profile et lancer launchApp ───
+  async function hydrateSupabaseSession(){
+    if(!window.sb) return;
+    try {
+      const { data: { session } } = await window.sb.auth.getSession();
+      if(!session) return;
+      const user = session.user;
+      // Fetch profile + memberships + subscription
+      const [profileRes, memRes, subRes] = await Promise.all([
+        window.sb.from('profiles').select('*').eq('id', user.id).single(),
+        window.sb.from('memberships').select('*, companies(*)').eq('user_id', user.id),
+        window.sb.from('subscriptions').select('*').eq('user_id', user.id).single()
+      ]);
+      const profile = profileRes.data;
+      const sub = subRes.data;
+      if(!profile){
+        console.warn('[Supabase] Pas de profile, attendre le trigger ou re-fetch');
+        return;
+      }
+      // Convertit en format compatible avec le système legacy `me`
+      const legacyUser = {
+        email:    profile.email,
+        prenom:   profile.prenom || '',
+        nom:      profile.nom || '',
+        societe:  profile.societe || 'Mon entreprise',
+        siren:    profile.siren,
+        profile:  profile.profile_type || 'entreprise',
+        uiMode:   profile.ui_mode || 'simple',
+        logo:     profile.logo,
+        tva:      profile.tva_settings,
+        settings: {
+          brandColor: profile.brand_color || '#1D9E75',
+          docHeader:  profile.doc_header || '',
+          docFooter:  profile.doc_footer || '',
+          currency:   profile.currency || 'EUR',
+          decimal:    profile.decimal_sep || 'comma'
+        },
+        sbId: profile.id,
+        // Plan + status mappés depuis subscription
+        plan:     (sub && sub.plan) || 'trial',
+        status:   (sub && sub.status) || 'active',
+        trialEnds: sub && sub.trial_ends_at,
+        data: {} // sera rempli en V8 (sync clients/factures)
+      };
+      // Cache dans cpme_users pour que le système legacy ait accès
+      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const idx = us.findIndex(u => u.email === legacyUser.email);
+      if(idx >= 0) us[idx] = Object.assign(us[idx], legacyUser);
+      else us.push(legacyUser);
+      localStorage.setItem('cpme_users', JSON.stringify(us));
+      // Crée la session legacy
+      localStorage.setItem('cpme_session', JSON.stringify({ email: legacyUser.email, ts: Date.now() }));
+      // Lance launchApp via bootApp
+      if(typeof bootApp === 'function'){
+        setTimeout(bootApp, 100);
+      }
+      if(typeof notif === 'function') notif('✓ Connecté via Supabase');
+    } catch(e){
+      console.warn('[Supabase] Hydratation erreur', e);
+      setCloudState('error');
+    }
+  }
+
+  // Tente l'hydratation au chargement si une session existe déjà
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => { if(window.sb) hydrateSupabaseSession(); }, 600);
+  });
+
+  // Helpers globaux pour V8/V9
+  window.cpmeSb = {
+    client: () => window.sb,
+    isAuth: async () => { const { data: { session } } = await window.sb.auth.getSession(); return !!session; },
+    user:   async () => { const { data: { user } } = await window.sb.auth.getUser(); return user; },
+    activeCompany: async () => {
+      const { data: { user } } = await window.sb.auth.getUser();
+      if(!user) return null;
+      const { data } = await window.sb.from('memberships').select('*, companies(*)').eq('user_id', user.id).limit(1).single();
+      return data && data.companies;
+    }
+  };
+})();
+</script>
+
+
 </body>
 </html>
