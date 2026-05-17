@@ -6913,5 +6913,533 @@ body.has-brand .sc-v[style*="color:var(--gr)"], body.has-brand .sc-v[style*="col
 </script>
 
 
+<!-- ════════════════════════════════════════════════════════════════
+     UX-V6-BLOCK-MARKER : PDF devis, import factures, switcher inline,
+     mode focus
+══════════════════════════════════════════════════════════════════ -->
+<style>
+/* ─── Switcher entreprise : dropdown inline ─── */
+.ux-co-menu{
+  position: fixed; width: 280px;
+  background: var(--bg0,#fff); border: 1px solid var(--bd,#dddad0); border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0,0,0,.18); z-index: 9995; padding: .5rem;
+  display: none; font-family: Inter, system-ui, sans-serif;
+}
+.ux-co-menu.open{ display: block; animation: uxFadeIn .15s; }
+.ux-co-menu .header{ padding: .35rem .75rem; font-size: 10px; color: var(--tx2,#999582); text-transform: uppercase; letter-spacing: .5px; font-weight: 700; }
+.ux-co-item{
+  display: flex; align-items: center; gap: .65rem; padding: .65rem .75rem;
+  border-radius: 8px; cursor: pointer; font-size: 13px; color: var(--tx0,#1a1a18);
+  transition: background .12s;
+}
+.ux-co-item:hover{ background: var(--bg2,#f6f6f4); }
+.ux-co-item .ic-wrap{
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(29,158,117,.1); color: var(--ux-brand, var(--gr,#1D9E75));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+}
+.ux-co-item .body{ flex: 1; min-width: 0; }
+.ux-co-item .nm{ font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ux-co-item .sub{ font-size: 11px; color: var(--tx2,#999582); margin-top: 1px; }
+.ux-co-item.active{ background: rgba(29,158,117,.06); }
+.ux-co-item.active .nm::after{ content: ' ✓'; color: var(--ux-brand, var(--gr,#1D9E75)); font-weight: 700; }
+.ux-co-menu .footer{
+  border-top: 1px solid var(--bd,#dddad0); margin-top: .35rem; padding-top: .35rem;
+}
+.ux-co-menu .footer .ux-co-item .ic-wrap{ background: var(--bg2,#f6f6f4); color: var(--tx1,#62604b); }
+
+/* ─── Mode focus : cache sidebar et toolbar ─── */
+body.ux-focus #sidebar-entreprise, body.ux-focus #sidebar-cabinet,
+body.ux-focus .sidebar { display: none !important; }
+body.ux-focus #ux-toolbar, body.ux-focus #ux-help-fab, body.ux-focus #onb-fab,
+body.ux-focus #ux-co-switcher { display: none !important; }
+body.ux-focus #app-wrap { padding-left: 0 !important; }
+body.ux-focus .topbar { padding: 0 1rem !important; }
+.ux-focus-pill{
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  background: #1a1a18; color: #fff; padding: 6px 14px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; font-family: Inter, system-ui, sans-serif;
+  z-index: 10001; display: none; align-items: center; gap: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+}
+body.ux-focus .ux-focus-pill{ display: inline-flex; }
+.ux-focus-pill button{
+  background: rgba(255,255,255,.15); color: #fff; border: none;
+  padding: 3px 10px; border-radius: 999px; font-size: 11px; cursor: pointer;
+  font-family: inherit; font-weight: 600;
+}
+.ux-focus-pill button:hover{ background: rgba(255,255,255,.25); }
+.ux-focus-pill .kbd{ background: rgba(255,255,255,.1); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-family: ui-monospace, monospace; }
+</style>
+
+<!-- Dropdown switcher entreprise -->
+<div class="ux-co-menu" id="ux-co-menu">
+  <div class="header" id="ux-co-header">Vos entreprises</div>
+  <div id="ux-co-list"></div>
+  <div class="footer">
+    <div class="ux-co-item" onclick="uxCoAdd()"><div class="ic-wrap">+</div><div class="body"><div class="nm">Ajouter une entreprise</div><div class="sub">Créer un nouveau dossier</div></div></div>
+    <div class="ux-co-item" onclick="uxCoManage()"><div class="ic-wrap">⚙</div><div class="body"><div class="nm">Gérer toutes les entreprises</div><div class="sub">Page Multi-entreprises</div></div></div>
+  </div>
+</div>
+
+<!-- Pill mode focus -->
+<div class="ux-focus-pill">
+  <span>🎯 Mode focus actif</span>
+  <span class="kbd">Esc</span>
+  <button onclick="uxFocusToggle()">Quitter</button>
+</div>
+
+<script>
+(function(){
+  function curUser(){
+    try {
+      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      if(!s) return null;
+      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      return us.find(u => u.email === s.email) || null;
+    } catch(e){ return null; }
+  }
+  function userSettings(){ const u = curUser(); return (u && u.settings) || {}; }
+  function brandHex(){ return userSettings().brandColor || '#1D9E75'; }
+  function escHtml(s){ return String(s||'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c]); }
+  function fmtNumber(n){
+    const s = userSettings();
+    const dec = s.decimal === 'dot' ? '.' : ',';
+    const thou = s.decimal === 'dot' ? ',' : ' ';
+    const v = Math.round((+n || 0) * 100) / 100;
+    const parts = String(Math.abs(v)).split('.');
+    const intP = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thou);
+    return (v < 0 ? '-' : '') + intP + dec + (parts[1] || '00').padEnd(2,'0');
+  }
+  function currencySymbol(){ return ({EUR:'€',USD:'$',GBP:'£',CHF:'CHF',CAD:'$',JPY:'¥'})[userSettings().currency || 'EUR'] || '€'; }
+
+  // ════════ 1. PDF DEVIS PERSONNALISÉ ════════
+  function buildDevisPdf(d, cl){
+    const u = curUser(); const s = userSettings();
+    const brand = brandHex();
+    const sym = currencySymbol();
+    const logoHtml = u && u.logo ? '<img src="' + u.logo + '" style="max-height:60px;max-width:180px;object-fit:contain;margin-bottom:.75rem;">' : '';
+    const headerHtml = s.docHeader ? '<div style="font-size:11px;color:#666;white-space:pre-wrap;line-height:1.5;margin-top:8px;">' + escHtml(s.docHeader) + '</div>' : '';
+    const footerHtml = s.docFooter ? '<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid #eee;font-size:11px;color:#666;text-align:center;font-style:italic;">' + escHtml(s.docFooter) + '</div>' : '';
+    const tvaA = d.ht * d.tva / 100;
+    return '<!DOCTYPE html><html><head><title>Devis ' + escHtml(d.num) + '</title><style>' +
+      'body{font-family:-apple-system,Segoe UI,sans-serif;padding:2.5rem 2rem;font-size:13px;max-width:780px;margin:auto;color:#1a1a18;line-height:1.5;}' +
+      'h1{color:' + brand + ';font-size:28px;letter-spacing:-.5px;margin:0;}' +
+      '.head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2.5rem;}' +
+      '.parties{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem;padding:1.25rem;background:#fafaf7;border-radius:10px;border-left:4px solid ' + brand + ';}' +
+      '.parties .lab{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}' +
+      'table{width:100%;border-collapse:collapse;margin-top:1.5rem;}' +
+      'th{background:#fafaf7;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#888;padding:10px;border-bottom:2px solid ' + brand + ';}' +
+      'td{padding:11px 10px;border-bottom:1px solid #eee;}' +
+      '.tot{font-weight:700;font-size:15px;background:' + brand + ';color:#fff;}' +
+      '.tot td{border:none;padding:14px 10px;}' +
+      '.tot td:last-child{font-size:18px;}' +
+      '.meta{font-size:12px;color:#666;text-align:right;}' +
+      '.bdg{display:inline-block;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;background:#fef3c7;color:#92400e;}' +
+      '.bdg.acc{background:#d1f4e2;color:#1D9E75;}' +
+      '.bdg.ref{background:#fee2e2;color:#b91c1c;}' +
+      '.valid{margin-top:1.5rem;padding:.85rem 1rem;background:#fef9e7;border:1px solid #f5d76e;border-radius:8px;font-size:12px;color:#7a5a00;}' +
+      '@media print{body{padding:1rem;}}' +
+      '</style></head><body>' +
+      '<div class="head">' +
+        '<div>' + logoHtml + '<h1>DEVIS</h1>' +
+          '<div style="font-size:24px;font-weight:700;margin-top:4px;color:' + brand + ';">' + escHtml(d.num) + '</div>' +
+          headerHtml +
+        '</div>' +
+        '<div class="meta">' +
+          '<div><strong>' + escHtml((u && u.societe) || 'Votre entreprise') + '</strong></div>' +
+          '<div>' + escHtml((u && (u.prenom||'') + ' ' + (u.nom||''))) + '</div>' +
+          '<div style="margin-top:14px;">Émis le : <strong>' + escHtml(d.date) + '</strong></div>' +
+          '<div>Valide jusqu\'au : <strong>' + escHtml(d.val) + '</strong></div>' +
+          '<div style="margin-top:8px;">Statut : <span class="bdg ' + (d.st === 'accepté' ? 'acc' : d.st === 'refusé' ? 'ref' : '') + '">' + escHtml(d.st) + '</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="parties">' +
+        '<div><div class="lab">Émetteur</div><strong style="font-size:14px;">' + escHtml((u && u.societe) || '—') + '</strong><br>' + escHtml((u && (u.prenom||'') + ' ' + (u.nom||''))) + '</div>' +
+        '<div><div class="lab">Pour le client</div><strong style="font-size:14px;">' + escHtml(cl.nom || '—') + '</strong><br>' +
+          (cl.adr ? escHtml(cl.adr) + '<br>' : '') +
+          (cl.cp || cl.ville ? escHtml((cl.cp||'') + ' ' + (cl.ville||'')) + '<br>' : '') +
+          (cl.email ? escHtml(cl.email) : '') +
+        '</div>' +
+      '</div>' +
+      '<table>' +
+        '<thead><tr><th style="text-align:left;">Prestation</th><th style="text-align:right;width:90px;">HT</th><th style="text-align:right;width:110px;">TVA (' + escHtml(d.tva) + '%)</th><th style="text-align:right;width:110px;">TTC</th></tr></thead>' +
+        '<tbody><tr><td>' + escHtml(d.desc || 'Prestation') + '</td>' +
+          '<td style="text-align:right;">' + fmtNumber(d.ht) + ' ' + sym + '</td>' +
+          '<td style="text-align:right;">' + fmtNumber(tvaA) + ' ' + sym + '</td>' +
+          '<td style="text-align:right;font-weight:700;">' + fmtNumber(d.ttc) + ' ' + sym + '</td></tr></tbody>' +
+        '<tfoot><tr class="tot"><td>MONTANT TOTAL</td>' +
+          '<td style="text-align:right;">' + fmtNumber(d.ht) + ' ' + sym + '</td>' +
+          '<td style="text-align:right;">' + fmtNumber(tvaA) + ' ' + sym + '</td>' +
+          '<td style="text-align:right;">' + fmtNumber(d.ttc) + ' ' + sym + '</td></tr></tfoot>' +
+      '</table>' +
+      '<div class="valid">⏳ <strong>Validité de l\'offre</strong> : ce devis est valable jusqu\'au ' + escHtml(d.val) + '. Pour accepter, retournez-le signé avec la mention « Bon pour accord ».</div>' +
+      footerHtml +
+      '<div style="margin-top:2rem;font-size:10px;color:#aaa;text-align:center;">Document généré par ComptaPME Pro · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
+      '</body></html>';
+  }
+  const origImpDevis = window.imprimerDevis;
+  if(typeof origImpDevis === 'function'){
+    window.imprimerDevis = function(i){
+      try {
+        const d = (typeof devis !== 'undefined' && devis[i]);
+        const cl = d && (typeof clients !== 'undefined') && clients[d.ci] || {};
+        if(!d) return origImpDevis.apply(this, arguments);
+        if(typeof addH === 'function') addH('export', 'Impression devis ' + d.num, 'inf');
+        const w = window.open('', '_blank');
+        if(!w) return origImpDevis.apply(this, arguments);
+        w.document.write(buildDevisPdf(d, cl));
+        w.document.close();
+        setTimeout(() => { try { w.print(); } catch(e){} }, 200);
+      } catch(e){ console.warn('V6 imprimerDevis fallback', e); return origImpDevis.apply(this, arguments); }
+    };
+  }
+
+  // ════════ 2. SWITCHER ENTREPRISE INLINE DROPDOWN ════════
+  function readCompanies(){
+    try { return (typeof companies !== 'undefined' && Array.isArray(companies)) ? companies : []; } catch(e){ return []; }
+  }
+  function activeId(){
+    try { return (typeof activeCompanyId !== 'undefined') ? activeCompanyId : null; } catch(e){ return null; }
+  }
+  function renderCoMenu(){
+    const list = document.getElementById('ux-co-list');
+    if(!list) return;
+    const all = readCompanies();
+    const act = activeId();
+    if(!all.length){
+      list.innerHTML = '<div style="padding:1rem;text-align:center;color:var(--tx2);font-size:12px;">Aucune entreprise — utilisez « Ajouter » ci-dessous.</div>';
+      return;
+    }
+    list.innerHTML = all.map((c, i) => {
+      const initial = (c.nom || '?').trim().charAt(0).toUpperCase();
+      const isAct = (c.id === act);
+      return '<div class="ux-co-item ' + (isAct?'active':'') + '" data-id="' + escHtml(c.id) + '">' +
+        '<div class="ic-wrap">' + escHtml(initial) + '</div>' +
+        '<div class="body"><div class="nm">' + escHtml(c.nom||'(sans nom)') + '</div>' +
+        '<div class="sub">' + escHtml((c.forme||'') + (c.siren && c.siren !== '—' ? ' · ' + c.siren : '')) + '</div></div></div>';
+    }).join('');
+    list.querySelectorAll('.ux-co-item[data-id]').forEach(el => {
+      el.onclick = () => {
+        const id = el.dataset.id;
+        if(typeof switchCompany === 'function'){
+          switchCompany(id);
+          renderCoMenu();
+          updateSwitcherLabel();
+        }
+        closeCoMenu();
+      };
+    });
+  }
+  function updateSwitcherLabel(){
+    const all = readCompanies();
+    const act = activeId();
+    const cur = all.find(c => c.id === act) || all[0];
+    const el = document.getElementById('ux-co-nm');
+    if(el && cur && cur.nom) el.textContent = cur.nom;
+  }
+  function openCoMenu(){
+    const m = document.getElementById('ux-co-menu');
+    const sw = document.getElementById('ux-co-switcher');
+    if(!m || !sw) return;
+    renderCoMenu();
+    const r = sw.getBoundingClientRect();
+    m.style.left = r.left + 'px';
+    m.style.top = (r.bottom + 8) + 'px';
+    m.classList.add('open');
+  }
+  function closeCoMenu(){ document.getElementById('ux-co-menu').classList.remove('open'); }
+  window.uxCoAdd = function(){
+    closeCoMenu();
+    if(typeof nav === 'function'){
+      const el = document.querySelector('[onclick*="nav(\'multi-company\'"]');
+      el ? nav('multi-company', el) : nav('multi-company');
+    }
+    setTimeout(() => { if(typeof openOv === 'function') openOv('ov-add-company'); }, 120);
+  };
+  window.uxCoManage = function(){
+    closeCoMenu();
+    if(typeof nav === 'function'){
+      const el = document.querySelector('[onclick*="nav(\'multi-company\'"]');
+      el ? nav('multi-company', el) : nav('multi-company');
+    }
+  };
+  // Remplacer le onclick du switcher existant
+  function rebindSwitcher(){
+    const sw = document.getElementById('ux-co-switcher');
+    if(!sw || sw.dataset.v6Hooked) return;
+    sw.dataset.v6Hooked = '1';
+    sw.onclick = function(e){ e.stopPropagation(); openCoMenu(); };
+  }
+  // Fermer au clic dehors
+  document.addEventListener('click', function(e){
+    const m = document.getElementById('ux-co-menu');
+    const sw = document.getElementById('ux-co-switcher');
+    if(m && m.classList.contains('open') && !m.contains(e.target) && (!sw || !sw.contains(e.target))) closeCoMenu();
+  });
+  setInterval(rebindSwitcher, 1500);
+  setInterval(updateSwitcherLabel, 3000);
+
+  // ════════ 3. IMPORT CSV FACTURES ════════
+  // Réutilise la modale d'import existante (V3) en l'adaptant au type 'factures'
+  // On crée une variante : button "📥 Importer CSV" sur la page Factures + modal dédié
+  function injectFacImportBtn(){
+    const newBtn = document.querySelector('#p-factures .ph .btn.btn-gr[onclick*="openFactureModal"]');
+    if(!newBtn || document.getElementById('ux-fac-import-btn')) return;
+    const btn = document.createElement('button');
+    btn.id = 'ux-fac-import-btn';
+    btn.className = 'ux-import-btn';
+    btn.innerHTML = '📥 Importer CSV';
+    btn.onclick = window.uxFacImportOpen;
+    newBtn.parentNode.insertBefore(btn, newBtn.nextSibling);
+  }
+  new MutationObserver(injectFacImportBtn).observe(document.body, {childList:true, subtree:true});
+  setInterval(injectFacImportBtn, 2000);
+
+  const FAC_FIELD_MAP = {
+    'numero':'f-num','numéro':'f-num','num':'f-num','number':'f-num',
+    'client':'__client','société':'__client','societe':'__client','customer':'__client','nom':'__client','raison sociale':'__client',
+    'date':'f-date','date émission':'f-date','date emission':'f-date','date facture':'f-date','issue date':'f-date',
+    'echeance':'f-due','échéance':'f-due','due':'f-due','due date':'f-due','date echeance':'f-due','date échéance':'f-due',
+    'ht':'f-ht','montant ht':'f-ht','total ht':'f-ht','amount':'f-ht',
+    'tva':'f-tva','tva %':'f-tva','tva (%)':'f-tva','vat':'f-tva','taux':'f-tva','taux tva':'f-tva',
+    'ttc':'__ttc','total ttc':'__ttc','total':'__ttc',
+    'statut':'f-st','status':'f-st','etat':'f-st','état':'f-st',
+    'description':'f-desc','desc':'f-desc','libelle':'f-desc','libellé':'f-desc'
+  };
+  const STATUT_MAP = {
+    'payee':'payée','payée':'payée','paid':'payée',
+    'en attente':'en attente','attente':'en attente','pending':'en attente','en cours':'en attente',
+    'en retard':'en retard','retard':'en retard','overdue':'en retard','late':'en retard'
+  };
+
+  function parseDate(s){
+    if(!s) return null;
+    s = String(s).trim();
+    // ISO YYYY-MM-DD
+    let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if(m) return m[1] + '-' + m[2].padStart(2,'0') + '-' + m[3].padStart(2,'0');
+    // FR DD/MM/YYYY ou DD-MM-YYYY
+    m = s.match(/^(\d{1,2})[\/\.\-](\d{1,2})[\/\.\-](\d{2,4})/);
+    if(m){
+      let y = m[3]; if(y.length === 2) y = '20' + y;
+      return y + '-' + m[2].padStart(2,'0') + '-' + m[1].padStart(2,'0');
+    }
+    return null;
+  }
+  function parseNum(s){
+    if(s === null || s === undefined || s === '') return null;
+    const cleaned = String(s).replace(/[^\d.,\-]/g, '').replace(/\s/g,'').replace(/,/g, '.');
+    const parts = cleaned.split('.');
+    let v;
+    if(parts.length > 2){ v = parts.slice(0,-1).join('') + '.' + parts.slice(-1); v = parseFloat(v); }
+    else v = parseFloat(cleaned);
+    return isNaN(v) ? null : v;
+  }
+  function parseCsv2(text){
+    const lines = []; let cur = '', inQ = false, row = [];
+    for(let i=0; i<text.length; i++){
+      const ch = text[i];
+      if(ch === '"'){ if(inQ && text[i+1]==='"'){ cur+='"'; i++; } else inQ = !inQ; }
+      else if((ch === ',' || ch === ';') && !inQ){ row.push(cur); cur=''; }
+      else if((ch === '\n' || ch === '\r') && !inQ){ if(cur||row.length){ row.push(cur); lines.push(row);} cur=''; row=[]; if(ch==='\r'&&text[i+1]==='\n') i++; }
+      else cur += ch;
+    }
+    if(cur || row.length){ row.push(cur); lines.push(row); }
+    return lines;
+  }
+
+  let facImportParsed = null;
+  window.uxFacImportOpen = function(){
+    // Réutilise le HTML du modal d'import client en customisant les labels
+    const ov = document.getElementById('ux-import-overlay');
+    if(!ov){ alert('Module d\'import indisponible'); return; }
+    // Reset
+    document.getElementById('ux-import-step1').style.display = '';
+    document.getElementById('ux-import-step2').style.display = 'none';
+    document.getElementById('ux-csv-file').value = '';
+    document.getElementById('ux-import-go').disabled = true;
+    document.getElementById('ux-import-go').textContent = 'Importer 0 facture';
+    facImportParsed = null;
+    // Patch le titre et le help text temporairement
+    const hd = ov.querySelector('.ux-import-hd h3');
+    if(hd) hd.innerHTML = '📥 Importer des factures depuis un CSV';
+    const help = document.querySelector('#ux-import-step1 .ux-import-help');
+    if(help) help.innerHTML = '<strong>Format attendu :</strong> 1ère ligne = en-têtes. Colonnes reconnues :<br><code>Client</code> (obligatoire, match par nom), <code>Date</code>, <code>HT</code>, <code>Échéance</code>, <code>TVA</code> (%), <code>Statut</code>, <code>Description</code>, <code>Numéro</code><br>Dates : <code>JJ/MM/AAAA</code> ou <code>AAAA-MM-JJ</code> · Séparateur : <code>,</code> ou <code>;</code>';
+    // Hook file input pour utiliser le parser factures
+    document.getElementById('ux-csv-file').onchange = function(e){
+      const f = e.target.files && e.target.files[0];
+      if(!f) return;
+      if(f.size > 1024*1024){ alert('Fichier trop volumineux (max 1 Mo)'); return; }
+      const r = new FileReader();
+      r.onload = ev => { parseFacCsv(ev.target.result.trim()); };
+      r.readAsText(f, 'utf-8');
+    };
+    // Hook bouton import pour utiliser le bulk-add factures
+    document.getElementById('ux-import-go').onclick = uxFacImportGo;
+    ov.classList.add('open');
+  };
+
+  function parseFacCsv(text){
+    const rows = parseCsv2(text);
+    if(rows.length < 2){ alert('Le CSV ne contient pas de données.'); return; }
+    const headers = rows[0].map(h => String(h).trim().toLowerCase().replace(/^"|"$/g,''));
+    const colMap = headers.map(h => FAC_FIELD_MAP[h] || null);
+    // Pré-calcule la map des clients
+    const clientsArr = (typeof clients !== 'undefined' && Array.isArray(clients)) ? clients : [];
+    const clientIdx = {}; clientsArr.forEach((c,i) => { if(c.nom) clientIdx[c.nom.toLowerCase().trim()] = i; });
+    function findClientIdx(name){
+      if(!name) return -1;
+      const k = name.toLowerCase().trim();
+      if(clientIdx[k] !== undefined) return clientIdx[k];
+      // Fuzzy : contient ou contenu
+      for(const cname in clientIdx){
+        if(cname.includes(k) || k.includes(cname)) return clientIdx[cname];
+      }
+      return -1;
+    }
+    const dataRows = rows.slice(1).map(cols => {
+      const mapped = {};
+      let clientName = '';
+      cols.forEach((v,i) => {
+        const t = colMap[i];
+        if(!t) return;
+        if(t === '__client') clientName = String(v).trim().replace(/^"|"$/g,'');
+        else if(t === '__ttc'){ /* ignoré : on recalcule */ }
+        else mapped[t] = String(v).trim().replace(/^"|"$/g,'');
+      });
+      // Trouve l'index client
+      const ci = findClientIdx(clientName);
+      mapped['__clientName'] = clientName;
+      mapped['__ci'] = ci;
+      // Parse date
+      if(mapped['f-date']){ const d = parseDate(mapped['f-date']); if(d) mapped['f-date'] = d; }
+      if(mapped['f-due']) { const d = parseDate(mapped['f-due']);  if(d) mapped['f-due']  = d; }
+      // Parse montant
+      const ht = parseNum(mapped['f-ht']);
+      const tva = parseNum(mapped['f-tva']);
+      // Statut normalisation
+      if(mapped['f-st']){ const st = STATUT_MAP[mapped['f-st'].toLowerCase()] || 'en attente'; mapped['f-st'] = st; }
+      // Validation
+      let valid = true, reason = '';
+      if(ci < 0){ valid = false; reason = 'Client inconnu : ' + (clientName || '?'); }
+      else if(ht === null || ht <= 0){ valid = false; reason = 'Montant HT manquant'; }
+      else if(!mapped['f-date']){ valid = false; reason = 'Date manquante'; }
+      return { cols, mapped, valid, reason, clientName, ci };
+    });
+    facImportParsed = { headers, colMap, rows: dataRows };
+    renderFacImportPreview();
+  }
+  function renderFacImportPreview(){
+    if(!facImportParsed) return;
+    document.getElementById('ux-import-step1').style.display = 'none';
+    document.getElementById('ux-import-step2').style.display = '';
+    const valid = facImportParsed.rows.filter(r => r.valid).length;
+    const invalid = facImportParsed.rows.length - valid;
+    document.getElementById('ux-stat-valid').textContent = valid;
+    document.getElementById('ux-stat-invalid').textContent = invalid;
+    document.getElementById('ux-stat-total').textContent = facImportParsed.rows.length;
+    // Mapping
+    const labels = {'f-num':'Numéro','__client':'Client','f-date':'Date','f-due':'Échéance','f-ht':'HT','f-tva':'TVA%','f-st':'Statut','f-desc':'Description','__ttc':'TTC (ignoré)'};
+    const mapped = facImportParsed.colMap.map((t,i) => t ? facImportParsed.headers[i] + ' → ' + (labels[t] || t) : null).filter(Boolean);
+    const unmapped = facImportParsed.colMap.map((t,i) => t ? null : facImportParsed.headers[i]).filter(Boolean);
+    document.getElementById('ux-import-mapping').innerHTML = '<strong>Mapping détecté :</strong> ' + mapped.join(' · ') + (unmapped.length ? '<br><strong style="color:#f5a623;">Colonnes ignorées :</strong> ' + unmapped.join(', ') : '');
+    // Preview
+    const sample = facImportParsed.rows.slice(0, 15);
+    const tbl = '<table><thead><tr>' + facImportParsed.headers.map(h => '<th>' + h.replace(/</g,'&lt;') + '</th>').join('') + '<th>Statut</th></tr></thead><tbody>' +
+      sample.map(r => '<tr class="' + (r.valid?'':'invalid') + '">' + r.cols.map(c => '<td>' + String(c).replace(/</g,'&lt;') + '</td>').join('') + '<td>' + (r.valid ? '✓' : '⚠ ' + r.reason) + '</td></tr>').join('') +
+      '</tbody></table>';
+    document.getElementById('ux-import-table').innerHTML = tbl + (facImportParsed.rows.length > 15 ? '<div style="padding:8px;font-size:11px;color:var(--tx2);text-align:center;">… +' + (facImportParsed.rows.length - 15) + ' ligne(s)</div>' : '');
+    const btn = document.getElementById('ux-import-go');
+    btn.disabled = valid === 0;
+    btn.textContent = 'Importer ' + valid + ' facture' + (valid>1?'s':'');
+  }
+  function uxFacImportGo(){
+    if(!facImportParsed) return;
+    const validRows = facImportParsed.rows.filter(r => r.valid);
+    if(!validRows.length) return;
+    if(!confirm('Importer ' + validRows.length + ' facture(s) ? Cette action est définitive.')) return;
+    if(typeof openFactureModal !== 'function' || typeof saveFac !== 'function'){ alert('Fonction d\'ajout indisponible'); return; }
+    const before = (curUser()?.data?.factures || []).length;
+    const origAlert = window.alert; window.alert = function(){};
+    let added = 0, failed = 0;
+    validRows.forEach(r => {
+      try {
+        openFactureModal(-1);
+        // Set f-num seulement si fourni, sinon laisse l'auto-numérotation
+        const ids = ['f-num','f-date','f-due','f-ht','f-tva','f-desc','f-st'];
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if(!el) return;
+          if(r.mapped[id]) el.value = r.mapped[id];
+        });
+        // Set client (index dans le select)
+        const cl = document.getElementById('f-cl');
+        if(cl) cl.value = r.ci;
+        // Default TVA si manquant
+        if(!r.mapped['f-tva']){ const t = document.getElementById('f-tva'); if(t && !t.value) t.value = '20'; }
+        // Default échéance si manquante
+        if(!r.mapped['f-due']){ const d = document.getElementById('f-due'); if(d && r.mapped['f-date']){ const dt = new Date(r.mapped['f-date']); dt.setDate(dt.getDate()+30); d.value = dt.toISOString().slice(0,10); } }
+        saveFac();
+        added++;
+      } catch(e){ failed++; console.warn(e); }
+    });
+    window.alert = origAlert;
+    // Force la persistance
+    if(typeof persistUserData === 'function') persistUserData();
+    document.getElementById('ux-import-overlay').classList.remove('open');
+    if(typeof notif === 'function') notif('✓ ' + added + ' facture(s) importée(s)' + (failed?' ('+failed+' échec)':''));
+    // Toast undo (réutilise V4)
+    if(typeof uxToast === 'function' && added > 0){
+      uxToast({
+        msg: '✓ ' + added + ' facture' + (added>1?'s':'') + ' importée' + (added>1?'s':''),
+        sub: 'Annulable pendant 12 sec',
+        action: function(){ undoFacImport(added); },
+        actionLabel: 'Annuler', countdown: 12
+      });
+    }
+  }
+  function undoFacImport(count){
+    if(typeof delFac !== 'function') return;
+    const origConfirm = window.confirm; window.confirm = () => true;
+    for(let i = 0; i < count; i++){
+      try {
+        const len = (curUser()?.data?.factures || []).length;
+        if(len === 0) break;
+        delFac(len - 1);
+        if(typeof persistUserData === 'function') persistUserData();
+      } catch(e){ break; }
+    }
+    window.confirm = origConfirm;
+    if(typeof notif === 'function') notif('Import factures annulé');
+  }
+
+  // ════════ 4. MODE FOCUS ════════
+  window.uxFocusToggle = function(){
+    document.body.classList.toggle('ux-focus');
+    if(typeof notif === 'function'){
+      notif(document.body.classList.contains('ux-focus') ? '🎯 Mode focus activé · Esc pour quitter' : 'Mode focus désactivé');
+    }
+  };
+  // Shortcut : Cmd/Ctrl + .
+  document.addEventListener('keydown', function(e){
+    if((e.ctrlKey || e.metaKey) && e.key === '.'){ e.preventDefault(); uxFocusToggle(); }
+    // Esc en mode focus → sortir
+    if(e.key === 'Escape' && document.body.classList.contains('ux-focus')){
+      // Mais seulement si aucun modal ou overlay actif (Esc déjà géré par d'autres)
+      const anyOpenOv = document.querySelector('.ov.open, .ux-search-overlay.open, .ux-prem-overlay.open, .ux-import-overlay.open, .ux-settings-overlay.open');
+      if(!anyOpenOv){ document.body.classList.remove('ux-focus'); }
+    }
+  });
+  // Ajout d'une entrée dans le help center via wrap si possible
+  setTimeout(() => {
+    const help = document.querySelector('.ux-help-section h4');
+    // Pas critique de l'ajouter, le raccourci est documenté côté tour-V2 maintenant
+  }, 1000);
+})();
+</script>
+
+
 </body>
 </html>
