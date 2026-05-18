@@ -7723,5 +7723,1357 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
 </script>
 
 
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FIN BLOC V7 — DÉBUT INJECTION V8                       -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════════════
+     LUNO V8 — Architecture multi-orgs · Org Switcher · Team Management
+     · Système d'invitations · Permissions par rôle
+     Injection : coller ce bloc entier JUSTE AVANT </body> dans app.html
+     (après le bloc SUPABASE-V7-BLOCK-MARKER)
+════════════════════════════════════════════════════════════════════ -->
+
+<!-- ── Styles V8 ─────────────────────────────────────────────── -->
+<style id="luno-v8-styles">
+/* ── Org Switcher ─────────────────────────────────── */
+#v8-org-switcher {
+  position: relative;
+  display: none; /* affiché après login */
+}
+#v8-org-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px 5px 8px;
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  border-radius: 100px;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--tx0);
+  transition: background .15s;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+#v8-org-btn:hover { background: var(--bg3); border-color: var(--bd2); }
+#v8-org-btn .v8-org-icon { font-size: 14px; flex-shrink: 0; }
+#v8-org-btn .v8-org-name { overflow: hidden; text-overflow: ellipsis; }
+#v8-org-btn .v8-org-chevron { color: var(--tx2); font-size: 10px; flex-shrink: 0; margin-left: 2px; }
+
+#v8-org-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 240px;
+  background: var(--bg-glass);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--bd);
+  border-radius: var(--rl);
+  box-shadow: var(--sh-lg);
+  z-index: 9999;
+  overflow: hidden;
+  display: none;
+  animation: v8-dd-in .12s ease;
+}
+@keyframes v8-dd-in {
+  from { opacity:0; transform:translateY(-4px) scale(.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+#v8-org-dropdown.open { display: block; }
+
+.v8-dd-header {
+  padding: 10px 14px 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--tx2);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.v8-dd-org-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  transition: background .1s;
+}
+.v8-dd-org-item:hover { background: var(--bg2); }
+.v8-dd-org-item.active { background: var(--gr3); }
+.v8-dd-org-item.active .v8-org-item-name { color: var(--gr); font-weight: 600; }
+.v8-org-item-icon { font-size: 18px; width: 32px; height: 32px; display:flex; align-items:center; justify-content:center; border-radius: 8px; background: var(--bg2); flex-shrink:0; }
+.v8-org-item-info { flex: 1; overflow: hidden; }
+.v8-org-item-name { font-size: 13px; font-weight: 500; color: var(--tx0); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.v8-org-item-meta { font-size: 11px; color: var(--tx2); margin-top: 1px; }
+.v8-org-item-check { color: var(--gr); font-size: 14px; opacity: 0; }
+.v8-dd-org-item.active .v8-org-item-check { opacity: 1; }
+
+.v8-dd-sep { height: 1px; background: var(--bd); margin: 4px 0; }
+.v8-dd-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--tx1);
+  transition: background .1s;
+}
+.v8-dd-action:hover { background: var(--bg2); color: var(--tx0); }
+.v8-dd-action svg { width:14px; height:14px; flex-shrink:0; }
+
+/* ── Bouton Équipe dans toolbar ─────────────────── */
+#v8-team-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  background: transparent;
+  border: 1px solid var(--bd);
+  border-radius: 100px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--tx1);
+  transition: all .15s;
+}
+#v8-team-btn:hover { background: var(--bg2); color: var(--tx0); border-color: var(--bd2); }
+
+/* ── Modal générique V8 ─────────────────────────── */
+.v8-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: v8-fade-in .15s ease;
+}
+@keyframes v8-fade-in { from {opacity:0} to {opacity:1} }
+.v8-modal {
+  background: var(--bg0);
+  border: 1px solid var(--bd);
+  border-radius: var(--rxl);
+  box-shadow: var(--sh-xl);
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: v8-modal-in .18s cubic-bezier(.34,1.4,.64,1);
+}
+@keyframes v8-modal-in {
+  from { opacity:0; transform:scale(.93) translateY(12px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+.v8-modal-sm {
+  width: min(420px, calc(100vw - 32px));
+}
+.v8-modal-head {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--bd);
+  gap: 12px;
+  flex-shrink: 0;
+}
+.v8-modal-title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tx0);
+}
+.v8-modal-close {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--tx1);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.v8-modal-close:hover { background: var(--bg3); color: var(--tx0); }
+.v8-modal-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 20px 24px;
+}
+.v8-modal-foot {
+  padding: 14px 24px;
+  border-top: 1px solid var(--bd);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+/* ── Tabs dans le modal Équipe ───────────────────── */
+.v8-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--bd);
+  padding-bottom: 0;
+}
+.v8-tab {
+  padding: 8px 14px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tx2);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all .15s;
+}
+.v8-tab:hover { color: var(--tx0); }
+.v8-tab.active { color: var(--gr); border-bottom-color: var(--gr); font-weight: 600; }
+
+/* ── Membre card ─────────────────────────────────── */
+.v8-member-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bd);
+}
+.v8-member-row:last-child { border-bottom: none; }
+.v8-member-av {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--gr3);
+  color: var(--gr);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.v8-member-info { flex: 1; overflow: hidden; }
+.v8-member-name { font-size: 13.5px; font-weight: 600; color: var(--tx0); }
+.v8-member-email { font-size: 11.5px; color: var(--tx2); margin-top: 1px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.v8-role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid currentColor;
+  flex-shrink: 0;
+}
+.v8-role-badge.owner, .v8-role-badge.cabinet_owner    { color: var(--pu); background: var(--pu2); border-color: var(--pu); }
+.v8-role-badge.admin                                   { color: var(--bl); background: var(--bl2); border-color: var(--bl); }
+.v8-role-badge.accountant, .v8-role-badge.collaborator { color: var(--am); background: var(--am2); border-color: var(--am); }
+.v8-role-badge.employee, .v8-role-badge.assistant      { color: var(--gr); background: var(--gr3); border-color: var(--gr); }
+.v8-role-badge.viewer                                  { color: var(--tx2); background: var(--bg2); border-color: var(--bd2); }
+
+.v8-member-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.v8-icon-btn {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  cursor: pointer;
+  font-size: 13px;
+  display: flex; align-items:center; justify-content:center;
+  color: var(--tx1);
+  transition: all .15s;
+}
+.v8-icon-btn:hover { background: var(--rd2); color: var(--rd); border-color: var(--rd); }
+.v8-icon-btn.edit:hover { background: var(--bl2); color: var(--bl); border-color: var(--bl); }
+
+/* ── Invitation en attente ───────────────────────── */
+.v8-inv-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bd);
+}
+.v8-inv-row:last-child { border-bottom: none; }
+.v8-inv-av {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--am2);
+  color: var(--am);
+  font-size: 18px;
+  display: flex; align-items:center; justify-content:center;
+  flex-shrink: 0;
+}
+.v8-inv-info { flex: 1; overflow: hidden; }
+.v8-inv-email { font-size: 13.5px; font-weight: 600; color: var(--tx0); }
+.v8-inv-meta { font-size: 11.5px; color: var(--tx2); margin-top: 1px; }
+.v8-inv-link {
+  font-size: 11.5px;
+  color: var(--bl);
+  cursor: pointer;
+  text-decoration: underline;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Formulaire d'invitation ─────────────────────── */
+.v8-invite-form {
+  background: var(--bg1);
+  border: 1px solid var(--bd);
+  border-radius: var(--rl);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.v8-invite-form-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tx0);
+  margin-bottom: 12px;
+}
+.v8-form-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.v8-form-field { flex: 1; }
+.v8-form-field label { font-size: 11.5px; color: var(--tx2); font-weight: 500; display: block; margin-bottom: 5px; }
+.v8-form-field input,
+.v8-form-field select {
+  width: 100%;
+  padding: 8px 11px;
+  border: 1px solid var(--bd2);
+  border-radius: var(--r);
+  background: var(--bg0);
+  color: var(--tx0);
+  font-size: 13px;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color .15s;
+}
+.v8-form-field input:focus,
+.v8-form-field select:focus { border-color: var(--gr); box-shadow: 0 0 0 3px var(--gr3); }
+
+/* ── Boutons ─────────────────────────────────────── */
+.v8-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--r);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all .15s;
+  font-family: var(--font);
+  white-space: nowrap;
+}
+.v8-btn-primary { background: var(--gr); color: #fff; }
+.v8-btn-primary:hover { background: var(--gr2); }
+.v8-btn-secondary { background: var(--bg2); color: var(--tx0); border: 1px solid var(--bd2); }
+.v8-btn-secondary:hover { background: var(--bg3); }
+.v8-btn-danger { background: var(--rd2); color: var(--rd); border: 1px solid var(--rd); }
+.v8-btn-danger:hover { background: var(--rd); color: #fff; }
+.v8-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ── Toast V8 ────────────────────────────────────── */
+#v8-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 99999;
+  pointer-events: none;
+}
+.v8-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg0);
+  border: 1px solid var(--bd);
+  border-radius: var(--rl);
+  box-shadow: var(--sh-lg);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tx0);
+  animation: v8-toast-in .25s cubic-bezier(.34,1.4,.64,1);
+  min-width: 260px;
+  max-width: 340px;
+  pointer-events: auto;
+}
+@keyframes v8-toast-in { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+.v8-toast.success { border-left: 3px solid var(--gr); }
+.v8-toast.error   { border-left: 3px solid var(--rd); }
+.v8-toast.info    { border-left: 3px solid var(--bl); }
+.v8-toast-icon { font-size: 16px; flex-shrink: 0; }
+
+/* ── Banner invitation entrant ───────────────────── */
+#v8-invite-banner {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg0);
+  border: 1px solid var(--gr);
+  border-radius: var(--rl);
+  box-shadow: var(--sh-lg);
+  padding: 16px 20px;
+  z-index: 99998;
+  min-width: 320px;
+  max-width: min(460px, calc(100vw - 32px));
+  text-align: center;
+  animation: v8-modal-in .2s ease;
+}
+#v8-invite-banner .v8-ib-icon { font-size: 28px; margin-bottom: 8px; }
+#v8-invite-banner .v8-ib-title { font-size: 15px; font-weight: 700; color: var(--tx0); margin-bottom: 4px; }
+#v8-invite-banner .v8-ib-sub { font-size: 13px; color: var(--tx1); margin-bottom: 16px; }
+#v8-invite-banner .v8-ib-actions { display: flex; gap: 8px; justify-content: center; }
+
+/* ── Role select stylé ───────────────────────────── */
+.v8-role-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px !important;
+}
+
+/* ── État vide ───────────────────────────────────── */
+.v8-empty {
+  text-align: center;
+  padding: 32px 0;
+  color: var(--tx2);
+}
+.v8-empty-icon { font-size: 32px; margin-bottom: 8px; }
+.v8-empty-text { font-size: 13px; }
+
+/* ── Spinner ─────────────────────────────────────── */
+.v8-spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid var(--bd2);
+  border-top-color: var(--gr);
+  border-radius: 50%;
+  animation: v8-spin .6s linear infinite;
+}
+@keyframes v8-spin { to { transform: rotate(360deg); } }
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 600px) {
+  .v8-modal { border-radius: var(--rl) var(--rl) 0 0; align-self: flex-end; max-height: 90vh; width: 100%; }
+  .v8-form-row { flex-direction: column; }
+  .v8-modal-overlay { align-items: flex-end; }
+  #v8-org-btn .v8-org-name { max-width: 90px; }
+}
+</style>
+
+<!-- ── DOM : containers ──────────────────────────── -->
+<div id="v8-toast-container"></div>
+<div id="v8-invite-banner"></div>
+<div id="v8-modals-root"></div>
+
+<!-- ── Script V8 core ────────────────────────────── -->
+<script>
+(function(){
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+// 1. CONSTANTES & STATE
+// ═══════════════════════════════════════════════════════════
+const V8_VERSION = '8.0.0';
+const LS_ACTIVE_ORG = 'luno_active_org_id';
+
+// State global V8
+window.v8 = {
+  orgs:      [],   // liste des orgs de l'utilisateur
+  activeOrg: null, // org active { company_id, company_name, company_type, user_role, member_count }
+  userId:    null,
+  userEmail: null,
+  _ready:    false
+};
+
+// ═══════════════════════════════════════════════════════════
+// 2. UTILITAIRES
+// ═══════════════════════════════════════════════════════════
+
+// Icône selon le type d'org
+function orgIcon(type){
+  const map = { company:'🏢', individual:'👤', accounting_firm:'📊' };
+  return map[type] || '🏢';
+}
+
+// Label rôle en français
+function roleLabel(role){
+  const map = {
+    owner:'Propriétaire', admin:'Administrateur',
+    accountant:'Comptable', employee:'Employé', viewer:'Lecteur',
+    cabinet_owner:'Directeur cabinet', collaborator:'Collaborateur', assistant:'Assistant'
+  };
+  return map[role] || role;
+}
+
+// Toast notification
+function v8Toast(msg, type='success', duration=3500){
+  const icons = { success:'✅', error:'❌', info:'ℹ️', warning:'⚠️' };
+  const el = document.createElement('div');
+  el.className = `v8-toast ${type}`;
+  el.innerHTML = `<span class="v8-toast-icon">${icons[type]||'💬'}</span><span>${msg}</span>`;
+  const container = document.getElementById('v8-toast-container');
+  if(container){ container.appendChild(el); setTimeout(()=>el.remove(), duration); }
+}
+
+// Ouvrir un modal
+function v8OpenModal(html, opts={}){
+  const root = document.getElementById('v8-modals-root');
+  const overlay = document.createElement('div');
+  overlay.className = 'v8-modal-overlay';
+  overlay.innerHTML = html;
+  if(!opts.noBackdropClose){
+    overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
+  }
+  root.appendChild(overlay);
+  return overlay;
+}
+
+// Fermer le modal du haut
+function v8CloseModal(){
+  const root = document.getElementById('v8-modals-root');
+  const last = root.lastElementChild;
+  if(last) last.remove();
+}
+
+// Formater date relative
+function relDate(isoStr){
+  if(!isoStr) return '';
+  const diff = Math.round((new Date(isoStr) - Date.now()) / 86400000);
+  if(diff < 0) return 'Expirée';
+  if(diff === 0) return 'Expire aujourd\'hui';
+  return `Expire dans ${diff}j`;
+}
+
+// Initiales pour avatar
+function initials(name){
+  if(!name) return '?';
+  return name.trim().split(/\s+/).map(w=>w[0]||'').slice(0,2).join('').toUpperCase();
+}
+
+// Vérifier si Supabase est prêt
+function sbReady(){ return !!(window.sb && window.v8.userId); }
+
+// ═══════════════════════════════════════════════════════════
+// 3. PERMISSIONS CENTRALISÉES
+// ═══════════════════════════════════════════════════════════
+const PERMISSIONS = {
+  // Gestion équipe / invitations
+  canInvite:       ['owner','admin','cabinet_owner'],
+  canManageRoles:  ['owner','admin','cabinet_owner'],
+  canRemoveMembers:['owner','admin','cabinet_owner'],
+  // Données
+  canEditData:     ['owner','admin','accountant','collaborator'],
+  canViewData:     ['owner','admin','accountant','collaborator','employee','assistant','viewer','cabinet_owner'],
+  canDeleteData:   ['owner','admin'],
+  // Facturation
+  canManageBilling:['owner','cabinet_owner'],
+  // Paramètres org
+  canEditOrgSettings:['owner','admin','cabinet_owner'],
+};
+
+function canDo(action){
+  const role = window.v8.activeOrg && window.v8.activeOrg.user_role;
+  if(!role) return false;
+  const allowed = PERMISSIONS[action];
+  if(!allowed) return false;
+  return allowed.includes(role);
+}
+
+// Exposer globalement
+window.v8CanDo = canDo;
+
+// ═══════════════════════════════════════════════════════════
+// 4. ORG SWITCHER — injection dans la toolbar
+// ═══════════════════════════════════════════════════════════
+function injectOrgSwitcher(){
+  if(document.getElementById('v8-org-switcher')) return;
+
+  // Trouver le bon ancre : le mode-toggle-wrap ou le bouton Déconnexion
+  const toolbar = document.querySelector('.toolbar-right') || document.querySelector('.t-right');
+  if(!toolbar) return;
+
+  const switcherHtml = `
+    <div id="v8-org-switcher">
+      <button id="v8-org-btn" onclick="v8ToggleOrgDropdown()">
+        <span class="v8-org-icon" id="v8-org-btn-icon">🏢</span>
+        <span class="v8-org-name" id="v8-org-btn-name">Organisation</span>
+        <span class="v8-org-chevron">▾</span>
+      </button>
+      <div id="v8-org-dropdown"></div>
+    </div>
+    <button id="v8-team-btn" onclick="v8OpenTeamModal()">
+      👥 <span>Équipe</span>
+    </button>
+  `;
+
+  // Insérer avant le bouton de déconnexion
+  const logoutBtn = toolbar.querySelector('.t-out') || Array.from(toolbar.querySelectorAll('button')).find(b=>b.textContent.includes('Déconnexion'));
+  if(logoutBtn){
+    logoutBtn.insertAdjacentHTML('beforebegin', switcherHtml);
+  } else {
+    toolbar.insertAdjacentHTML('afterbegin', switcherHtml);
+  }
+
+  // Fermer le dropdown si on clique ailleurs
+  document.addEventListener('click', e => {
+    const sw = document.getElementById('v8-org-switcher');
+    if(sw && !sw.contains(e.target)){
+      const dd = document.getElementById('v8-org-dropdown');
+      if(dd) dd.classList.remove('open');
+    }
+  });
+}
+
+function v8ToggleOrgDropdown(){
+  const dd = document.getElementById('v8-org-dropdown');
+  if(!dd) return;
+  if(dd.classList.contains('open')){ dd.classList.remove('open'); return; }
+  renderOrgDropdown();
+  dd.classList.add('open');
+}
+window.v8ToggleOrgDropdown = v8ToggleOrgDropdown;
+
+function renderOrgDropdown(){
+  const dd = document.getElementById('v8-org-dropdown');
+  if(!dd) return;
+  const orgs = window.v8.orgs || [];
+  const active = window.v8.activeOrg;
+
+  let html = `<div class="v8-dd-header">Mes organisations</div>`;
+
+  if(!orgs.length){
+    html += `<div style="padding:14px;font-size:12px;color:var(--tx2)">Aucune organisation trouvée</div>`;
+  } else {
+    orgs.forEach(org => {
+      const isActive = active && active.company_id === org.company_id;
+      html += `
+        <div class="v8-dd-org-item ${isActive?'active':''}"
+             onclick="v8SwitchOrg('${org.company_id}')">
+          <div class="v8-org-item-icon">${orgIcon(org.company_type)}</div>
+          <div class="v8-org-item-info">
+            <div class="v8-org-item-name">${esc(org.company_name)}</div>
+            <div class="v8-org-item-meta">${roleLabel(org.user_role)} · ${org.member_count||1} membre${org.member_count>1?'s':''}</div>
+          </div>
+          <span class="v8-org-item-check">✓</span>
+        </div>`;
+    });
+  }
+
+  html += `
+    <div class="v8-dd-sep"></div>
+    <div class="v8-dd-action" onclick="v8OpenNewOrgModal();document.getElementById('v8-org-dropdown').classList.remove('open')">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>
+      Créer une organisation
+    </div>`;
+
+  dd.innerHTML = html;
+}
+
+// Échapper HTML
+function esc(s){ const d=document.createElement('div');d.textContent=s||'';return d.innerHTML; }
+
+// Switcher d'org (sans déconnexion)
+async function v8SwitchOrg(orgId){
+  const dd = document.getElementById('v8-org-dropdown');
+  if(dd) dd.classList.remove('open');
+
+  const org = window.v8.orgs.find(o => o.company_id === orgId);
+  if(!org) return;
+
+  window.v8.activeOrg = org;
+  localStorage.setItem(LS_ACTIVE_ORG, orgId);
+  updateOrgBtn();
+
+  // Mettre à jour le legacy `me` pour garder la compatibilité
+  if(window.me){
+    window.me.societe = org.company_name;
+    window.me.activeOrgId = orgId;
+    window.me.role = org.user_role;
+  }
+
+  // Afficher/masquer le bouton Équipe selon le rôle
+  updateTeamBtn();
+
+  v8Toast(`Organisation active : ${org.company_name}`, 'success', 2500);
+
+  // Recharger les données de l'org active si nécessaire
+  if(typeof window.refreshDashboard === 'function') window.refreshDashboard();
+}
+window.v8SwitchOrg = v8SwitchOrg;
+
+function updateOrgBtn(){
+  const org = window.v8.activeOrg;
+  if(!org) return;
+  const btn = document.getElementById('v8-org-btn');
+  const icon = document.getElementById('v8-org-btn-icon');
+  const name = document.getElementById('v8-org-btn-name');
+  if(icon) icon.textContent = orgIcon(org.company_type);
+  if(name) name.textContent = org.company_name;
+  const sw = document.getElementById('v8-org-switcher');
+  if(sw) sw.style.display = 'block';
+}
+
+function updateTeamBtn(){
+  const btn = document.getElementById('v8-team-btn');
+  if(!btn) return;
+  btn.style.display = canDo('canInvite') ? 'inline-flex' : 'none';
+}
+
+// ═══════════════════════════════════════════════════════════
+// 5. CHARGEMENT DES ORGANISATIONS
+// ═══════════════════════════════════════════════════════════
+async function v8LoadOrgs(){
+  if(!sbReady()) return;
+  try {
+    const { data, error } = await window.sb.rpc('get_user_organizations');
+    if(error){ console.warn('[V8] get_user_organizations:', error.message); return; }
+    if(!data || !data.length) return;
+
+    window.v8.orgs = data;
+
+    // Restaurer l'org active depuis localStorage
+    const savedId = localStorage.getItem(LS_ACTIVE_ORG);
+    const restoredOrg = savedId && data.find(o => o.company_id === savedId);
+    window.v8.activeOrg = restoredOrg || data[0];
+    localStorage.setItem(LS_ACTIVE_ORG, window.v8.activeOrg.company_id);
+
+    updateOrgBtn();
+    updateTeamBtn();
+    console.log(`[V8] ${data.length} org(s) chargée(s). Active: ${window.v8.activeOrg.company_name}`);
+  } catch(e){
+    console.warn('[V8] loadOrgs error:', e);
+  }
+}
+window.v8LoadOrgs = v8LoadOrgs;
+
+// ═══════════════════════════════════════════════════════════
+// 6. MODAL TEAM MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+async function v8OpenTeamModal(){
+  const org = window.v8.activeOrg;
+  if(!org){ v8Toast('Aucune organisation sélectionnée','error'); return; }
+
+  const overlay = v8OpenModal(`
+    <div class="v8-modal" id="v8-team-modal">
+      <div class="v8-modal-head">
+        <div style="font-size:22px">${orgIcon(org.company_type)}</div>
+        <div class="v8-modal-title">Équipe · ${esc(org.company_name)}</div>
+        <button class="v8-modal-close" onclick="v8CloseModal()">✕</button>
+      </div>
+      <div class="v8-modal-body">
+        <div class="v8-tabs">
+          <div class="v8-tab active" onclick="v8TeamTab(this,'members')" data-tab="members">👥 Membres</div>
+          <div class="v8-tab" onclick="v8TeamTab(this,'invites')" data-tab="invites">📨 Invitations</div>
+          <div class="v8-tab" onclick="v8TeamTab(this,'org')" data-tab="org">🏢 Organisation</div>
+        </div>
+        <div id="v8-team-tab-content">
+          <div style="display:flex;justify-content:center;padding:24px"><div class="v8-spinner"></div></div>
+        </div>
+      </div>
+    </div>
+  `);
+
+  // Charger les membres
+  await v8RenderMembersTab();
+}
+window.v8OpenTeamModal = v8OpenTeamModal;
+
+function v8TeamTab(el, tab){
+  document.querySelectorAll('.v8-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  if(tab === 'members') v8RenderMembersTab();
+  else if(tab === 'invites') v8RenderInvitesTab();
+  else if(tab === 'org') v8RenderOrgTab();
+}
+window.v8TeamTab = v8TeamTab;
+
+// ── Tab Membres ──
+async function v8RenderMembersTab(){
+  const content = document.getElementById('v8-team-tab-content');
+  if(!content) return;
+  const org = window.v8.activeOrg;
+  const canManage = canDo('canManageRoles');
+
+  content.innerHTML = `<div style="display:flex;justify-content:center;padding:24px"><div class="v8-spinner"></div></div>`;
+
+  try {
+    const { data, error } = await window.sb.rpc('get_org_members', { p_org_id: org.company_id });
+    if(error) throw error;
+
+    let inviteForm = '';
+    if(canDo('canInvite')){
+      inviteForm = `
+        <div class="v8-invite-form">
+          <div class="v8-invite-form-title">Inviter un membre</div>
+          <div class="v8-form-row">
+            <div class="v8-form-field" style="flex:2">
+              <label>Email</label>
+              <input type="email" id="v8-invite-email" placeholder="collaborateur@societe.fr">
+            </div>
+            <div class="v8-form-field">
+              <label>Rôle</label>
+              <select id="v8-invite-role" class="v8-role-select">
+                ${org.company_type === 'accounting_firm' ? `
+                  <option value="collaborator">Collaborateur</option>
+                  <option value="assistant">Assistant</option>
+                  <option value="viewer">Lecteur</option>
+                ` : `
+                  <option value="admin">Administrateur</option>
+                  <option value="accountant">Comptable</option>
+                  <option value="employee">Employé</option>
+                  <option value="viewer">Lecteur</option>
+                `}
+              </select>
+            </div>
+            <div class="v8-form-field" style="flex:0">
+              <label>&nbsp;</label>
+              <button class="v8-btn v8-btn-primary" onclick="v8SendInvite()">Inviter</button>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    if(!data || !data.length){
+      content.innerHTML = inviteForm + `<div class="v8-empty"><div class="v8-empty-icon">👥</div><div class="v8-empty-text">Aucun membre dans cette organisation</div></div>`;
+      return;
+    }
+
+    const membersHtml = data.map(m => {
+      const isCurrentUser = m.user_id === window.v8.userId;
+      const isOwner = m.role === 'owner' || m.role === 'cabinet_owner';
+      const name = (m.full_name || '').trim() || m.email;
+
+      return `
+        <div class="v8-member-row">
+          <div class="v8-member-av">${initials(name)}</div>
+          <div class="v8-member-info">
+            <div class="v8-member-name">${esc(name)}${isCurrentUser?' <span style="font-size:10px;color:var(--tx2)">(vous)</span>':''}</div>
+            <div class="v8-member-email">${esc(m.email||'')}</div>
+          </div>
+          <span class="v8-role-badge ${m.role}">${roleLabel(m.role)}</span>
+          ${canManage && !isCurrentUser && !isOwner ? `
+            <div class="v8-member-actions">
+              <button class="v8-icon-btn edit" title="Changer le rôle"
+                onclick="v8ChangeRoleModal('${m.user_id}','${m.role}','${esc(name)}')">✏️</button>
+              <button class="v8-icon-btn" title="Retirer de l'organisation"
+                onclick="v8RemoveMember('${m.user_id}','${esc(name)}')">🗑️</button>
+            </div>
+          ` : '<div class="v8-member-actions"></div>'}
+        </div>`;
+    }).join('');
+
+    content.innerHTML = inviteForm + membersHtml;
+  } catch(e){
+    console.error('[V8] get_org_members:', e);
+    content.innerHTML = `<div class="v8-empty"><div class="v8-empty-icon">⚠️</div><div class="v8-empty-text">Erreur de chargement : ${esc(e.message)}</div></div>`;
+  }
+}
+
+// ── Tab Invitations ──
+async function v8RenderInvitesTab(){
+  const content = document.getElementById('v8-team-tab-content');
+  if(!content) return;
+  const org = window.v8.activeOrg;
+
+  content.innerHTML = `<div style="display:flex;justify-content:center;padding:24px"><div class="v8-spinner"></div></div>`;
+
+  try {
+    const { data, error } = await window.sb.rpc('get_org_invitations', { p_org_id: org.company_id });
+    if(error) throw error;
+
+    if(!data || !data.length){
+      content.innerHTML = `<div class="v8-empty"><div class="v8-empty-icon">📭</div><div class="v8-empty-text">Aucune invitation en attente</div></div>`;
+      return;
+    }
+
+    const html = data.map(inv => `
+      <div class="v8-inv-row">
+        <div class="v8-inv-av">✉️</div>
+        <div class="v8-inv-info">
+          <div class="v8-inv-email">${esc(inv.email)}</div>
+          <div class="v8-inv-meta">${roleLabel(inv.role)} · ${relDate(inv.expires_at)}</div>
+        </div>
+        <span class="v8-inv-link" onclick="v8CopyInviteLink('${inv.token}')">📋 Copier lien</span>
+        <button class="v8-icon-btn" title="Annuler" style="margin-left:8px"
+          onclick="v8RevokeInvite('${inv.inv_id}')">🗑️</button>
+      </div>
+    `).join('');
+
+    content.innerHTML = `<div style="margin-bottom:12px;font-size:12px;color:var(--tx2)">${data.length} invitation${data.length>1?'s':''} en attente</div>` + html;
+  } catch(e){
+    console.error('[V8] get_org_invitations:', e);
+    content.innerHTML = `<div class="v8-empty"><div class="v8-empty-icon">⚠️</div><div class="v8-empty-text">Erreur : ${esc(e.message)}</div></div>`;
+  }
+}
+
+// ── Tab Organisation ──
+function v8RenderOrgTab(){
+  const content = document.getElementById('v8-team-tab-content');
+  if(!content) return;
+  const org = window.v8.activeOrg;
+  const canEdit = canDo('canEditOrgSettings');
+
+  const typeLabels = { company:'Entreprise', individual:'Indépendant / Particulier', accounting_firm:'Cabinet comptable' };
+
+  content.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--bg1);border-radius:var(--rl)">
+        <div style="font-size:40px">${orgIcon(org.company_type)}</div>
+        <div>
+          <div style="font-size:17px;font-weight:700;color:var(--tx0)">${esc(org.company_name)}</div>
+          <div style="font-size:12px;color:var(--tx2);margin-top:3px">${typeLabels[org.company_type]||org.company_type} · ${org.member_count} membre${org.member_count>1?'s':''}</div>
+          <div style="margin-top:6px"><span class="v8-role-badge ${org.user_role}">${roleLabel(org.user_role)}</span></div>
+        </div>
+      </div>
+      <div style="background:var(--bg1);border-radius:var(--rl);overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid var(--bd)">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:4px">Type d'organisation</div>
+          <div style="font-size:13px;color:var(--tx0)">${typeLabels[org.company_type]||org.company_type}</div>
+        </div>
+        <div style="padding:12px 16px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:4px">Votre rôle</div>
+          <div style="font-size:13px;color:var(--tx0)">${roleLabel(org.user_role)}</div>
+        </div>
+      </div>
+      ${window.v8.orgs.length > 1 ? `
+        <div style="padding-top:8px">
+          <div style="font-size:12px;font-weight:600;color:var(--tx1);margin-bottom:8px">Toutes vos organisations</div>
+          ${window.v8.orgs.map(o=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)">
+              <span style="font-size:18px">${orgIcon(o.company_type)}</span>
+              <span style="flex:1;font-size:13px;font-weight:500;color:var(--tx0)">${esc(o.company_name)}</span>
+              <span class="v8-role-badge ${o.user_role}">${roleLabel(o.user_role)}</span>
+              ${o.company_id !== org.company_id ? `<button class="v8-btn v8-btn-secondary" style="padding:4px 10px;font-size:11px" onclick="v8SwitchOrg('${o.company_id}');v8CloseModal()">Basculer</button>` : '<span style="font-size:11px;color:var(--gr);font-weight:600">Active</span>'}
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+      <button class="v8-btn v8-btn-secondary" onclick="v8OpenNewOrgModal()">+ Créer une nouvelle organisation</button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// 7. INVITATION — ENVOI
+// ═══════════════════════════════════════════════════════════
+async function v8SendInvite(){
+  const emailEl = document.getElementById('v8-invite-email');
+  const roleEl  = document.getElementById('v8-invite-role');
+  if(!emailEl || !roleEl) return;
+
+  const email = emailEl.value.trim().toLowerCase();
+  const role  = roleEl.value;
+  const org   = window.v8.activeOrg;
+
+  if(!email || !email.includes('@')){ v8Toast('Email invalide','error'); return; }
+  if(!org){ v8Toast('Aucune organisation active','error'); return; }
+
+  const sendBtn = emailEl.closest('.v8-invite-form').querySelector('button');
+  if(sendBtn){ sendBtn.disabled = true; sendBtn.textContent = '...'; }
+
+  try {
+    const { data, error } = await window.sb.rpc('invite_member', {
+      p_organization_id: org.company_id,
+      p_email:           email,
+      p_role:            role
+    });
+
+    if(error) throw error;
+
+    const result = data || {};
+    if(!result.success){ throw new Error(result.error || 'Erreur inconnue'); }
+
+    // Construire le lien d'invitation
+    const inviteUrl = `${window.location.origin}${window.location.pathname}?invite=${result.token}`;
+
+    v8Toast(`Invitation envoyée à ${email}`, 'success');
+    emailEl.value = '';
+
+    // Afficher le lien à copier
+    v8OpenModal(`
+      <div class="v8-modal v8-modal-sm">
+        <div class="v8-modal-head">
+          <div class="v8-modal-title">✅ Invitation créée</div>
+          <button class="v8-modal-close" onclick="v8CloseModal()">✕</button>
+        </div>
+        <div class="v8-modal-body">
+          <p style="font-size:13px;color:var(--tx1);margin-bottom:16px">
+            Envoyez ce lien à <strong>${esc(email)}</strong> pour qu'il rejoigne <strong>${esc(org.company_name)}</strong> avec le rôle <strong>${roleLabel(role)}</strong>.
+          </p>
+          <div style="background:var(--bg1);border:1px solid var(--bd);border-radius:var(--r);padding:10px 14px;font-size:12px;font-family:monospace;word-break:break-all;color:var(--tx0)">${esc(inviteUrl)}</div>
+        </div>
+        <div class="v8-modal-foot">
+          <button class="v8-btn v8-btn-secondary" onclick="v8CloseModal()">Fermer</button>
+          <button class="v8-btn v8-btn-primary" onclick="navigator.clipboard.writeText('${inviteUrl}').then(()=>v8Toast('Lien copié !','success'));v8CloseModal()">📋 Copier le lien</button>
+        </div>
+      </div>
+    `);
+
+    // Rafraîchir la liste des membres
+    setTimeout(v8RenderMembersTab, 300);
+
+  } catch(e){
+    v8Toast(e.message || 'Erreur lors de l\'invitation', 'error');
+  } finally {
+    if(sendBtn){ sendBtn.disabled = false; sendBtn.textContent = 'Inviter'; }
+  }
+}
+window.v8SendInvite = v8SendInvite;
+
+// Copier lien invitation
+function v8CopyInviteLink(token){
+  const url = `${window.location.origin}${window.location.pathname}?invite=${token}`;
+  navigator.clipboard.writeText(url).then(()=>v8Toast('Lien copié dans le presse-papiers !','success'));
+}
+window.v8CopyInviteLink = v8CopyInviteLink;
+
+// Révoquer une invitation
+async function v8RevokeInvite(invId){
+  if(!confirm('Annuler cette invitation ?')) return;
+  const { data, error } = await window.sb.rpc('revoke_invitation', { p_inv_id: invId });
+  if(error){ v8Toast('Erreur : ' + error.message,'error'); return; }
+  const res = data || {};
+  if(res.success){ v8Toast('Invitation annulée','info'); v8RenderInvitesTab(); }
+  else v8Toast(res.error||'Erreur','error');
+}
+window.v8RevokeInvite = v8RevokeInvite;
+
+// ═══════════════════════════════════════════════════════════
+// 8. GESTION MEMBRES — RÔLES & SUPPRESSION
+// ═══════════════════════════════════════════════════════════
+function v8ChangeRoleModal(userId, currentRole, name){
+  const org = window.v8.activeOrg;
+  v8OpenModal(`
+    <div class="v8-modal v8-modal-sm">
+      <div class="v8-modal-head">
+        <div class="v8-modal-title">Changer le rôle</div>
+        <button class="v8-modal-close" onclick="v8CloseModal()">✕</button>
+      </div>
+      <div class="v8-modal-body">
+        <p style="font-size:13px;color:var(--tx1);margin-bottom:16px">Modifier le rôle de <strong>${esc(name)}</strong> dans <strong>${esc(org.company_name)}</strong></p>
+        <div class="v8-form-field">
+          <label>Nouveau rôle</label>
+          <select id="v8-new-role-sel" class="v8-role-select" style="width:100%;padding:9px 28px 9px 11px">
+            ${org.company_type === 'accounting_firm' ? `
+              <option value="collaborator" ${currentRole==='collaborator'?'selected':''}>Collaborateur</option>
+              <option value="assistant"    ${currentRole==='assistant'?'selected':''}>Assistant</option>
+              <option value="viewer"       ${currentRole==='viewer'?'selected':''}>Lecteur</option>
+            ` : `
+              <option value="admin"       ${currentRole==='admin'?'selected':''}>Administrateur</option>
+              <option value="accountant"  ${currentRole==='accountant'?'selected':''}>Comptable</option>
+              <option value="employee"    ${currentRole==='employee'?'selected':''}>Employé</option>
+              <option value="viewer"      ${currentRole==='viewer'?'selected':''}>Lecteur</option>
+            `}
+          </select>
+        </div>
+      </div>
+      <div class="v8-modal-foot">
+        <button class="v8-btn v8-btn-secondary" onclick="v8CloseModal()">Annuler</button>
+        <button class="v8-btn v8-btn-primary" onclick="v8DoChangeRole('${userId}')">Confirmer</button>
+      </div>
+    </div>
+  `);
+}
+window.v8ChangeRoleModal = v8ChangeRoleModal;
+
+async function v8DoChangeRole(userId){
+  const sel = document.getElementById('v8-new-role-sel');
+  const newRole = sel && sel.value;
+  const org = window.v8.activeOrg;
+
+  const { data, error } = await window.sb.rpc('update_member_role', {
+    p_org_id:   org.company_id,
+    p_user_id:  userId,
+    p_new_role: newRole
+  });
+
+  if(error){ v8Toast('Erreur : ' + error.message,'error'); return; }
+  const res = data || {};
+  if(res.success){
+    v8CloseModal(); v8Toast('Rôle mis à jour','success');
+    v8RenderMembersTab();
+  } else {
+    v8Toast(res.error||'Erreur','error');
+  }
+}
+window.v8DoChangeRole = v8DoChangeRole;
+
+async function v8RemoveMember(userId, name){
+  if(!confirm(`Retirer ${name} de l'organisation ?`)) return;
+  const org = window.v8.activeOrg;
+  const { data, error } = await window.sb.rpc('remove_member', {
+    p_org_id:  org.company_id,
+    p_user_id: userId
+  });
+  if(error){ v8Toast('Erreur : '+error.message,'error'); return; }
+  const res = data || {};
+  if(res.success){ v8Toast(`${name} retiré de l'organisation`,'info'); v8RenderMembersTab(); }
+  else v8Toast(res.error||'Erreur','error');
+}
+window.v8RemoveMember = v8RemoveMember;
+
+// ═══════════════════════════════════════════════════════════
+// 9. CRÉER UNE NOUVELLE ORGANISATION
+// ═══════════════════════════════════════════════════════════
+function v8OpenNewOrgModal(){
+  v8OpenModal(`
+    <div class="v8-modal v8-modal-sm">
+      <div class="v8-modal-head">
+        <div class="v8-modal-title">➕ Nouvelle organisation</div>
+        <button class="v8-modal-close" onclick="v8CloseModal()">✕</button>
+      </div>
+      <div class="v8-modal-body">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="v8-form-field">
+            <label>Nom de l'organisation *</label>
+            <input type="text" id="v8-new-org-name" placeholder="Ex: Dupont SARL, Cabinet Martin...">
+          </div>
+          <div class="v8-form-field">
+            <label>Type *</label>
+            <select id="v8-new-org-type" class="v8-role-select">
+              <option value="company">🏢 Entreprise</option>
+              <option value="individual">👤 Indépendant / Particulier</option>
+              <option value="accounting_firm">📊 Cabinet comptable</option>
+            </select>
+          </div>
+          <div id="v8-new-org-err" style="color:var(--rd);font-size:12px;display:none"></div>
+        </div>
+      </div>
+      <div class="v8-modal-foot">
+        <button class="v8-btn v8-btn-secondary" onclick="v8CloseModal()">Annuler</button>
+        <button class="v8-btn v8-btn-primary" id="v8-new-org-btn" onclick="v8CreateOrg()">Créer →</button>
+      </div>
+    </div>
+  `);
+}
+window.v8OpenNewOrgModal = v8OpenNewOrgModal;
+
+async function v8CreateOrg(){
+  const name    = (document.getElementById('v8-new-org-name')?.value||'').trim();
+  const type    = document.getElementById('v8-new-org-type')?.value;
+  const errEl   = document.getElementById('v8-new-org-err');
+  const btn     = document.getElementById('v8-new-org-btn');
+
+  if(!name){ if(errEl){errEl.textContent='Veuillez saisir un nom';errEl.style.display='block';} return; }
+  if(errEl) errEl.style.display='none';
+  if(btn){ btn.disabled=true; btn.textContent='Création...'; }
+
+  try {
+    const role = type === 'accounting_firm' ? 'cabinet_owner' : 'owner';
+
+    // Créer l'organisation directement dans Supabase
+    const { data: company, error: compErr } = await window.sb
+      .from('companies')
+      .insert({ nom: name, type: type, exercice: new Date().getFullYear().toString(), settings: {} })
+      .select()
+      .single();
+
+    if(compErr) throw compErr;
+
+    // Créer le membership
+    const { error: memErr } = await window.sb
+      .from('memberships')
+      .insert({ user_id: window.v8.userId, company_id: company.id, role: role });
+
+    if(memErr) throw memErr;
+
+    v8CloseModal();
+    v8Toast(`Organisation "${name}" créée !`, 'success');
+
+    // Recharger les orgs et switcher vers la nouvelle
+    await v8LoadOrgs();
+    await v8SwitchOrg(company.id);
+
+  } catch(e){
+    if(errEl){ errEl.textContent = e.message||'Erreur lors de la création'; errEl.style.display='block'; }
+  } finally {
+    if(btn){ btn.disabled=false; btn.textContent='Créer →'; }
+  }
+}
+window.v8CreateOrg = v8CreateOrg;
+
+// ═══════════════════════════════════════════════════════════
+// 10. ACCEPTATION D'INVITATION VIA URL ?invite=TOKEN
+// ═══════════════════════════════════════════════════════════
+async function v8CheckInviteToken(){
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('invite');
+  if(!token) return;
+
+  // Nettoyer l'URL sans rechargement
+  const cleanUrl = window.location.pathname;
+  window.history.replaceState({}, '', cleanUrl);
+
+  // Stocker le token pour après connexion
+  sessionStorage.setItem('luno_pending_invite', token);
+
+  // Si déjà connecté → accepter directement
+  if(sbReady()){
+    await v8ProcessPendingInvite();
+    return;
+  }
+
+  // Sinon : afficher un message sur la page de login
+  const banner = document.getElementById('v8-invite-banner');
+  if(banner){
+    banner.innerHTML = `
+      <div class="v8-ib-icon">✉️</div>
+      <div class="v8-ib-title">Vous avez été invité</div>
+      <div class="v8-ib-sub">Connectez-vous ou créez un compte pour rejoindre l'organisation.</div>
+      <div class="v8-ib-actions">
+        <button class="v8-btn v8-btn-secondary" onclick="this.closest('#v8-invite-banner').style.display='none'">Ignorer</button>
+        <button class="v8-btn v8-btn-primary" onclick="this.closest('#v8-invite-banner').style.display='none';document.getElementById('tab-register')&&document.getElementById('tab-register').click()">Créer un compte →</button>
+      </div>
+    `;
+    banner.style.display = 'block';
+  }
+}
+
+async function v8ProcessPendingInvite(){
+  const token = sessionStorage.getItem('luno_pending_invite');
+  if(!token) return;
+  sessionStorage.removeItem('luno_pending_invite');
+
+  try {
+    const { data, error } = await window.sb.rpc('accept_invitation', { p_token: token });
+    if(error) throw error;
+    const res = data || {};
+    if(!res.success){ v8Toast(res.error||'Invitation invalide','error'); return; }
+
+    // Rafraîchir les orgs et switcher vers la nouvelle
+    await v8LoadOrgs();
+    await v8SwitchOrg(res.org_id);
+
+    v8Toast(`🎉 Vous avez rejoint "${res.org_name}" en tant que ${roleLabel(res.role)}`, 'success', 5000);
+
+  } catch(e){
+    v8Toast('Erreur lors de l\'acceptation : ' + e.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// 11. HOOK SUR LAUNCHAPP — connexion avec le système legacy
+// ═══════════════════════════════════════════════════════════
+function hookLaunchApp(){
+  const origLaunch = window.launchApp;
+  if(!origLaunch || window._v8LaunchHooked) return;
+  window._v8LaunchHooked = true;
+
+  window.launchApp = async function(user, status){
+    // Appeler le launchApp original
+    origLaunch(user, status);
+
+    // Récupérer l'userId Supabase
+    try {
+      const { data: { user: sbUser } } = await window.sb.auth.getUser();
+      if(sbUser){
+        window.v8.userId    = sbUser.id;
+        window.v8.userEmail = sbUser.email;
+
+        // Charger les organisations
+        await v8LoadOrgs();
+
+        // Traiter l'invitation en attente
+        await v8ProcessPendingInvite();
+      }
+    } catch(e){ console.warn('[V8] hookLaunchApp:', e); }
+  };
+}
+
+// Hook sur doLogout
+function hookLogout(){
+  const origLogout = window.doLogout;
+  if(!origLogout || window._v8LogoutHooked) return;
+  window._v8LogoutHooked = true;
+
+  window.doLogout = async function(){
+    // Reset V8 state
+    window.v8.orgs      = [];
+    window.v8.activeOrg = null;
+    window.v8.userId    = null;
+    const sw = document.getElementById('v8-org-switcher');
+    if(sw) sw.style.display = 'none';
+    const tb = document.getElementById('v8-team-btn');
+    if(tb) tb.style.display = 'none';
+
+    origLogout();
+  };
+}
+
+// ═══════════════════════════════════════════════════════════
+// 12. INITIALISATION
+// ═══════════════════════════════════════════════════════════
+function v8Init(){
+  // Injecter le switcher d'org dans la toolbar
+  injectOrgSwitcher();
+
+  // Hooker launchApp et doLogout
+  hookLaunchApp();
+  hookLogout();
+
+  // Vérifier le token d'invitation dans l'URL
+  v8CheckInviteToken();
+
+  // Si déjà auth au boot (session persistée)
+  if(window.sb){
+    window.sb.auth.getSession().then(({ data: { session } }) => {
+      if(session){
+        window.v8.userId    = session.user.id;
+        window.v8.userEmail = session.user.email;
+        v8LoadOrgs();
+        v8ProcessPendingInvite();
+      }
+    });
+  }
+
+  window.v8._ready = true;
+  console.log(`[V8] Luno multi-orgs v${V8_VERSION} initialisé`);
+}
+
+// Lancer après que V7 soit prêt
+function waitForV7AndInit(){
+  if(window.sb && document.getElementById('v8-toast-container')){
+    // Attendre un tick pour que V7 finisse ses hooks
+    setTimeout(v8Init, 150);
+  } else {
+    setTimeout(waitForV7AndInit, 100);
+  }
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', waitForV7AndInit);
+} else {
+  waitForV7AndInit();
+}
+
+// Exposer l'API V8 publique
+window.v8API = {
+  loadOrgs:         v8LoadOrgs,
+  switchOrg:        v8SwitchOrg,
+  openTeamModal:    v8OpenTeamModal,
+  openNewOrgModal:  v8OpenNewOrgModal,
+  sendInvite:       v8SendInvite,
+  canDo:            canDo,
+  toast:            v8Toast,
+  activeOrg:        () => window.v8.activeOrg,
+  orgIcon:          orgIcon,
+  roleLabel:        roleLabel,
+};
+
+})();
+</script>
+
 </body>
 </html>
