@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ComptaPME Pro</title>
+<title>Luno</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════════════
-   ComptaPME Pro — Design System
+   Luno — Design System
    Premium SaaS · iOS-inspired clarity · macOS material language
 ═══════════════════════════════════════════════════════════════ */
 :root {
@@ -745,7 +745,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
   <div class="auth-box">
     <div class="auth-logo">
       <div class="auth-logo-mark">📒</div>
-      ComptaPME Pro
+      Luno
     </div>
     <div class="atabs">
       <div class="atab on" onclick="aTab('login',this)">Connexion</div>
@@ -754,10 +754,10 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
     <!-- LOGIN -->
     <div id="al-login">
       <div class="aerr" id="lerr"></div>
-      <div class="afield"><label>Email</label><input id="l-email" type="email" value="demo@comptapme.fr"></div>
+      <div class="afield"><label>Email</label><input id="l-email" type="email" value="demo@Luno.fr"></div>
       <div class="afield"><label>Mot de passe</label><input id="l-pwd" type="password" value="demo1234"></div>
       <button class="abtn" onclick="doLogin()">Se connecter →</button>
-      <div class="ahint">Compte démo : demo@comptapme.fr / demo1234</div>
+      <div class="ahint">Compte démo : demo@Luno.fr / demo1234</div>
     </div>
     <!-- REGISTER -->
     <div id="al-reg" style="display:none;">
@@ -850,7 +850,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
   <div class="topbar">
     <div class="t-logo">
       <div class="t-logo-icon">📒</div>
-      ComptaPME Pro
+      Luno
     </div>
     <!-- Mode indicator -->
     <div id="mode-indicator" style="display:none;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;margin-left:6px;"></div>
@@ -1388,7 +1388,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
     <div class="ch">🔗 Webhooks</div>
     <div style="padding:.85rem 1rem;">
       <div style="display:flex;gap:6px;margin-bottom:.75rem;">
-        <input type="url" id="webhook-url" placeholder="https://votre-app.fr/webhook/comptapme" style="font-size:12px;">
+        <input type="url" id="webhook-url" placeholder="https://votre-app.fr/webhook/Luno" style="font-size:12px;">
         <button class="btn btn-gr btn-sm" onclick="saveWebhook()">Enregistrer</button>
       </div>
       <div id="webhook-list"></div>
@@ -1660,7 +1660,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
       <div style="padding:.85rem 1rem;">
         <p style="font-size:12px;color:var(--tx2);margin-bottom:.75rem;">Partagez ce lien avec votre client pour qu'il accède à son espace sécurisé : documents, factures, messages.</p>
         <div style="display:flex;gap:6px;">
-          <input type="text" id="portail-url" value="https://app.comptapme.fr/portail/[code-client]" readonly style="font-size:11px;font-family:monospace;background:var(--bg1);">
+          <input type="text" id="portail-url" value="https://app.Luno.fr/portail/[code-client]" readonly style="font-size:11px;font-family:monospace;background:var(--bg1);">
           <button class="btn btn-sm" onclick="copyPortailUrl()">📋 Copier</button>
         </div>
       </div>
@@ -2053,8 +2053,8 @@ function getStatus(user){
 }
 function initDemoAccounts(){
   const now=Date.now();let users=getUsers();
-  if(!users.find(u=>u.email==='demo@comptapme.fr'))
-    users.push({email:'demo@comptapme.fr',pwd:'demo1234',prenom:'Sophie',nom:'Dupuis',
+  if(!users.find(u=>u.email==='demo@Luno.fr'))
+    users.push({email:'demo@Luno.fr',pwd:'demo1234',prenom:'Sophie',nom:'Dupuis',
       societe:'Demo SAS',plan:'pro',paidUntil:now+25*86400000,
       trialEnd:now-1,trialUsed:true,createdAt:now-5*86400000,
       profile:'entreprise',uiMode:'avance',data:{}});
@@ -2233,7 +2233,7 @@ function bypassSirenApp(){
 
 
 // ╔══════════════════════════════════════════════════════════════╗
-// ║   SYSTÈME DE DROITS PAR PLAN — ComptaPME Pro                ║
+// ║   SYSTÈME DE DROITS PAR PLAN — Luno                ║
 // ║   Définit précisément ce que chaque plan peut faire          ║
 // ╚══════════════════════════════════════════════════════════════╝
 
@@ -3193,7 +3193,7 @@ function showPaywall(user){
         </button>
         <div style="font-size:12px;color:var(--tx2);margin-bottom:1rem;">Paiement sécurisé via Stripe · Sans engagement · Annulable à tout moment</div>
         <div style="display:flex;gap:1.5rem;justify-content:center;font-size:13px;">
-          <a href="comptapme_vitrine.html" style="color:var(--tx2);text-decoration:none;">← Retour au site</a>
+          <a href="Luno_vitrine.html" style="color:var(--tx2);text-decoration:none;">← Retour au site</a>
           <a href="#" onclick="doLogout();return false;" style="color:var(--tx2);text-decoration:none;">Changer de compte</a>
         </div>
       </div>
@@ -3365,7 +3365,7 @@ function imprimerDevis(i){
   <table><thead><tr><th>Description</th><th style="text-align:right;">HT</th><th style="text-align:right;">TVA ${d.tva}%</th><th style="text-align:right;">TTC</th></tr></thead>
   <tbody><tr><td>${d.desc||'Prestation'}</td><td style="text-align:right;">${fmtN(d.ht)} €</td><td style="text-align:right;">${fmtN(d.ht*d.tva/100)} €</td><td style="text-align:right;font-weight:bold;">${fmtN(d.ttc)} €</td></tr></tbody>
   <tfoot><tr class="tot"><td>TOTAL</td><td style="text-align:right;">${fmtN(d.ht)} €</td><td style="text-align:right;">${fmtN(d.ht*d.tva/100)} €</td><td style="text-align:right;">${fmtN(d.ttc)} €</td></tr></tfoot></table>
-  <p style="margin-top:2rem;font-size:11px;color:#999;">Valable jusqu'au ${d.val} — ComptaPME Pro</p></body></html>`);
+  <p style="margin-top:2rem;font-size:11px;color:#999;">Valable jusqu'au ${d.val} — Luno</p></body></html>`);
   w.document.close();w.print();addH('export','Impression devis '+d.num,'inf');
 }
 function renderDevis(){
@@ -3408,7 +3408,7 @@ function printFacIdx(i){
   <table><thead style="background:#f6f6f4;"><tr><th style="text-align:left;">Description</th><th style="text-align:right;">HT</th><th style="text-align:right;">TVA (${f.tva}%)</th><th style="text-align:right;">TTC</th></tr></thead>
   <tbody><tr><td>${f.desc||'Prestation de services'}</td><td style="text-align:right;">${fmtN(f.ht)} €</td><td style="text-align:right;">${fmtN(f.tvaA)} €</td><td style="text-align:right;font-weight:bold;">${fmtN(f.ttc)} €</td></tr></tbody>
   <tfoot><tr class="tot"><td>TOTAL</td><td style="text-align:right;">${fmtN(f.ht)} €</td><td style="text-align:right;">${fmtN(f.tvaA)} €</td><td style="text-align:right;color:#1D9E75;">${fmtN(f.ttc)} €</td></tr></tfoot></table>
-  <p style="margin-top:3rem;font-size:11px;color:#aaa;text-align:center;">Généré par ComptaPME Pro · ${new Date().toLocaleDateString('fr-FR')} · TVA non applicable selon l'article 293B du CGI (si applicable)</p></body></html>`);
+  <p style="margin-top:3rem;font-size:11px;color:#aaa;text-align:center;">Généré par Luno · ${new Date().toLocaleDateString('fr-FR')} · TVA non applicable selon l'article 293B du CGI (si applicable)</p></body></html>`);
   w.document.close();w.print();
 }
 function renderFactures(){
@@ -3537,7 +3537,7 @@ function printBilan(){
   addH('export','Impression bilan & résultat','inf');
   const w=window.open('','_blank');
   w.document.write(`<html><head><title>Bilan ${yr}</title><style>body{font-family:sans-serif;padding:2rem;font-size:13px;max-width:700px;margin:auto;}h1{color:#1D9E75;}h3{margin:1.5rem 0 .5rem;border-bottom:1px solid #ccc;padding-bottom:.25rem;}table{width:100%;border-collapse:collapse;}td{padding:5px 8px;border-bottom:1px solid #eee;}.tot{font-weight:bold;border-top:2px solid #1D9E75;background:#f6f6f4;}.pos{color:green;}.neg{color:red;}</style></head><body>
-  <h1>📒 ComptaPME Pro — Bilan & Résultat</h1><p style="color:#888;">Exercice ${yr} · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p>
+  <h1>📒 Luno — Bilan & Résultat</h1><p style="color:#888;">Exercice ${yr} · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p>
   <h3>Compte de résultat</h3>
   <table><tr><td>Total produits d'exploitation</td><td style="text-align:right;">${fmt(pr)}</td></tr><tr><td>Total charges d'exploitation</td><td style="text-align:right;color:red;">– ${fmt(ch)}</td></tr><tr class="tot"><td>Résultat net de l'exercice</td><td style="text-align:right;" class="${res>=0?'pos':'neg'}">${fmt(res)}</td></tr></table>
   <h3>Soldes intermédiaires</h3>
@@ -3632,7 +3632,7 @@ function printPaie(nom,mois,brut,net,cs,pat){
   <tr class="tot"><td>Net à payer</td><td style="text-align:right;color:green;">${net.toFixed(2)} €</td></tr>
   <tr style="margin-top:1rem;"><td style="color:#888;">Charges patronales</td><td style="text-align:right;color:#888;">${pat.toFixed(2)} €</td></tr>
   <tr class="tot"><td>Coût total employeur</td><td style="text-align:right;">${(brut+pat).toFixed(2)} €</td></tr></table>
-  <p style="margin-top:2rem;font-size:11px;color:#aaa;">ComptaPME Pro · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p></body></html>`);
+  <p style="margin-top:2rem;font-size:11px;color:#aaa;">Luno · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p></body></html>`);
   w.document.close();w.print();
 }
 
@@ -3662,7 +3662,7 @@ function getDB(){return{v:'4.0',date:new Date().toISOString(),user:me?.email,soc
 function exportSauvegarde(){
   const db=getDB();
   const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`comptapme_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`Luno_${new Date().toISOString().slice(0,10)}.json`;a.click();
   addH('export','Sauvegarde exportée','ok');notif('Sauvegarde téléchargée ✓');createAutoSave();
 }
 function importSauvegarde(evt){
@@ -3690,7 +3690,7 @@ function renderSauvegarde(){
 
 
 // ══════════════════════════════════════════════════════════════
-//  SYSTÈME DE MODULES & PROFILS — ComptaPME Pro
+//  SYSTÈME DE MODULES & PROFILS — Luno
 //  Couche d'adaptation multi-profil (Entreprise / Cabinet)
 //  ⚠ Ne modifie pas les données existantes, uniquement l'UI
 // ══════════════════════════════════════════════════════════════
@@ -4323,7 +4323,7 @@ document.head.appendChild(cabStyle);
 <div class="onb-panel" id="onb-panel">
   <button class="onb-x" onclick="onbToggle()" aria-label="Fermer">×</button>
   <div class="onb-head">
-    <div class="onb-title">Bienvenue dans ComptaPME Pro 👋</div>
+    <div class="onb-title">Bienvenue dans Luno 👋</div>
     <div class="onb-sub">Lancez-vous en 5 étapes — environ 3 min.</div>
     <div class="onb-progress"><div class="onb-bar" id="onb-bar"></div></div>
   </div>
@@ -4702,7 +4702,7 @@ document.head.appendChild(cabStyle);
   </div>
   <div class="ux-help-section">
     <h4>Besoin d'aide ?</h4>
-    <div style="font-size:12px;color:var(--tx1,#62604b);">📧 <a href="mailto:hello@comptapme.fr" style="color:var(--gr,#1D9E75);">hello@comptapme.fr</a></div>
+    <div style="font-size:12px;color:var(--tx1,#62604b);">📧 <a href="mailto:hello@Luno.fr" style="color:var(--gr,#1D9E75);">hello@Luno.fr</a></div>
     <div style="font-size:12px;color:var(--tx1,#62604b);margin-top:.25rem;">⏱ Réponse sous 24 h ouvrées</div>
   </div>
 </div>
@@ -5571,7 +5571,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
     ocr:         { tier:'plus', title:'OCR & Reconnaissance IA', sub:'Photographiez une facture, on extrait tout. Le scan papier devient une donnée comptable en 1 clic.', bullets:['Photo → écriture comptable','Multi-format (PDF, image)','Détection automatique TVA, total, fournisseur','50 documents/mois inclus'] },
     analytics:   { tier:'premium', title:'Analytics avancé', sub:'Tableaux de bord détaillés, prévisions de trésorerie, KPIs métier. Pilotez votre activité avec précision.', bullets:['Prévisions de trésorerie à 90 jours','KPI par client, produit, période','Comparaisons multi-exercices','Export Excel automatisé'] },
     'multi-company': { tier:'premium', title:'Multi-entreprises', sub:'Gérez plusieurs sociétés en un seul abonnement. Idéal pour les holdings et groupes.', bullets:['Jusqu\'à 5 entreprises','Vue consolidée','Bascule rapide entre dossiers','TVA et bilans séparés'] },
-    api:         { tier:'premium', title:'API publique', sub:'Connectez ComptaPME à votre stack. Webhooks, REST, lecture/écriture sécurisée.', bullets:['REST API complète','Webhooks événements','Tokens scoped','Documentation interactive'] },
+    api:         { tier:'premium', title:'API publique', sub:'Connectez Luno à votre stack. Webhooks, REST, lecture/écriture sécurisée.', bullets:['REST API complète','Webhooks événements','Tokens scoped','Documentation interactive'] },
     'sauvegarde-avancee': { tier:'premium', title:'Sauvegardes avancées', sub:'Continuité d\'activité maximale. Vos données protégées avec une rétention longue durée.', bullets:['Rétention 1 an minimum','Sauvegardes chiffrées multi-régions','Restauration ponctuelle','Audit complet'] }
   };
   const PRICES = {
@@ -5777,7 +5777,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
       <div class="ux-settings-section" id="ux-sec-documents">
         <div class="fld">
           <label>En-tête personnalisé (visible sur les factures et devis PDF)</label>
-          <textarea id="ux-doc-header" rows="3" placeholder="ComptaPME Pro\n123 rue de la République, 75001 Paris\nSIRET 123 456 789 00012"></textarea>
+          <textarea id="ux-doc-header" rows="3" placeholder="Luno\n123 rue de la République, 75001 Paris\nSIRET 123 456 789 00012"></textarea>
         </div>
         <div class="fld">
           <label>Mention de pied de page (facultative)</label>
@@ -6743,7 +6743,7 @@ body.has-brand .sc-v[style*="color:var(--gr)"], body.has-brand .sc-v[style*="col
           '<td style="text-align:right;">' + fmtNumber(f.ttc) + ' ' + sym + '</td></tr></tfoot>' +
       '</table>' +
       footerHtml +
-      '<div style="margin-top:2.5rem;font-size:10px;color:#aaa;text-align:center;">Document généré par ComptaPME Pro · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
+      '<div style="margin-top:2.5rem;font-size:10px;color:#aaa;text-align:center;">Document généré par Luno · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
       '</body></html>';
   }
   // Override printFacIdx — toujours utiliser le nouveau template (qui fallback proprement si pas de settings)
@@ -7076,7 +7076,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
       '</table>' +
       '<div class="valid">⏳ <strong>Validité de l\'offre</strong> : ce devis est valable jusqu\'au ' + escHtml(d.val) + '. Pour accepter, retournez-le signé avec la mention « Bon pour accord ».</div>' +
       footerHtml +
-      '<div style="margin-top:2rem;font-size:10px;color:#aaa;text-align:center;">Document généré par ComptaPME Pro · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
+      '<div style="margin-top:2rem;font-size:10px;color:#aaa;text-align:center;">Document généré par Luno · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
       '</body></html>';
   }
   const origImpDevis = window.imprimerDevis;
@@ -7540,7 +7540,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         if(!email || !pwd){ if(errEl){ errEl.textContent='Email et mot de passe requis.'; errEl.style.display='block'; } return; }
 
         // Comptes démo → fallback localStorage (pour ne pas casser les comptes de test existants)
-        if(email === 'demo@comptapme.fr' || email === 'test@test.fr' || email.includes('demo')){
+        if(email === 'demo@Luno.fr' || email === 'test@test.fr' || email.includes('demo')){
           return origLogin.apply(this, arguments);
         }
 

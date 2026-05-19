@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ComptaPME Pro — Tarifs</title>
+<title>Luno — Tarifs</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -209,38 +209,121 @@ tailwind.config = {
     </div>
 
     <!-- ── Cards ── -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6 items-start mb-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-start mb-16">
 
-      <!-- ─── CARD 1 : ESSENTIEL ─── -->
+      <!-- ─── CARD 1 : FREE ─── -->
       <div class="pricing-card reveal reveal-d1 rounded-2xl bg-white dark:bg-neutral-900/80 shadow-card-light dark:shadow-card-dark border border-neutral-200/80 dark:border-neutral-800/60 p-7 flex flex-col gap-6 hover:shadow-card-hover dark:hover:shadow-card-dark-hover">
-
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold tracking-widest uppercase text-neutral-400 dark:text-neutral-500">Essentiel</span>
+            <span class="text-xs font-bold tracking-widest uppercase text-neutral-400 dark:text-neutral-500">Free</span>
             <span class="text-xs font-medium px-2.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400">Gratuit</span>
           </div>
-
-          <!-- Prix -->
           <div class="flex items-end gap-1 mb-3">
             <span class="text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">0</span>
             <span class="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mb-1">€</span>
-            <span class="text-sm text-neutral-400 dark:text-neutral-500 mb-1.5 ml-0.5">/ mois</span>
+            <span class="text-sm text-neutral-400 dark:text-neutral-400 mb-1">/mois</span>
           </div>
-
-          <p class="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">
-            Pour les indépendants et petites entreprises qui veulent commencer gratuitement.
-          </p>
+          <p class="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">Pour découvrir le logiciel et démarrer simplement.</p>
         </div>
-
-        <!-- CTA -->
-        <a href="#" class="btn-ghost-cta block text-center w-full px-5 py-3 rounded-xl border-2 border-neutral-200 dark:border-neutral-700 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:border-sage-400 dark:hover:border-sage-600 hover:text-sage-700 dark:hover:text-sage-400 hover:bg-sage-50/50 dark:hover:bg-sage-950/30 focus:outline-none focus:ring-2 focus:ring-sage-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-950">
+        <ul class="flex flex-col gap-3">
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">5 factures/mois</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">5 devis/mois</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Gestion clients</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Tableau de bord simplifié</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Suivi paiements</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Export PDF</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">1 utilisateur</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Accès mobile & web</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Essai fonctionnalités premium limité</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-red-400" fill="none" viewBox="0 0 12 12"><path d="M3 9l6-6M9 9L3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <span class="text-neutral-400 dark:text-neutral-500">Comptabilité limitée</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-red-400" fill="none" viewBox="0 0 12 12"><path d="M3 9l6-6M9 9L3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <span class="text-neutral-400 dark:text-neutral-500">Pas de TVA avancée</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-red-400" fill="none" viewBox="0 0 12 12"><path d="M3 9l6-6M9 9L3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </span>
+            <span class="text-neutral-400 dark:text-neutral-500">Pas de relances automatiques</span>
+          </li>
+        </ul>
+        <a href="/app" class="mt-auto btn-ghost-cta block text-center py-2.5 px-4 rounded-xl border border-neutral-200 dark:border-neutral-700 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all">
           Commencer gratuitement
         </a>
+      </div>
 
-        <div class="w-full h-px bg-neutral-100 dark:bg-neutral-800"></div>
-
-        <!-- Features -->
-        <ul class="flex flex-col gap-3">
+      <!-- ─── CARD 2 : PLUS (featured) ─── -->
+      <div class="relative">
+        <div class="shimmer-border absolute inset-0 rounded-2xl pointer-events-none" aria-hidden="true"></div>
+        <div class="pricing-card featured reveal reveal-d2 rounded-2xl bg-white dark:bg-neutral-950/95 shadow-featured-light dark:shadow-featured-dark border-2 border-sage-500/80 dark:border-sage-400/50 p-7 flex flex-col gap-6 relative overflow-hidden">
+          <div class="absolute top-0 right-0 px-3 py-1 bg-sage-500 dark:bg-sage-600 text-white text-xs font-bold tracking-widest uppercase rounded-bl-xl rounded-tr-xl">
+            Populaire
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold tracking-widest uppercase text-sage-600 dark:text-sage-400">Plus</span>
+            </div>
+            <div class="flex items-end gap-1 mb-1">
+              <span id="plus-price" class="text-5xl font-bold tracking-tight text-sage-700 dark:text-sage-400">7.90</span>
+              <span class="text-2xl font-semibold text-sage-700 dark:text-sage-400 mb-1">€</span>
+              <span class="text-sm text-neutral-500 dark:text-neutral-400 mb-1.5 ml-0.5">HT / mois</span>
+            </div>
+            <p id="plus-billing-note" class="text-xs text-sage-600/70 dark:text-sage-500 mb-3">Facturé annuellement · 94.80€/an</p>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">Pour auto-entrepreneurs et petites activités.</p>
+          </div>
+          <ul class="flex flex-col gap-3">
           <li class="feature-row flex items-start gap-3 text-sm">
             <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -257,263 +340,246 @@ tailwind.config = {
             <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-700 dark:text-neutral-300">Génération <strong class="font-semibold text-neutral-900 dark:text-neutral-100">PDF</strong></span>
+            <span class="text-neutral-700 dark:text-neutral-300">Gestion clients / fournisseurs</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
             <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-700 dark:text-neutral-300">Tableau de bord</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Suivi TVA</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
             <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-700 dark:text-neutral-300">Gestion clients & produits</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Trésorerie</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
             <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-700 dark:text-neutral-300">Facturation électronique <span class="font-mono text-xs bg-sage-50 dark:bg-sage-950/50 text-sage-600 dark:text-sage-400 px-1.5 py-0.5 rounded border border-sage-200/60 dark:border-sage-800/50 ml-0.5">2026</span></span>
+            <span class="text-neutral-700 dark:text-neutral-300">Relances automatiques</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
             <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-700 dark:text-neutral-300"><strong class="font-semibold text-neutral-900 dark:text-neutral-100">1</strong> utilisateur</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Personnalisation factures & logo</span>
           </li>
-          <!-- Limitations -->
-          <li class="flex items-start gap-3 text-sm opacity-50">
-            <span class="w-5 h-5 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-neutral-400" fill="none" viewBox="0 0 12 12"><path d="M2.5 9.5l7-7M9.5 9.5l-7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-500 dark:text-neutral-500">Branding visible</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Exports Excel / PDF</span>
           </li>
-          <li class="flex items-start gap-3 text-sm opacity-50">
-            <span class="w-5 h-5 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-neutral-400" fill="none" viewBox="0 0 12 12"><path d="M2.5 9.5l7-7M9.5 9.5l-7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-500 dark:text-neutral-500">Pas d'IA ni d'automatisations</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Sauvegarde automatique</span>
           </li>
-        </ul>
-      </div>
-
-      <!-- ─── CARD 2 : PLUS (featured) ─── -->
-      <div class="pricing-card featured reveal reveal-d2 relative">
-        <!-- Shimmer border wrapper -->
-        <div class="absolute -inset-[1.5px] rounded-[1.125rem] shimmer-border opacity-80"></div>
-
-        <div class="card-inner rounded-2xl p-7 flex flex-col gap-6 shadow-featured-glow noise"
-             style="background: linear-gradient(145deg, #ffffff 0%, #f8fdfb 100%);">
-          <!-- Dark mode override via class -->
-          <style>.dark .card-inner { background: linear-gradient(145deg, #161614 0%, #111f18 100%) !important; }</style>
-
-          <div>
-            <div class="flex items-center justify-between mb-3">
-              <span class="text-xs font-bold tracking-widest uppercase text-sage-600 dark:text-sage-400">Plus</span>
-              <!-- Badge populaire -->
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-sage-500 to-sage-600 text-white shadow-sm">
-                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                Le plus populaire
-              </span>
-            </div>
-
-            <!-- Prix -->
-            <div class="flex items-end gap-1 mb-1">
-              <span id="plus-price" class="text-5xl font-bold tracking-tight text-sage-700 dark:text-sage-400">7.90</span>
-              <span class="text-2xl font-semibold text-sage-700 dark:text-sage-400 mb-1">€</span>
-              <span class="text-sm text-neutral-500 dark:text-neutral-400 mb-1.5 ml-0.5">/ mois</span>
-            </div>
-            <p id="plus-billing-note" class="text-xs text-sage-600/70 dark:text-sage-500 mb-3">Facturé annuellement · 94.80€/an</p>
-
-            <p class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-              Pour les entreprises qui veulent automatiser leur facturation.
-            </p>
-          </div>
-
-          <!-- CTA principal -->
-          <button class="btn-cta w-full px-5 py-3.5 rounded-xl text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-sage-400 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"
-            style="background: linear-gradient(135deg, #1d7a5f 0%, #2d9d77 100%); box-shadow: 0 1px 3px rgba(29,122,95,.3), inset 0 1px 0 rgba(255,255,255,.1);">
-            Passer au plan Plus →
-          </button>
-
-          <div class="w-full h-px bg-sage-100/60 dark:bg-sage-900/40"></div>
-
-          <!-- Features -->
-          <ul class="flex flex-col gap-3">
-            <li class="flex items-start gap-2.5 text-xs font-semibold text-sage-600 dark:text-sage-400 mb-1">
-              <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 16 16"><path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              Tout le plan Essentiel, plus&nbsp;:
-            </li>
-            <li class="feature-row flex items-start gap-3 text-sm">
-              <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/80 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="text-neutral-700 dark:text-neutral-300"><strong class="font-semibold">Suppression</strong> du branding</span>
-            </li>
-            <li class="feature-row flex items-start gap-3 text-sm">
-              <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/80 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="text-neutral-700 dark:text-neutral-300">Relances automatiques des factures</span>
-            </li>
-            <li class="feature-row flex items-start gap-3 text-sm">
-              <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/80 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="text-neutral-700 dark:text-neutral-300">Signature électronique des devis</span>
-            </li>
-            <li class="feature-row flex items-start gap-3 text-sm">
-              <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/80 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="text-neutral-700 dark:text-neutral-300">Export comptable</span>
-            </li>
-            <li class="feature-row flex items-start gap-3 text-sm">
-              <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/80 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="text-neutral-700 dark:text-neutral-300">Synchronisation bancaire</span>
-            </li>
-            <li class="feature-row flex items-start gap-3 text-sm">
-              <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/80 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="text-neutral-700 dark:text-neutral-300">OCR IA <span class="font-mono text-xs bg-sage-50 dark:bg-sage-950/50 text-sage-600 dark:text-sage-400 px-1.5 py-0.5 rounded border border-sage-200/60 dark:border-sage-800/50">limité</span></span>
-            </li>
-            <li class="feature-row flex items-start gap-3 text-sm">
-              <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/80 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="text-neutral-700 dark:text-neutral-300">Automatisations simples</span>
-            </li>
-            <li class="feature-row flex items-start gap-3 text-sm">
-              <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/80 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="text-neutral-700 dark:text-neutral-300">Multi-comptes bancaires</span>
-            </li>
-            <li class="feature-row flex items-start gap-3 text-sm">
-              <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/80 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="text-neutral-700 dark:text-neutral-300">Jusqu'à <strong class="font-semibold">3 utilisateurs</strong></span>
-            </li>
-            <li class="feature-row flex items-start gap-3 text-sm">
-              <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/80 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              <span class="text-neutral-700 dark:text-neutral-300">Support prioritaire email</span>
-            </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Activité récente & recherche globale</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Support standard</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">2 utilisateurs</span>
+          </li>
           </ul>
+          <p class="text-xs text-neutral-400 dark:text-neutral-500 -mt-2">Idéal : freelances, micro-entreprises, indépendants</p>
+          <a href="/app?plan=plus" class="btn-cta block text-center py-3 px-4 rounded-xl bg-sage-600 hover:bg-sage-700 dark:bg-sage-500 dark:hover:bg-sage-600 text-white text-sm font-bold tracking-wide transition-all">
+            Commencer avec Plus
+          </a>
         </div>
       </div>
 
-      <!-- ─── CARD 3 : PREMIUM ─── -->
-      <div class="pricing-card reveal reveal-d3 rounded-2xl bg-neutral-925 dark:bg-neutral-900/90 p-7 flex flex-col gap-6 border border-neutral-800/60 hover:border-amber-700/30 hover:shadow-[0_8px_40px_-8px_rgba(180,130,30,.2)]"
-           style="background: linear-gradient(145deg, #0f0f0e 0%, #131310 100%);">
-
+      <!-- ─── CARD 3 : PRO ─── -->
+      <div class="pricing-card reveal reveal-d3 rounded-2xl bg-white dark:bg-neutral-900/80 shadow-card-light dark:shadow-card-dark border border-neutral-200/80 dark:border-neutral-800/60 p-7 flex flex-col gap-6 hover:shadow-card-hover dark:hover:shadow-card-dark-hover">
         <div>
           <div class="flex items-center justify-between mb-3">
-            <span class="text-xs font-bold tracking-widest uppercase text-amber-500/80">Premium</span>
-            <!-- Badge premium -->
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border border-amber-700/30 text-amber-400"
-              style="background: linear-gradient(135deg, rgba(180,130,30,.15) 0%, rgba(120,90,20,.1) 100%);">
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
-              Automatisation avancée
-            </span>
+            <span class="text-xs font-bold tracking-widest uppercase text-neutral-600 dark:text-neutral-400">Pro</span>
           </div>
-
-          <!-- Prix -->
           <div class="flex items-end gap-1 mb-1">
-            <span id="premium-price" class="text-5xl font-bold tracking-tight text-gradient-gold">15.90</span>
-            <span class="text-2xl font-semibold text-amber-500 mb-1">€</span>
-            <span class="text-sm text-neutral-500 mb-1.5 ml-0.5">/ mois</span>
+            <span id="pro-price" class="text-5xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">15.90</span>
+            <span class="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mb-1">€</span>
+            <span class="text-sm text-neutral-400 dark:text-neutral-400 mb-1.5 ml-0.5">HT / mois</span>
           </div>
-          <p id="premium-billing-note" class="text-xs text-amber-700/70 mb-3">Facturé annuellement · 190.80€/an</p>
-
-          <p class="text-sm text-neutral-400 leading-relaxed">
-            Pour les PME et utilisateurs avancés qui veulent automatiser toute leur gestion.
-          </p>
+          <p id="pro-billing-note" class="text-xs text-neutral-500 dark:text-neutral-400 mb-3">Facturé annuellement · 190.80€/an</p>
+          <p class="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">Pour entreprises ayant une vraie gestion comptable.</p>
         </div>
-
-        <!-- CTA premium -->
-        <button class="btn-cta w-full px-5 py-3.5 rounded-xl text-sm font-bold text-neutral-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-neutral-925"
-          style="background: linear-gradient(135deg, #d4a017 0%, #f5c842 50%, #d4a017 100%); box-shadow: 0 1px 3px rgba(180,130,30,.4), inset 0 1px 0 rgba(255,255,255,.15);">
-          Passer au Premium →
-        </button>
-
-        <div class="w-full h-px bg-neutral-800/60"></div>
-
-        <!-- Features -->
         <ul class="flex flex-col gap-3">
-          <li class="flex items-start gap-2.5 text-xs font-semibold text-amber-500/80 mb-1">
-            <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 16 16"><path d="M2 8l4 4 8-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            Tout le plan Plus, plus&nbsp;:
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Tout le plan <strong class="font-semibold text-neutral-900 dark:text-neutral-100">Plus</strong> +</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
-            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-amber-900/30 border border-amber-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-amber-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-300"><strong class="font-semibold text-neutral-100">IA avancée</strong> — catégorisation auto des dépenses</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Comptabilité complète</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
-            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-amber-900/30 border border-amber-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-amber-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-300">TVA automatique</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Écritures & journal comptable</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
-            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-amber-900/30 border border-amber-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-amber-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-300">Multi-utilisateurs <strong class="font-semibold text-neutral-100">illimités</strong></span>
+            <span class="text-neutral-700 dark:text-neutral-300">Exports comptables</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
-            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-amber-900/30 border border-amber-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-amber-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-300">Multi-entreprises</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Rapprochement bancaire</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
-            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-amber-900/30 border border-amber-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-amber-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-300">Accès API complet</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Gestion TVA avancée</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
-            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-amber-900/30 border border-amber-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-amber-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-300">Dashboard analytics avancé</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Imports CSV / Excel</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
-            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-amber-900/30 border border-amber-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-amber-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-300">Accès comptable</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Tableau de bord avancé & statistiques</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
-            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-amber-900/30 border border-amber-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-amber-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-300">Automatisations avancées</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Multi-comptes bancaires</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
-            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-amber-900/30 border border-amber-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-amber-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-300">Support chat prioritaire</span>
+            <span class="text-neutral-700 dark:text-neutral-300">Support prioritaire</span>
           </li>
           <li class="feature-row flex items-start gap-3 text-sm">
-            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-amber-900/30 border border-amber-700/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <svg class="w-3 h-3 text-amber-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            <span class="text-neutral-300">Sauvegardes avancées</span>
+            <span class="text-neutral-700 dark:text-neutral-300">5 utilisateurs</span>
           </li>
         </ul>
+        <p class="text-xs text-neutral-400 dark:text-neutral-500 -mt-2">Idéal : TPE, SASU, EURL, petites sociétés</p>
+        <a href="/app?plan=pro" class="btn-ghost-cta block text-center py-2.5 px-4 rounded-xl border border-neutral-300 dark:border-neutral-600 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all">
+          Commencer avec Pro
+        </a>
       </div>
+
+      <!-- ─── CARD 4 : BUSINESS ─── -->
+      <div class="pricing-card reveal reveal-d4 rounded-2xl bg-neutral-950 dark:bg-neutral-900/90 shadow-card-dark border border-neutral-800/80 p-7 flex flex-col gap-6 hover:shadow-card-dark-hover">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold tracking-widest uppercase text-gradient-gold">Business</span>
+          </div>
+          <div class="flex items-end gap-1 mb-1">
+            <span id="business-price" class="text-5xl font-bold tracking-tight text-white">28.90</span>
+            <span class="text-2xl font-semibold text-white mb-1">€</span>
+            <span class="text-sm text-neutral-400 mb-1.5 ml-0.5">HT / mois</span>
+          </div>
+          <p id="business-billing-note" class="text-xs text-neutral-500 mb-3">Facturé annuellement · 346.80€/an</p>
+          <p class="text-sm text-neutral-400 leading-relaxed">Pour entreprises structurées et cabinets.</p>
+        </div>
+        <ul class="flex flex-col gap-3">
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Tout le plan <strong class="font-semibold text-white">Pro</strong> +</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Multi-sociétés</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Utilisateurs illimités</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Permissions avancées</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Automatisations</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">API</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Gestion équipes</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Analytics complets</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Personnalisation avancée</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Historique avancé</span>
+          </li>
+          <li class="feature-row flex items-start gap-3 text-sm">
+            <span class="feature-dot check-icon w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="text-neutral-700 dark:text-neutral-300">Support ultra rapide & assistance prioritaire</span>
+          </li>
+        </ul>
+        <p class="text-xs text-neutral-500 -mt-2">Idéal : PME, cabinets comptables, équipes multi-activités</p>
+        <a href="/app?plan=business" class="btn-cta block text-center py-3 px-4 rounded-xl bg-neutral-700 hover:bg-neutral-600 text-white text-sm font-bold tracking-wide transition-all">
+          Commencer avec Business
+        </a>
+      </div>
+
     </div>
 
     <!-- ── Comparatif fonctionnalités ── -->
@@ -522,33 +588,29 @@ tailwind.config = {
         <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Comparatif complet</h3>
         <p class="text-sm text-neutral-500 dark:text-neutral-400">Toutes les fonctionnalités, plan par plan</p>
       </div>
-
       <div class="bg-white dark:bg-neutral-900/60 rounded-2xl border border-neutral-200/80 dark:border-neutral-800/50 overflow-hidden shadow-card-light dark:shadow-card-dark">
         <!-- Header -->
-        <div class="grid grid-cols-4 gap-0 border-b border-neutral-200/80 dark:border-neutral-800/50">
+        <div class="grid grid-cols-5 gap-0 border-b border-neutral-200/80 dark:border-neutral-800/50">
           <div class="p-4 pl-6 text-xs font-bold tracking-widest uppercase text-neutral-400 dark:text-neutral-500">Fonctionnalité</div>
           <div class="p-4 text-center">
-            <span class="text-xs font-bold tracking-widest uppercase text-neutral-500 dark:text-neutral-400">Essentiel</span>
-            <div class="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5 font-mono">0€</div>
+            <span class="text-xs font-bold tracking-widest uppercase text-neutral-500 dark:text-neutral-400">Free</span>
+            <div class="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">0€</div>
           </div>
-          <div class="p-4 text-center bg-sage-50/60 dark:bg-sage-950/30">
+          <div class="p-4 text-center bg-sage-50/60 dark:bg-sage-900/20">
             <span class="text-xs font-bold tracking-widest uppercase text-sage-600 dark:text-sage-400">Plus</span>
-            <div class="text-xs text-sage-500 dark:text-sage-500 mt-0.5 font-mono">7.90€/mois</div>
+            <div class="text-xs text-sage-500 dark:text-sage-500 mt-0.5">7.90€/mois</div>
           </div>
-          <div class="p-4 text-center" style="background:rgba(15,15,14,.03)">
-            <span class="text-xs font-bold tracking-widest uppercase text-amber-500/80">Premium</span>
-            <div class="text-xs text-amber-600/60 mt-0.5 font-mono">15.90€/mois</div>
+          <div class="p-4 text-center">
+            <span class="text-xs font-bold tracking-widest uppercase text-neutral-600 dark:text-neutral-400">Pro</span>
+            <div class="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">15.90€/mois</div>
           </div>
-        </div>
-
-        <!-- Rows -->
-        <div id="comparison-table">
-          <!-- Section: Facturation -->
-          <div class="grid grid-cols-4 gap-0 px-6 py-2.5 bg-neutral-50/80 dark:bg-neutral-800/30">
-            <div class="col-span-4 text-xs font-bold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">Facturation</div>
+          <div class="p-4 text-center bg-neutral-950/5 dark:bg-neutral-100/5">
+            <span class="text-xs font-bold tracking-widest uppercase text-gradient-gold">Business</span>
+            <div class="text-xs text-neutral-400 dark:text-neutral-500 mt-0.5">28.90€/mois</div>
           </div>
         </div>
-
+        <!-- Body -->
+        <div id="comp-body"></div>
       </div>
     </div>
 
@@ -568,7 +630,7 @@ tailwind.config = {
           </div>
           <h3 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Satisfait ou remboursé — 30 jours</h3>
           <p class="text-sm text-neutral-600 dark:text-neutral-400 max-w-md mx-auto leading-relaxed mb-6">
-            Si ComptaPME Pro ne vous convient pas dans les 30 premiers jours, nous vous remboursons intégralement. Sans question, sans friction.
+            Si Luno ne vous convient pas dans les 30 premiers jours, nous vous remboursons intégralement. Sans question, sans friction.
           </p>
           <div class="flex flex-wrap justify-center gap-6">
             <div class="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400">
@@ -624,7 +686,7 @@ tailwind.config = {
     <div class="reveal mt-16">
       <div class="text-center mb-8">
         <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Ce qu'ils en disent</h3>
-        <p class="text-sm text-neutral-500 dark:text-neutral-400">Des PME françaises qui utilisent ComptaPME Pro au quotidien</p>
+        <p class="text-sm text-neutral-500 dark:text-neutral-400">Des PME françaises qui utilisent Luno au quotidien</p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <!-- Témoignage 1 -->
@@ -773,233 +835,135 @@ tailwind.config = {
 <script>
 // ── DONNÉES DU COMPARATIF ──
 const rows = [
-  // Section Facturation
-  { section: null, label: 'Factures illimitées',           essentiel: true,   plus: true,    premium: true  },
-  { section: null, label: 'Devis illimités',               essentiel: true,   plus: true,    premium: true  },
-  { section: null, label: 'Génération PDF',                essentiel: true,   plus: true,    premium: true  },
-  { section: null, label: 'Facturation électronique 2026', essentiel: true,   plus: true,    premium: true  },
-  { section: null, label: 'Signature électronique',        essentiel: false,  plus: true,    premium: true  },
-  { section: null, label: 'Relances automatiques',         essentiel: false,  plus: true,    premium: true  },
-  { section: null, label: 'Branding supprimé',             essentiel: false,  plus: true,    premium: true  },
-  // Section Comptabilité
+  // Facturation
+  { section: 'Facturation', label: null },
+  { section: null, label: 'Factures',               free: '5/mois',  plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Devis',                  free: '5/mois',  plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Génération PDF',          free: true,      plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Export PDF',              free: true,      plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Personnalisation & logo', free: false,     plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Relances automatiques',   free: false,     plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Exports Excel / PDF',     free: false,     plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Imports CSV / Excel',     free: false,     plus: false,  pro: true,    business: true  },
+  // Comptabilité
   { section: 'Comptabilité & bancaire', label: null },
-  { section: null, label: 'Tableau de bord',               essentiel: true,   plus: true,    premium: true  },
-  { section: null, label: 'Export comptable',              essentiel: false,  plus: true,    premium: true  },
-  { section: null, label: 'Synchronisation bancaire',      essentiel: false,  plus: true,    premium: true  },
-  { section: null, label: 'Multi-comptes bancaires',       essentiel: false,  plus: true,    premium: true  },
-  { section: null, label: 'TVA automatique',               essentiel: false,  plus: false,   premium: true  },
-  { section: null, label: 'Dashboard analytics avancé',    essentiel: false,  plus: false,   premium: true  },
-  { section: null, label: 'Accès comptable partagé',       essentiel: false,  plus: false,   premium: true  },
-  // Section IA
-  { section: 'Intelligence artificielle', label: null },
-  { section: null, label: 'OCR IA (limité)',               essentiel: false,  plus: true,    premium: true  },
-  { section: null, label: 'IA avancée',                    essentiel: false,  plus: false,   premium: true  },
-  { section: null, label: 'Catégorisation auto dépenses',  essentiel: false,  plus: false,   premium: true  },
-  // Section Automatisations
-  { section: 'Automatisations', label: null },
-  { section: null, label: 'Automatisations simples',       essentiel: false,  plus: true,    premium: true  },
-  { section: null, label: 'Automatisations avancées',      essentiel: false,  plus: false,   premium: true  },
-  { section: null, label: 'API publique',                  essentiel: false,  plus: false,   premium: true  },
-  // Section Organisation
+  { section: null, label: 'Tableau de bord',         free: 'Limité',  plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Suivi TVA',               free: false,     plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Gestion TVA avancée',     free: false,     plus: false,  pro: true,    business: true  },
+  { section: null, label: 'Trésorerie',              free: false,     plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Comptabilité complète',   free: false,     plus: false,  pro: true,    business: true  },
+  { section: null, label: 'Écritures & journal',     free: false,     plus: false,  pro: true,    business: true  },
+  { section: null, label: 'Exports comptables',      free: false,     plus: false,  pro: true,    business: true  },
+  { section: null, label: 'Rapprochement bancaire',  free: false,     plus: false,  pro: true,    business: true  },
+  { section: null, label: 'Multi-comptes bancaires', free: false,     plus: false,  pro: true,    business: true  },
+  { section: null, label: 'Statistiques financières',free: false,     plus: false,  pro: true,    business: true  },
+  // Organisation
   { section: 'Organisation & équipe', label: null },
-  { section: null, label: 'Utilisateurs',                  essentiel: '1',    plus: '3',     premium: '∞'   },
-  { section: null, label: 'Multi-entreprises',             essentiel: false,  plus: false,   premium: true  },
-  { section: null, label: 'Sauvegardes avancées',          essentiel: false,  plus: false,   premium: true  },
-  // Section Support
+  { section: null, label: 'Utilisateurs',            free: '1',       plus: '2',    pro: '5',     business: '∞'   },
+  { section: null, label: 'Gestion clients',         free: true,      plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Gestion fournisseurs',    free: false,     plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Multi-sociétés',          free: false,     plus: false,  pro: false,   business: true  },
+  { section: null, label: 'Permissions avancées',    free: false,     plus: false,  pro: false,   business: true  },
+  { section: null, label: 'Gestion équipes',         free: false,     plus: false,  pro: false,   business: true  },
+  // Automatisations & API
+  { section: 'Automatisations & API', label: null },
+  { section: null, label: 'Automatisations',         free: false,     plus: false,  pro: false,   business: true  },
+  { section: null, label: 'API publique',            free: false,     plus: false,  pro: false,   business: true  },
+  { section: null, label: 'Exports avancés',         free: false,     plus: false,  pro: false,   business: true  },
+  { section: null, label: 'Analytics complets',      free: false,     plus: false,  pro: false,   business: true  },
+  { section: null, label: 'Historique avancé',       free: false,     plus: false,  pro: false,   business: true  },
+  // Support
   { section: 'Support', label: null },
-  { section: null, label: 'Support email basique',         essentiel: true,   plus: true,    premium: true  },
-  { section: null, label: 'Support prioritaire email',     essentiel: false,  plus: true,    premium: true  },
-  { section: null, label: 'Support chat prioritaire',      essentiel: false,  plus: false,   premium: true  },
+  { section: null, label: 'Support',                 free: 'Email',   plus: 'Standard', pro: 'Prioritaire', business: 'Ultra rapide' },
+  { section: null, label: 'Accès mobile & web',      free: true,      plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Sauvegarde automatique',  free: false,     plus: true,   pro: true,    business: true  },
+  { section: null, label: 'Facturation élec. 2026',  free: true,      plus: true,   pro: true,    business: true  },
 ];
 
+// ── RENDU DU COMPARATIF ──
 function renderCell(val) {
-  if (val === true)
-    return `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-sage-100 dark:bg-sage-900/50">
-      <svg class="w-3.5 h-3.5 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </span>`;
-  if (val === false)
-    return `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-neutral-100 dark:bg-neutral-800">
-      <svg class="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600" fill="none" viewBox="0 0 12 12"><path d="M3 9l6-6M9 9L3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-    </span>`;
-  return `<span class="text-sm font-bold font-mono text-neutral-700 dark:text-neutral-300">${val}</span>`;
+  if (val === true)  return '<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-sage-100 dark:bg-sage-900/60"><svg class="w-3 h-3 text-sage-600 dark:text-sage-400" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+  if (val === false) return '<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-neutral-100 dark:bg-neutral-800"><svg class="w-3 h-3 text-neutral-300 dark:text-neutral-600" fill="none" viewBox="0 0 12 12"><path d="M3 6h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>';
+  return '<span class="text-xs font-medium text-neutral-600 dark:text-neutral-300">' + val + '</span>';
 }
 
-const tableEl = document.getElementById('comparison-table');
-rows.forEach((row, i) => {
-  if (row.section !== undefined && row.label === null) {
-    // Section header
-    const div = document.createElement('div');
-    div.className = 'grid grid-cols-4 gap-0 px-6 py-2.5 bg-neutral-50/80 dark:bg-neutral-800/30';
-    div.innerHTML = `<div class="col-span-4 text-xs font-bold tracking-wider uppercase text-neutral-400 dark:text-neutral-500">${row.section}</div>`;
-    tableEl.appendChild(div);
-  } else {
-    const div = document.createElement('div');
-    div.className = 'comp-row grid grid-cols-4 gap-0 border-b border-neutral-100 dark:border-neutral-800/40 last:border-0';
-    div.innerHTML = `
-      <div class="p-3.5 pl-6 text-sm text-neutral-600 dark:text-neutral-400 flex items-center">${row.label}</div>
-      <div class="p-3.5 flex items-center justify-center">${renderCell(row.essentiel)}</div>
-      <div class="p-3.5 flex items-center justify-center bg-sage-50/40 dark:bg-sage-950/20">${renderCell(row.plus)}</div>
-      <div class="p-3.5 flex items-center justify-center" style="background:rgba(15,15,14,.015)">${renderCell(row.premium)}</div>
-    `;
-    tableEl.appendChild(div);
-  }
-});
-
-// ── TOGGLE MENSUEL / ANNUEL ──
-let isAnnual = true;
-const prices = {
-  plus:    { annual: '7.90',  monthly: '9.90',  annualNote: 'Facturé annuellement · 94.80€/an',   monthlyNote: 'Facturé mensuellement' },
-  premium: { annual: '15.90', monthly: '20.90', annualNote: 'Facturé annuellement · 190.80€/an', monthlyNote: 'Facturé mensuellement' },
-};
-
-function toggleBilling() {
-  isAnnual = !isAnnual;
-  const dot = document.getElementById('toggle-dot');
-  const labelMonthly = document.getElementById('label-monthly');
-  const labelAnnual  = document.getElementById('label-annual');
-
-  dot.style.transform = isAnnual ? 'translateX(0)' : 'translateX(24px)';
-
-  labelMonthly.className = isAnnual
-    ? 'text-sm font-medium text-neutral-400 dark:text-neutral-500'
-    : 'text-sm font-semibold text-neutral-900 dark:text-neutral-100';
-  labelAnnual.className = isAnnual
-    ? 'text-sm font-semibold text-neutral-900 dark:text-neutral-100'
-    : 'text-sm font-medium text-neutral-400 dark:text-neutral-500';
-
-  // Swap prices with animation
-  ['plus', 'premium'].forEach(plan => {
-    const priceEl = document.getElementById(`${plan}-price`);
-    const noteEl  = document.getElementById(`${plan}-billing-note`);
-    if (!priceEl || !noteEl) return;
-
-    priceEl.style.opacity = '0';
-    priceEl.style.transform = 'translateY(-6px)';
-    setTimeout(() => {
-      priceEl.textContent = isAnnual ? prices[plan].annual : prices[plan].monthly;
-      noteEl.textContent  = isAnnual ? prices[plan].annualNote : prices[plan].monthlyNote;
-      priceEl.style.opacity = '1';
-      priceEl.style.transform = 'translateY(0)';
-    }, 140);
-  });
-
-  priceEl_set();
-}
-
-function priceEl_set() {
-  ['plus','premium'].forEach(plan => {
-    const priceEl = document.getElementById(`${plan}-price`);
-    if (priceEl) {
-      priceEl.style.transition = 'opacity .15s ease, transform .15s ease';
+function buildComparateur() {
+  const body = document.getElementById('comp-body');
+  if (!body) return;
+  let html = '';
+  rows.forEach((row, i) => {
+    if (row.section && !row.label) {
+      html += '<div class="grid grid-cols-5 gap-0 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-800/60"><div class="p-3 pl-6 col-span-5 text-xs font-bold tracking-widest uppercase text-neutral-500 dark:text-neutral-400">' + row.section + '</div></div>';
+    } else if (!row.section && row.label) {
+      const zebra = i % 2 === 0 ? '' : 'bg-neutral-50/60 dark:bg-white/[.02]';
+      html += '<div class="comp-row grid grid-cols-5 gap-0 border-t border-neutral-100 dark:border-neutral-800/50 ' + zebra + '">';
+      html += '<div class="p-3 pl-6 text-sm text-neutral-700 dark:text-neutral-300">' + row.label + '</div>';
+      html += '<div class="p-3 flex items-center justify-center">' + renderCell(row.free) + '</div>';
+      html += '<div class="p-3 flex items-center justify-center bg-sage-50/40 dark:bg-sage-900/10">' + renderCell(row.plus) + '</div>';
+      html += '<div class="p-3 flex items-center justify-center">' + renderCell(row.pro) + '</div>';
+      html += '<div class="p-3 flex items-center justify-center bg-neutral-950/[.03] dark:bg-neutral-100/[.03]">' + renderCell(row.business) + '</div>';
+      html += '</div>';
     }
   });
+  body.innerHTML = html;
 }
-priceEl_set();
 
-// ── FAQ DATA & RENDER ──
-const faqs = [
-  {
-    q: 'Puis-je changer de plan à tout moment ?',
-    a: 'Oui. Vous pouvez upgrader ou downgrader à tout moment depuis votre espace client. L\'upgrade est immédiat avec ajustement prorata temporis. Le downgrade prend effet à la prochaine échéance de facturation.'
-  },
-  {
-    q: 'Le plan Essentiel est-il vraiment gratuit pour toujours ?',
-    a: 'Absolument. Le plan Essentiel est gratuit sans limite de durée, sans carte bancaire requise. Il n\'y a aucun piège : vous accédez aux fonctionnalités listées tant que vous le souhaitez.'
-  },
-  {
-    q: 'Qu\'est-ce que la facturation électronique compatible 2026 ?',
-    a: 'À partir de 2026, la réforme fiscale française rend obligatoire la facturation électronique pour toutes les entreprises assujetties à la TVA. Tous nos plans incluent dès maintenant la conformité e-invoicing (format Factur-X / UBL) pour vous préparer sans frais supplémentaires.'
-  },
-  {
-    q: 'Comment fonctionne l\'export comptable ?',
-    a: 'Le plan Plus et Premium permettent d\'exporter vos données au format FEC (Fichier des Écritures Comptables), conforme à l\'article A.47 A-1 du Livre des Procédures Fiscales. Ce fichier est directement importable dans Sage, Cegid, Quadratus ou transmissible à votre expert-comptable.'
-  },
-  {
-    q: 'Comment fonctionne la garantie 30 jours ?',
-    a: 'Si vous n\'êtes pas satisfait dans les 30 premiers jours suivant votre souscription à un plan payant, contactez-nous à remboursement@comptapme.fr. Nous procédons au remboursement intégral sous 48h, sans question et sans frais de résiliation.'
-  },
-  {
-    q: 'Mes données sont-elles sécurisées et où sont-elles hébergées ?',
-    a: 'Toutes vos données sont hébergées exclusivement en France chez OVH (Roubaix), chiffrées en transit (TLS 1.3) et au repos (AES-256). Vos données comptables vous appartiennent à 100% et ne sont jamais revendues ni exploitées. Vous pouvez exporter l\'intégralité de vos données à tout moment au format JSON.'
-  },
-  {
-    q: 'L\'OCR IA du plan Plus, c\'est quoi exactement ?',
-    a: 'L\'OCR IA permet de photographier ou d\'uploader une facture fournisseur (PDF, photo) et de remplir automatiquement les champs (montant, date, fournisseur, TVA). Sur le plan Plus, cette fonctionnalité est limitée à 50 documents/mois. Elle est illimitée sur le plan Premium avec catégorisation automatique.'
-  },
-  {
-    q: 'Puis-je connecter mon compte bancaire ?',
-    a: 'Oui, à partir du plan Plus. La synchronisation bancaire est basée sur la directive DSP2 via notre partenaire agréé ACPR. Elle supporte plus de 400 banques françaises et européennes. Les transactions sont importées automatiquement et catégorisées par l\'IA sur le plan Premium.'
-  },
-];
+// ── TOGGLE MENSUEL / ANNUEL ──
+const plans = {
+  plus:     { monthly: 10.90, annual: 7.90,  yearTotal: 94.80  },
+  pro:      { monthly: 19.90, annual: 15.90, yearTotal: 190.80 },
+  business: { monthly: 34.90, annual: 28.90, yearTotal: 346.80 },
+};
 
-const faqEl = document.getElementById('faq-list');
-faqs.forEach((faq, i) => {
-  const item = document.createElement('div');
-  item.className = 'faq-item';
-  item.innerHTML = `
-    <button onclick="toggleFaq(${i})" class="w-full text-left px-6 py-4 flex items-start justify-between gap-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/30 transition-colors group">
-      <span class="text-sm font-semibold text-neutral-900 dark:text-neutral-100 leading-relaxed">${faq.q}</span>
-      <span id="faq-icon-${i}" class="flex-shrink-0 w-5 h-5 rounded-full border border-neutral-200 dark:border-neutral-700 flex items-center justify-center transition-all duration-200 mt-0.5 group-hover:border-sage-300 dark:group-hover:border-sage-700">
-        <svg class="w-3 h-3 text-neutral-400 dark:text-neutral-500 transition-transform duration-200" id="faq-chevron-${i}" fill="none" viewBox="0 0 10 10">
-          <path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
-    </button>
-    <div id="faq-body-${i}" class="overflow-hidden" style="max-height:0;transition:max-height .3s cubic-bezier(.4,0,.2,1);">
-      <div class="px-6 pb-5 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed border-t border-neutral-100 dark:border-neutral-800 pt-3">
-        ${faq.a}
-      </div>
-    </div>`;
-  faqEl.appendChild(item);
-});
+let isAnnual = true;
 
-let openFaq = null;
-function toggleFaq(i) {
-  const body = document.getElementById(`faq-body-${i}`);
-  const icon = document.getElementById(`faq-icon-${i}`);
-  const chevron = document.getElementById(`faq-chevron-${i}`);
-  const isOpen = openFaq === i;
-
-  // Close current
-  if (openFaq !== null) {
-    const prevBody = document.getElementById(`faq-body-${openFaq}`);
-    const prevIcon = document.getElementById(`faq-icon-${openFaq}`);
-    const prevChevron = document.getElementById(`faq-chevron-${openFaq}`);
-    prevBody.style.maxHeight = '0';
-    if (prevIcon) { prevIcon.style.background=''; prevIcon.style.borderColor=''; }
-    if (prevChevron) prevChevron.style.transform = 'rotate(0deg)';
-    openFaq = null;
-  }
-
-  if (!isOpen) {
-    body.style.maxHeight = body.scrollHeight + 80 + 'px';
-    icon.style.background = 'rgb(220 243 232 / 0.7)';
-    icon.style.borderColor = 'rgb(141 211 184 / 0.6)';
-    chevron.style.transform = 'rotate(180deg)';
-    openFaq = i;
+function updatePrices() {
+  for (const [plan, p] of Object.entries(plans)) {
+    const priceEl = document.getElementById(plan + '-price');
+    const noteEl  = document.getElementById(plan + '-billing-note');
+    if (!priceEl) continue;
+    if (isAnnual) {
+      priceEl.textContent = p.annual.toFixed(2).replace('.', ',');
+      if (noteEl) noteEl.textContent = 'Facturé annuellement · ' + p.yearTotal.toFixed(2).replace('.', ',') + '€/an';
+    } else {
+      priceEl.textContent = p.monthly.toFixed(2).replace('.', ',');
+      if (noteEl) noteEl.textContent = 'Ou ' + p.annual.toFixed(2).replace('.', ',') + '€/mois en annuel';
+    }
   }
 }
 
-// ── DARK MODE ──
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-let isDark = prefersDark;
-function applyTheme() {
-  document.documentElement.classList.toggle('dark', isDark);
-  document.getElementById('theme-icon').textContent  = isDark ? '☀️' : '🌙';
-  document.getElementById('theme-label').textContent = isDark ? 'Mode clair' : 'Mode sombre';
+function initToggle() {
+  const btn   = document.querySelector('[aria-label="Basculer entre mensuel et annuel"]');
+  const dot   = document.getElementById('toggle-dot');
+  const lbM   = document.getElementById('label-monthly');
+  const lbA   = document.getElementById('label-annual');
+  if (!btn) return;
+  const applyState = () => {
+    btn.setAttribute('aria-checked', isAnnual);
+    if (dot) dot.style.transform = isAnnual ? 'translateX(1.25rem)' : 'translateX(0)';
+    if (lbM) lbM.style.opacity = isAnnual ? '0.5' : '1';
+    if (lbA) lbA.style.opacity = isAnnual ? '1' : '0.5';
+    updatePrices();
+  };
+  btn.addEventListener('click', () => { isAnnual = !isAnnual; applyState(); });
+  applyState();
 }
-applyTheme();
-document.getElementById('theme-toggle').addEventListener('click', () => {
-  isDark = !isDark; applyTheme();
-});
 
-// ── SCROLL REVEAL ──
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
-  });
-}, { threshold: 0.08 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+// ── REVEAL ON SCROLL ──
+function initReveal() {
+  const els = document.querySelectorAll('.reveal');
+  if (!els.length) return;
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  els.forEach(el => io.observe(el));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildComparateur();
+  initToggle();
+  initReveal();
+});
 </script>
 </body>
 </html>
