@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Luno</title>
+<title>ComptaPME Pro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════════════
-   Luno — Design System
+   ComptaPME Pro — Design System
    Premium SaaS · iOS-inspired clarity · macOS material language
 ═══════════════════════════════════════════════════════════════ */
 :root {
@@ -219,6 +219,36 @@ body {
 }
 .abtn:hover { opacity: .92; box-shadow: 0 4px 16px rgba(29,158,117,.35); }
 .abtn:active { transform: scale(.99); opacity: .88; }
+
+/* ── Registration step plan cards ── */
+.reg-plan-card {
+  border: 2px solid var(--bd2); border-radius: var(--r); padding: 10px 8px;
+  cursor: pointer; text-align: center; transition: all .15s; background: var(--bg0);
+}
+.reg-plan-card:hover { border-color: var(--gr); background: var(--gr3); }
+.reg-plan-card.selected { border-color: var(--gr); background: var(--gr3); }
+
+/* ── Register step progress bar ── */
+.reg-steps {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin-bottom: 18px;
+}
+.reg-step-dot {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.reg-step-dot span {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  background: var(--bg2); color: var(--tx2); border: 2px solid var(--bd2);
+  transition: all .25s;
+}
+.reg-step-dot small { font-size: 9px; color: var(--tx2); white-space: nowrap; }
+.reg-step-dot.rs-active span { background: var(--gr); color: #fff; border-color: var(--gr); }
+.reg-step-dot.rs-done span  { background: #e6f9f0; color: var(--gr); border-color: var(--gr); }
+.reg-step-dot.rs-active small, .reg-step-dot.rs-done small { color: var(--tx0); font-weight: 600; }
+.reg-step-line { width: 28px; height: 2px; background: var(--bd2); margin-bottom: 12px; transition: background .25s; }
+.reg-step-line.done { background: var(--gr); }
 
 .aerr {
   font-size: 13px; color: var(--rd);
@@ -745,7 +775,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
   <div class="auth-box">
     <div class="auth-logo">
       <div class="auth-logo-mark">📒</div>
-      Luno
+      ComptaPME Pro
     </div>
     <div class="atabs">
       <div class="atab on" onclick="aTab('login',this)">Connexion</div>
@@ -754,10 +784,10 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
     <!-- LOGIN -->
     <div id="al-login">
       <div class="aerr" id="lerr"></div>
-      <div class="afield"><label>Email</label><input id="l-email" type="email" value="demo@Luno.fr"></div>
+      <div class="afield"><label>Email</label><input id="l-email" type="email" value="demo@comptapme.fr"></div>
       <div class="afield"><label>Mot de passe</label><input id="l-pwd" type="password" value="demo1234"></div>
       <button class="abtn" onclick="doLogin()">Se connecter →</button>
-      <div class="ahint">Compte démo : demo@Luno.fr / demo1234</div>
+      <div class="ahint">Compte démo : demo@comptapme.fr / demo1234</div>
     </div>
     <!-- REGISTER -->
     <div id="al-reg" style="display:none;">
@@ -837,7 +867,41 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
         <div class="afield"><label>Email *</label><input id="r-email" type="email" placeholder="vous@societe.fr"></div>
         <div class="afield"><label>Mot de passe (min. 6 car.) *</label><input id="r-pwd" type="password" placeholder="••••••••"></div>
         <div class="afield"><label>Confirmer *</label><input id="r-pwd2" type="password" placeholder="••••••••"></div>
-        <button class="abtn" onclick="doRegister()">🚀 Créer mon compte gratuit</button>
+        <button class="abtn" onclick="goAppStep3()">Choisir mon plan →</button>
+      </div>
+
+      <!-- Étape 3 : Choix du plan -->
+      <div id="app-step3" style="display:none;">
+        <div style="font-size:12px;color:var(--tx2);margin-bottom:.65rem;display:flex;align-items:center;gap:6px;">
+          <button onclick="goAppStep2b()" style="background:none;border:none;cursor:pointer;color:var(--tx2);font-size:12px;font-family:inherit;padding:0;">← Retour</button>
+        </div>
+        <div style="font-size:13px;font-weight:700;color:var(--tx0);margin-bottom:4px;">Choisissez votre plan</div>
+        <div style="font-size:11px;color:var(--tx2);margin-bottom:14px;">14 jours d'essai gratuit · Aucune carte requise</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;" id="reg-plan-grid">
+          <div class="reg-plan-card" id="rp-starter" onclick="regSelectPlan('starter')">
+            <div style="font-size:18px;">⚡</div>
+            <div style="font-size:12px;font-weight:700;margin:4px 0;">Starter</div>
+            <div style="font-size:17px;font-weight:800;color:var(--gr);">19€<span style="font-size:10px;font-weight:400;opacity:.7;">/m</span></div>
+            <div style="font-size:9px;color:var(--tx2);margin-top:4px;line-height:1.4;">Auto-entrepreneurs<br>& freelances</div>
+          </div>
+          <div class="reg-plan-card selected" id="rp-pro" onclick="regSelectPlan('pro')" style="border-color:var(--gr);background:var(--gr3);">
+            <div style="font-size:9px;font-weight:700;color:var(--gr);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">⭐ Populaire</div>
+            <div style="font-size:18px;">🚀</div>
+            <div style="font-size:12px;font-weight:700;margin:4px 0;">Pro</div>
+            <div style="font-size:17px;font-weight:800;color:var(--gr);">49€<span style="font-size:10px;font-weight:400;opacity:.7;">/m</span></div>
+            <div style="font-size:9px;color:var(--tx2);margin-top:4px;line-height:1.4;">PME & équipes<br>comptables</div>
+          </div>
+          <div class="reg-plan-card" id="rp-entreprise" onclick="regSelectPlan('entreprise')">
+            <div style="font-size:18px;">🏢</div>
+            <div style="font-size:12px;font-weight:700;margin:4px 0;">Entreprise</div>
+            <div style="font-size:17px;font-weight:800;color:#8b5cf6;">99€<span style="font-size:10px;font-weight:400;opacity:.7;">/m</span></div>
+            <div style="font-size:9px;color:var(--tx2);margin-top:4px;line-height:1.4;">Multi-entités<br>& cabinets</div>
+          </div>
+        </div>
+        <div style="background:var(--bg2);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--tx2);margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+          🔒 Essai gratuit 14 jours — aucune carte bancaire requise à l'inscription
+        </div>
+        <button class="abtn" id="reg-final-btn" onclick="doRegisterFinal()">🚀 Créer mon compte gratuitement</button>
       </div>
     </div>
   </div>
@@ -850,7 +914,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
   <div class="topbar">
     <div class="t-logo">
       <div class="t-logo-icon">📒</div>
-      Luno
+      ComptaPME Pro
     </div>
     <!-- Mode indicator -->
     <div id="mode-indicator" style="display:none;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;margin-left:6px;"></div>
@@ -901,7 +965,10 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
       <div class="ni nav-premium" onclick="navGated('analytics','premium',this)">📊 Analytics avancé</div>
       <div class="ns">Équipe & Structure</div>
       <div class="ni" onclick="nav('salaries',this)">👤 Salariés & Paie</div>
+      <div class="ni" onclick="nav('equipe',this)">👥 Équipe & Rôles</div>
       <div class="ni nav-premium" onclick="navGated('multi-company','premium',this)">🏢 Multi-entreprises</div>
+      <div class="ns">Compte</div>
+      <div class="ni" onclick="nav('abonnement',this)">💳 Mon abonnement</div>
       <div class="ns">Intégrations</div>
       <div class="ni nav-premium" onclick="navGated('api','premium',this)">⚡ API publique</div>
       <div class="ns">Données</div>
@@ -927,6 +994,10 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
       <div class="ns">Accès client</div>
       <div class="ni" onclick="navCab('cab-clients',this)">👥 Gestion des dossiers</div>
       <div class="ni" onclick="navCab('cab-portail',this)">🌐 Portail client</div>
+      <div class="ns">Équipe</div>
+      <div class="ni" onclick="nav('equipe',this)">👥 Équipe & Rôles</div>
+      <div class="ns">Compte</div>
+      <div class="ni" onclick="nav('abonnement',this)">💳 Mon abonnement</div>
       <div class="ns">Données</div>
       <div class="ni" onclick="nav('exports',this)">⬇ Exports</div>
       <div class="ni" onclick="nav('sauvegarde',this)">💾 Sauvegarde</div>
@@ -1388,7 +1459,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
     <div class="ch">🔗 Webhooks</div>
     <div style="padding:.85rem 1rem;">
       <div style="display:flex;gap:6px;margin-bottom:.75rem;">
-        <input type="url" id="webhook-url" placeholder="https://votre-app.fr/webhook/Luno" style="font-size:12px;">
+        <input type="url" id="webhook-url" placeholder="https://votre-app.fr/webhook/comptapme" style="font-size:12px;">
         <button class="btn btn-gr btn-sm" onclick="saveWebhook()">Enregistrer</button>
       </div>
       <div id="webhook-list"></div>
@@ -1660,7 +1731,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
       <div style="padding:.85rem 1rem;">
         <p style="font-size:12px;color:var(--tx2);margin-bottom:.75rem;">Partagez ce lien avec votre client pour qu'il accède à son espace sécurisé : documents, factures, messages.</p>
         <div style="display:flex;gap:6px;">
-          <input type="text" id="portail-url" value="https://app.Luno.fr/portail/[code-client]" readonly style="font-size:11px;font-family:monospace;background:var(--bg1);">
+          <input type="text" id="portail-url" value="https://app.comptapme.fr/portail/[code-client]" readonly style="font-size:11px;font-family:monospace;background:var(--bg1);">
           <button class="btn btn-sm" onclick="copyPortailUrl()">📋 Copier</button>
         </div>
       </div>
@@ -1671,6 +1742,18 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
     </div>
   </div>
 </div>
+<!-- ════ PAGE ÉQUIPE ════ -->
+<div class="page" id="p-equipe">
+  <div class="ph"><div class="pt">👥 Équipe & Rôles</div></div>
+  <div id="equipe-root" style="max-width:860px;"></div>
+</div>
+
+<!-- ════ PAGE ABONNEMENT ════ -->
+<div class="page" id="p-abonnement">
+  <div class="ph"><div class="pt">💳 Mon abonnement</div></div>
+  <div id="abonnement-root" style="max-width:900px;"></div>
+</div>
+
   </div><!-- /app-body -->
 </div><!-- /app-wrap -->
 
@@ -2013,6 +2096,7 @@ let tvaHist=[
 let hist=[];
 let backupHistory = [];
 let selectedProfile = null;
+window.selectedProfile = selectedProfile;
 
 const mNoms=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 let _notifTimer=null;
@@ -2053,8 +2137,8 @@ function getStatus(user){
 }
 function initDemoAccounts(){
   const now=Date.now();let users=getUsers();
-  if(!users.find(u=>u.email==='demo@Luno.fr'))
-    users.push({email:'demo@Luno.fr',pwd:'demo1234',prenom:'Sophie',nom:'Dupuis',
+  if(!users.find(u=>u.email==='demo@comptapme.fr'))
+    users.push({email:'demo@comptapme.fr',pwd:'demo1234',prenom:'Sophie',nom:'Dupuis',
       societe:'Demo SAS',plan:'pro',paidUntil:now+25*86400000,
       trialEnd:now-1,trialUsed:true,createdAt:now-5*86400000,
       profile:'entreprise',uiMode:'avance',data:{}});
@@ -2233,7 +2317,7 @@ function bypassSirenApp(){
 
 
 // ╔══════════════════════════════════════════════════════════════╗
-// ║   SYSTÈME DE DROITS PAR PLAN — Luno                ║
+// ║   SYSTÈME DE DROITS PAR PLAN — ComptaPME Pro                ║
 // ║   Définit précisément ce que chaque plan peut faire          ║
 // ╚══════════════════════════════════════════════════════════════╝
 
@@ -3099,7 +3183,7 @@ function aTab(t,el){
   document.querySelectorAll('.atab').forEach(x=>x.classList.remove('on'));el.classList.add('on');
   E('al-login').style.display=t==='login'?'':'none';
   E('al-reg').style.display=t==='register'?'':'none';
-  if(t==='register'){ goAppStep0(); selectedProfile=null; }
+  if(t==='register'){ goAppStep0(); selectedProfile=null; window.selectedProfile=null; }
 }
 
 // ══ INIT ══
@@ -3154,6 +3238,7 @@ function doRegister(){
 
 // ══ MUR DE PAIEMENT ══
 let selectedPlan='pro';
+window.selectedPlan=selectedPlan;
 function showPaywall(user){
   if(user) me=user;const u=user||me;
   E('auth-wrap').style.display='none';E('app-wrap').style.display='none';
@@ -3193,7 +3278,7 @@ function showPaywall(user){
         </button>
         <div style="font-size:12px;color:var(--tx2);margin-bottom:1rem;">Paiement sécurisé via Stripe · Sans engagement · Annulable à tout moment</div>
         <div style="display:flex;gap:1.5rem;justify-content:center;font-size:13px;">
-          <a href="Luno_vitrine.html" style="color:var(--tx2);text-decoration:none;">← Retour au site</a>
+          <a href="comptapme_vitrine.html" style="color:var(--tx2);text-decoration:none;">← Retour au site</a>
           <a href="#" onclick="doLogout();return false;" style="color:var(--tx2);text-decoration:none;">Changer de compte</a>
         </div>
       </div>
@@ -3261,6 +3346,8 @@ function nav(name,el){
     // Premium features
     analytics:renderAnalytics, 'multi-company':renderMultiCompany, api:renderApi,
     'sauvegarde-avancee':renderSauvegardeAvancee,
+    // V8/V9 pages
+    equipe:renderEquipe, abonnement:renderAbonnement,
   };
   if(R[name]) R[name]();
 }
@@ -3365,11 +3452,11 @@ function imprimerDevis(i){
   <table><thead><tr><th>Description</th><th style="text-align:right;">HT</th><th style="text-align:right;">TVA ${d.tva}%</th><th style="text-align:right;">TTC</th></tr></thead>
   <tbody><tr><td>${d.desc||'Prestation'}</td><td style="text-align:right;">${fmtN(d.ht)} €</td><td style="text-align:right;">${fmtN(d.ht*d.tva/100)} €</td><td style="text-align:right;font-weight:bold;">${fmtN(d.ttc)} €</td></tr></tbody>
   <tfoot><tr class="tot"><td>TOTAL</td><td style="text-align:right;">${fmtN(d.ht)} €</td><td style="text-align:right;">${fmtN(d.ht*d.tva/100)} €</td><td style="text-align:right;">${fmtN(d.ttc)} €</td></tr></tfoot></table>
-  <p style="margin-top:2rem;font-size:11px;color:#999;">Valable jusqu'au ${d.val} — Luno</p></body></html>`);
+  <p style="margin-top:2rem;font-size:11px;color:#999;">Valable jusqu'au ${d.val} — ComptaPME Pro</p></body></html>`);
   w.document.close();w.print();addH('export','Impression devis '+d.num,'inf');
 }
 function renderDevis(){
-  const ST={accepté:'ok','en attente':'wa',refusé:'er'};
+  const ST={'accepté':'ok','en attente':'wa','refusé':'er'};
   E('dv-stats').innerHTML=`<div class="sc"><div class="sc-l">Total devis</div><div class="sc-v">${devis.length}</div></div><div class="sc"><div class="sc-l">Acceptés</div><div class="sc-v" style="color:var(--gr);">${devis.filter(d=>d.st==='accepté').length}</div></div><div class="sc"><div class="sc-l">En attente</div><div class="sc-v" style="color:var(--am);">${devis.filter(d=>d.st==='en attente').length}</div></div><div class="sc"><div class="sc-l">Valeur totale HT</div><div class="sc-v">${fmt(devis.reduce((s,d)=>s+d.ht,0))}</div></div>`;
   E('dv-tbl').innerHTML=devis.length?devis.map((d,i)=>`<tr><td style="font-weight:700;">${d.num}</td><td>${clients[d.ci]?.nom||'?'}</td><td>${d.date}</td><td>${d.val}</td><td style="text-align:right;font-weight:700;">${fmt(d.ttc)}</td><td><span class="bdg ${ST[d.st]||'inf'}">${d.st}</span></td><td><div style="display:flex;gap:2px;">${d.st==='en attente'?`<button class="btn btn-sm" onclick="convertDevis(${i})" title="Convertir en facture" style="font-size:11px;">→🧾</button>`:''}<button class="btn btn-sm" onclick="imprimerDevis(${i})" title="Imprimer">🖨</button><button class="btn btn-sm btn-rd" onclick="delDevis(${i})">✕</button></div></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--tx2);padding:1.5rem;">Aucun devis</td></tr>';
 }
@@ -3408,11 +3495,11 @@ function printFacIdx(i){
   <table><thead style="background:#f6f6f4;"><tr><th style="text-align:left;">Description</th><th style="text-align:right;">HT</th><th style="text-align:right;">TVA (${f.tva}%)</th><th style="text-align:right;">TTC</th></tr></thead>
   <tbody><tr><td>${f.desc||'Prestation de services'}</td><td style="text-align:right;">${fmtN(f.ht)} €</td><td style="text-align:right;">${fmtN(f.tvaA)} €</td><td style="text-align:right;font-weight:bold;">${fmtN(f.ttc)} €</td></tr></tbody>
   <tfoot><tr class="tot"><td>TOTAL</td><td style="text-align:right;">${fmtN(f.ht)} €</td><td style="text-align:right;">${fmtN(f.tvaA)} €</td><td style="text-align:right;color:#1D9E75;">${fmtN(f.ttc)} €</td></tr></tfoot></table>
-  <p style="margin-top:3rem;font-size:11px;color:#aaa;text-align:center;">Généré par Luno · ${new Date().toLocaleDateString('fr-FR')} · TVA non applicable selon l'article 293B du CGI (si applicable)</p></body></html>`);
+  <p style="margin-top:3rem;font-size:11px;color:#aaa;text-align:center;">Généré par ComptaPME Pro · ${new Date().toLocaleDateString('fr-FR')} · TVA non applicable selon l'article 293B du CGI (si applicable)</p></body></html>`);
   w.document.close();w.print();
 }
 function renderFactures(){
-  const ST={payée:'ok','en attente':'wa','en retard':'er'};
+  const ST={'payée':'ok','en attente':'wa','en retard':'er'};
   const p=factures.filter(f=>f.st==='payée');const a=factures.filter(f=>f.st==='en attente');const r=factures.filter(f=>f.st==='en retard');
   E('fac-stats').innerHTML=`<div class="sc"><div class="sc-l">Total émises</div><div class="sc-v">${factures.length}</div></div><div class="sc"><div class="sc-l">Payées</div><div class="sc-v" style="color:var(--gr);">${fmt(p.reduce((s,f)=>s+f.ttc,0))}</div></div><div class="sc"><div class="sc-l">En attente</div><div class="sc-v" style="color:var(--am);">${fmt(a.reduce((s,f)=>s+f.ttc,0))}</div></div><div class="sc"><div class="sc-l">En retard</div><div class="sc-v" style="color:var(--rd);">${fmt(r.reduce((s,f)=>s+f.ttc,0))}</div></div>`;
   E('fac-tbl').innerHTML=factures.length?factures.map((f,i)=>`<tr><td style="font-weight:700;">${f.num}</td><td>${clients[f.ci]?.nom||'?'}</td><td>${f.date}</td><td>${f.due}</td><td style="text-align:right;font-weight:700;">${fmt(f.ttc)}</td><td><span class="bdg ${ST[f.st]||'inf'}">${f.st}</span></td><td><div style="display:flex;gap:2px;">${f.st!=='payée'?`<button class="btn btn-sm" onclick="payerFac(${i})" title="Marquer payée">✓</button>`:''}<button class="btn btn-sm" onclick="openFactureModal(${i})" title="Modifier">✏</button><button class="btn btn-sm" onclick="printFacIdx(${i})" title="PDF">🖨</button><button class="btn btn-sm btn-rd" onclick="delFac(${i})">✕</button></div></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--tx2);padding:1.5rem;">Aucune facture</td></tr>';
@@ -3436,7 +3523,7 @@ function saveAchat(){
 function payerAchat(i){achats[i].st='payée';addH('paiement','Facture achat '+achats[i].num+' réglée','ok');renderAchats();}
 function delAchat(i){if(confirm('Supprimer ?')){achats.splice(i,1);renderAchats();}}
 function renderAchats(){
-  const ST={payée:'ok','en attente':'wa','en retard':'er'};
+  const ST={'payée':'ok','en attente':'wa','en retard':'er'};
   E('ac-tbl').innerHTML=achats.length?achats.map((a,i)=>`<tr><td>${a.num}</td><td>${fournisseurs[a.fi]?.nom||'?'}</td><td>${a.date}</td><td>${a.due}</td><td style="text-align:right;font-weight:700;">${fmt(a.ttc)}</td><td><span class="bdg ${ST[a.st]||'inf'}">${a.st}</span></td><td><div style="display:flex;gap:2px;">${a.st!=='payée'?`<button class="btn btn-sm" onclick="payerAchat(${i})">✓</button>`:''}<button class="btn btn-sm btn-rd" onclick="delAchat(${i})">✕</button></div></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--tx2);padding:1.5rem;">Aucune facture achat</td></tr>';
 }
 
@@ -3537,7 +3624,7 @@ function printBilan(){
   addH('export','Impression bilan & résultat','inf');
   const w=window.open('','_blank');
   w.document.write(`<html><head><title>Bilan ${yr}</title><style>body{font-family:sans-serif;padding:2rem;font-size:13px;max-width:700px;margin:auto;}h1{color:#1D9E75;}h3{margin:1.5rem 0 .5rem;border-bottom:1px solid #ccc;padding-bottom:.25rem;}table{width:100%;border-collapse:collapse;}td{padding:5px 8px;border-bottom:1px solid #eee;}.tot{font-weight:bold;border-top:2px solid #1D9E75;background:#f6f6f4;}.pos{color:green;}.neg{color:red;}</style></head><body>
-  <h1>📒 Luno — Bilan & Résultat</h1><p style="color:#888;">Exercice ${yr} · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p>
+  <h1>📒 ComptaPME Pro — Bilan & Résultat</h1><p style="color:#888;">Exercice ${yr} · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p>
   <h3>Compte de résultat</h3>
   <table><tr><td>Total produits d'exploitation</td><td style="text-align:right;">${fmt(pr)}</td></tr><tr><td>Total charges d'exploitation</td><td style="text-align:right;color:red;">– ${fmt(ch)}</td></tr><tr class="tot"><td>Résultat net de l'exercice</td><td style="text-align:right;" class="${res>=0?'pos':'neg'}">${fmt(res)}</td></tr></table>
   <h3>Soldes intermédiaires</h3>
@@ -3632,7 +3719,7 @@ function printPaie(nom,mois,brut,net,cs,pat){
   <tr class="tot"><td>Net à payer</td><td style="text-align:right;color:green;">${net.toFixed(2)} €</td></tr>
   <tr style="margin-top:1rem;"><td style="color:#888;">Charges patronales</td><td style="text-align:right;color:#888;">${pat.toFixed(2)} €</td></tr>
   <tr class="tot"><td>Coût total employeur</td><td style="text-align:right;">${(brut+pat).toFixed(2)} €</td></tr></table>
-  <p style="margin-top:2rem;font-size:11px;color:#aaa;">Luno · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p></body></html>`);
+  <p style="margin-top:2rem;font-size:11px;color:#aaa;">ComptaPME Pro · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p></body></html>`);
   w.document.close();w.print();
 }
 
@@ -3662,7 +3749,7 @@ function getDB(){return{v:'4.0',date:new Date().toISOString(),user:me?.email,soc
 function exportSauvegarde(){
   const db=getDB();
   const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`Luno_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`comptapme_${new Date().toISOString().slice(0,10)}.json`;a.click();
   addH('export','Sauvegarde exportée','ok');notif('Sauvegarde téléchargée ✓');createAutoSave();
 }
 function importSauvegarde(evt){
@@ -3690,7 +3777,7 @@ function renderSauvegarde(){
 
 
 // ══════════════════════════════════════════════════════════════
-//  SYSTÈME DE MODULES & PROFILS — Luno
+//  SYSTÈME DE MODULES & PROFILS — ComptaPME Pro
 //  Couche d'adaptation multi-profil (Entreprise / Cabinet)
 //  ⚠ Ne modifie pas les données existantes, uniquement l'UI
 // ══════════════════════════════════════════════════════════════
@@ -4250,6 +4337,7 @@ function copyPortailUrl(){
 // ─── 17. SÉLECTION DU PROFIL À L'INSCRIPTION ───
 function selectProfile(profile){
   selectedProfile = profile;
+  window.selectedProfile = profile;
   const cfg = PROFILE_CONFIGS[profile];
   const otherProfile = profile==='entreprise' ? 'cabinet' : 'entreprise';
   const btn = E('profile-btn-'+profile);
@@ -4271,10 +4359,31 @@ function selectProfile(profile){
 }
 
 // ─── 18. NAVIGATION ÉTAPES INSCRIPTION ───
-function goAppStep0(){ E('app-step0').style.display=''; E('app-step1').style.display='none'; E('app-step2').style.display='none'; }
-function goAppStep1(){ if(!selectedProfile){notif('Veuillez choisir votre profil');return;} E('app-step0').style.display='none'; E('app-step1').style.display=''; E('app-step2').style.display='none'; }
-function goAppStep1b(){ E('app-step0').style.display='none'; E('app-step1').style.display=''; E('app-step2').style.display='none'; }
-function goAppStep2(){ if(!appSirenData){lookupSirenApp();return;} E('app-step0').style.display='none'; E('app-step1').style.display='none'; E('app-step2').style.display=''; document.getElementById('app-company-recap').textContent=appSirenData.nom; }
+function goAppStep0(){ E('app-step0').style.display=''; E('app-step1').style.display='none'; E('app-step2').style.display='none'; E('app-step3').style.display='none'; }
+function goAppStep1(){ if(!selectedProfile){notif('Veuillez choisir votre profil');return;} E('app-step0').style.display='none'; E('app-step1').style.display=''; E('app-step2').style.display='none'; E('app-step3').style.display='none'; }
+function goAppStep1b(){ E('app-step0').style.display='none'; E('app-step1').style.display=''; E('app-step2').style.display='none'; E('app-step3').style.display='none'; }
+function goAppStep2(){ if(!appSirenData){lookupSirenApp();return;} E('app-step0').style.display='none'; E('app-step1').style.display='none'; E('app-step2').style.display=''; E('app-step3').style.display='none'; document.getElementById('app-company-recap').textContent=appSirenData.nom; }
+function goAppStep2b(){ E('app-step0').style.display='none'; E('app-step1').style.display='none'; E('app-step2').style.display=''; E('app-step3').style.display='none'; }
+function goAppStep3(){
+  const err=E('rerr');
+  const nom=E('r-nom').value.trim();
+  const email=E('r-email').value.trim().toLowerCase();
+  const pwd=E('r-pwd').value;
+  const pwd2=E('r-pwd2').value;
+  if(!nom||!email||!pwd){ err.textContent='Tous les champs sont requis.'; err.style.display='block'; return; }
+  if(pwd.length<6){ err.textContent='Mot de passe trop court (min. 6 car.).'; err.style.display='block'; return; }
+  if(pwd!==pwd2){ err.textContent='Les mots de passe ne correspondent pas.'; err.style.display='block'; return; }
+  err.style.display='none';
+  E('app-step0').style.display='none'; E('app-step1').style.display='none'; E('app-step2').style.display='none'; E('app-step3').style.display='';
+}
+function regSelectPlan(plan){
+  selectedPlan=plan;
+  window.selectedPlan=plan;
+  document.querySelectorAll('.reg-plan-card').forEach(card=>{ card.classList.remove('selected'); card.style.borderColor='var(--bd2)'; card.style.background='var(--bg0)'; });
+  const card=E('rp-'+plan);
+  if(card){ card.classList.add('selected'); card.style.borderColor='var(--gr)'; card.style.background='var(--gr3)'; }
+}
+function doRegisterFinal(){ doRegister(); }
 
 // ─── CSS dynamique pour le mode cabinet ───
 const cabStyle=document.createElement('style');
@@ -4323,7 +4432,7 @@ document.head.appendChild(cabStyle);
 <div class="onb-panel" id="onb-panel">
   <button class="onb-x" onclick="onbToggle()" aria-label="Fermer">×</button>
   <div class="onb-head">
-    <div class="onb-title">Bienvenue dans Luno 👋</div>
+    <div class="onb-title">Bienvenue dans ComptaPME Pro 👋</div>
     <div class="onb-sub">Lancez-vous en 5 étapes — environ 3 min.</div>
     <div class="onb-progress"><div class="onb-bar" id="onb-bar"></div></div>
   </div>
@@ -4702,7 +4811,7 @@ document.head.appendChild(cabStyle);
   </div>
   <div class="ux-help-section">
     <h4>Besoin d'aide ?</h4>
-    <div style="font-size:12px;color:var(--tx1,#62604b);">📧 <a href="mailto:hello@Luno.fr" style="color:var(--gr,#1D9E75);">hello@Luno.fr</a></div>
+    <div style="font-size:12px;color:var(--tx1,#62604b);">📧 <a href="mailto:hello@comptapme.fr" style="color:var(--gr,#1D9E75);">hello@comptapme.fr</a></div>
     <div style="font-size:12px;color:var(--tx1,#62604b);margin-top:.25rem;">⏱ Réponse sous 24 h ouvrées</div>
   </div>
 </div>
@@ -5571,7 +5680,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
     ocr:         { tier:'plus', title:'OCR & Reconnaissance IA', sub:'Photographiez une facture, on extrait tout. Le scan papier devient une donnée comptable en 1 clic.', bullets:['Photo → écriture comptable','Multi-format (PDF, image)','Détection automatique TVA, total, fournisseur','50 documents/mois inclus'] },
     analytics:   { tier:'premium', title:'Analytics avancé', sub:'Tableaux de bord détaillés, prévisions de trésorerie, KPIs métier. Pilotez votre activité avec précision.', bullets:['Prévisions de trésorerie à 90 jours','KPI par client, produit, période','Comparaisons multi-exercices','Export Excel automatisé'] },
     'multi-company': { tier:'premium', title:'Multi-entreprises', sub:'Gérez plusieurs sociétés en un seul abonnement. Idéal pour les holdings et groupes.', bullets:['Jusqu\'à 5 entreprises','Vue consolidée','Bascule rapide entre dossiers','TVA et bilans séparés'] },
-    api:         { tier:'premium', title:'API publique', sub:'Connectez Luno à votre stack. Webhooks, REST, lecture/écriture sécurisée.', bullets:['REST API complète','Webhooks événements','Tokens scoped','Documentation interactive'] },
+    api:         { tier:'premium', title:'API publique', sub:'Connectez ComptaPME à votre stack. Webhooks, REST, lecture/écriture sécurisée.', bullets:['REST API complète','Webhooks événements','Tokens scoped','Documentation interactive'] },
     'sauvegarde-avancee': { tier:'premium', title:'Sauvegardes avancées', sub:'Continuité d\'activité maximale. Vos données protégées avec une rétention longue durée.', bullets:['Rétention 1 an minimum','Sauvegardes chiffrées multi-régions','Restauration ponctuelle','Audit complet'] }
   };
   const PRICES = {
@@ -5777,7 +5886,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
       <div class="ux-settings-section" id="ux-sec-documents">
         <div class="fld">
           <label>En-tête personnalisé (visible sur les factures et devis PDF)</label>
-          <textarea id="ux-doc-header" rows="3" placeholder="Luno\n123 rue de la République, 75001 Paris\nSIRET 123 456 789 00012"></textarea>
+          <textarea id="ux-doc-header" rows="3" placeholder="ComptaPME Pro\n123 rue de la République, 75001 Paris\nSIRET 123 456 789 00012"></textarea>
         </div>
         <div class="fld">
           <label>Mention de pied de page (facultative)</label>
@@ -6743,7 +6852,7 @@ body.has-brand .sc-v[style*="color:var(--gr)"], body.has-brand .sc-v[style*="col
           '<td style="text-align:right;">' + fmtNumber(f.ttc) + ' ' + sym + '</td></tr></tfoot>' +
       '</table>' +
       footerHtml +
-      '<div style="margin-top:2.5rem;font-size:10px;color:#aaa;text-align:center;">Document généré par Luno · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
+      '<div style="margin-top:2.5rem;font-size:10px;color:#aaa;text-align:center;">Document généré par ComptaPME Pro · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
       '</body></html>';
   }
   // Override printFacIdx — toujours utiliser le nouveau template (qui fallback proprement si pas de settings)
@@ -7076,7 +7185,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
       '</table>' +
       '<div class="valid">⏳ <strong>Validité de l\'offre</strong> : ce devis est valable jusqu\'au ' + escHtml(d.val) + '. Pour accepter, retournez-le signé avec la mention « Bon pour accord ».</div>' +
       footerHtml +
-      '<div style="margin-top:2rem;font-size:10px;color:#aaa;text-align:center;">Document généré par Luno · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
+      '<div style="margin-top:2rem;font-size:10px;color:#aaa;text-align:center;">Document généré par ComptaPME Pro · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
       '</body></html>';
   }
   const origImpDevis = window.imprimerDevis;
@@ -7540,7 +7649,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         if(!email || !pwd){ if(errEl){ errEl.textContent='Email et mot de passe requis.'; errEl.style.display='block'; } return; }
 
         // Comptes démo → fallback localStorage (pour ne pas casser les comptes de test existants)
-        if(email === 'demo@Luno.fr' || email === 'test@test.fr' || email.includes('demo')){
+        if(email === 'demo@comptapme.fr' || email === 'test@test.fr' || email.includes('demo')){
           return origLogin.apply(this, arguments);
         }
 
@@ -7570,8 +7679,10 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         const f = id => (document.getElementById(id)||{}).value || '';
         const email = f('r-email').trim().toLowerCase();
         const pwd = f('r-pwd');
-        const prenom = f('r-prenom') || f('app-prenom') || '';
-        const nom = f('r-nom') || f('app-nom') || '';
+        const fullName = f('r-nom') || f('app-nom') || '';
+        const nameParts = fullName.trim().split(/\s+/).filter(Boolean);
+        const prenom = f('r-prenom') || f('app-prenom') || nameParts[0] || '';
+        const nom = f('r-prenom') ? fullName : (nameParts.slice(1).join(' ') || nameParts[0] || '');
         const societe = f('r-societe') || f('app-societe-nom') || (window.appSirenData && window.appSirenData.nom) || 'Mon entreprise';
         const siren = f('r-siren') || (window.appSirenData && window.appSirenData.siren) || null;
         const errEl = document.getElementById('rerr') || document.getElementById('app-err');
@@ -7588,7 +7699,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         try {
           const { data, error } = await window.sb.auth.signUp({
             email, password: pwd,
-            options: { data: { prenom, nom, societe, siren, profile_type: window.selectedProfile || 'entreprise' } }
+            options: { data: { prenom, nom, societe, org_name: societe, siren, profile_type: window.selectedProfile || 'entreprise', selected_plan: window.selectedPlan || 'pro' } }
           });
           if(error){
             // Email déjà pris → essai legacy
@@ -8265,6 +8376,18 @@ function initials(name){
 
 // Vérifier si Supabase est prêt
 function sbReady(){ return !!(window.sb && window.v8.userId); }
+async function v8Rpc(name, args){
+  const aliases = {
+    user_orgs: 'get_user_organizations',
+    list_org_members: 'get_org_members',
+    list_pending_invitations: 'get_org_invitations'
+  };
+  const result = await window.sb.rpc(name, args || {});
+  if(result.error && result.error.code === 'PGRST202' && aliases[name]){
+    return window.sb.rpc(aliases[name], args || {});
+  }
+  return result;
+}
 
 // ═══════════════════════════════════════════════════════════
 // 3. PERMISSIONS CENTRALISÉES
@@ -8438,8 +8561,8 @@ function updateTeamBtn(){
 async function v8LoadOrgs(){
   if(!sbReady()) return;
   try {
-    const { data, error } = await window.sb.rpc('get_user_organizations');
-    if(error){ console.warn('[V8] get_user_organizations:', error.message); return; }
+    const { data, error } = await v8Rpc('user_orgs');
+    if(error){ console.warn('[V8] user_orgs:', error.message); return; }
     if(!data || !data.length) return;
 
     window.v8.orgs = data;
@@ -8510,7 +8633,7 @@ async function v8RenderMembersTab(){
   content.innerHTML = `<div style="display:flex;justify-content:center;padding:24px"><div class="v8-spinner"></div></div>`;
 
   try {
-    const { data, error } = await window.sb.rpc('get_org_members', { p_org_id: org.company_id });
+    const { data, error } = await v8Rpc('list_org_members', { p_org_id: org.company_id });
     if(error) throw error;
 
     let inviteForm = '';
@@ -8577,7 +8700,7 @@ async function v8RenderMembersTab(){
 
     content.innerHTML = inviteForm + membersHtml;
   } catch(e){
-    console.error('[V8] get_org_members:', e);
+    console.error('[V8] list_org_members:', e);
     content.innerHTML = `<div class="v8-empty"><div class="v8-empty-icon">⚠️</div><div class="v8-empty-text">Erreur de chargement : ${esc(e.message)}</div></div>`;
   }
 }
@@ -8591,7 +8714,7 @@ async function v8RenderInvitesTab(){
   content.innerHTML = `<div style="display:flex;justify-content:center;padding:24px"><div class="v8-spinner"></div></div>`;
 
   try {
-    const { data, error } = await window.sb.rpc('get_org_invitations', { p_org_id: org.company_id });
+    const { data, error } = await v8Rpc('list_pending_invitations', { p_org_id: org.company_id });
     if(error) throw error;
 
     if(!data || !data.length){
@@ -8614,7 +8737,7 @@ async function v8RenderInvitesTab(){
 
     content.innerHTML = `<div style="margin-bottom:12px;font-size:12px;color:var(--tx2)">${data.length} invitation${data.length>1?'s':''} en attente</div>` + html;
   } catch(e){
-    console.error('[V8] get_org_invitations:', e);
+    console.error('[V8] list_pending_invitations:', e);
     content.innerHTML = `<div class="v8-empty"><div class="v8-empty-icon">⚠️</div><div class="v8-empty-text">Erreur : ${esc(e.message)}</div></div>`;
   }
 }
@@ -8684,7 +8807,7 @@ async function v8SendInvite(){
   if(sendBtn){ sendBtn.disabled = true; sendBtn.textContent = '...'; }
 
   try {
-    const { data, error } = await window.sb.rpc('invite_member', {
+    const { data, error } = await v8Rpc('invite_member', {
       p_organization_id: org.company_id,
       p_email:           email,
       p_role:            role
@@ -8742,7 +8865,7 @@ window.v8CopyInviteLink = v8CopyInviteLink;
 // Révoquer une invitation
 async function v8RevokeInvite(invId){
   if(!confirm('Annuler cette invitation ?')) return;
-  const { data, error } = await window.sb.rpc('revoke_invitation', { p_inv_id: invId });
+  const { data, error } = await v8Rpc('cancel_invitation', { p_invitation_id: invId });
   if(error){ v8Toast('Erreur : ' + error.message,'error'); return; }
   const res = data || {};
   if(res.success){ v8Toast('Invitation annulée','info'); v8RenderInvitesTab(); }
@@ -8793,7 +8916,7 @@ async function v8DoChangeRole(userId){
   const newRole = sel && sel.value;
   const org = window.v8.activeOrg;
 
-  const { data, error } = await window.sb.rpc('update_member_role', {
+  const { data, error } = await v8Rpc('update_member_role', {
     p_org_id:   org.company_id,
     p_user_id:  userId,
     p_new_role: newRole
@@ -8813,7 +8936,7 @@ window.v8DoChangeRole = v8DoChangeRole;
 async function v8RemoveMember(userId, name){
   if(!confirm(`Retirer ${name} de l'organisation ?`)) return;
   const org = window.v8.activeOrg;
-  const { data, error } = await window.sb.rpc('remove_member', {
+  const { data, error } = await v8Rpc('remove_member', {
     p_org_id:  org.company_id,
     p_user_id: userId
   });
@@ -8876,7 +8999,12 @@ async function v8CreateOrg(){
     // Créer l'organisation directement dans Supabase
     const { data: company, error: compErr } = await window.sb
       .from('companies')
-      .insert({ nom: name, type: type, exercice: new Date().getFullYear().toString(), settings: {} })
+      .insert({
+        owner_id: window.v8.userId,
+        nom: name,
+        type: type,
+        exercice: new Date().getFullYear().toString()
+      })
       .select()
       .single();
 
@@ -8947,7 +9075,7 @@ async function v8ProcessPendingInvite(){
   sessionStorage.removeItem('luno_pending_invite');
 
   try {
-    const { data, error } = await window.sb.rpc('accept_invitation', { p_token: token });
+    const { data, error } = await v8Rpc('accept_invitation', { p_token: token });
     if(error) throw error;
     const res = data || {};
     if(!res.success){ v8Toast(res.error||'Invitation invalide','error'); return; }
@@ -9075,5 +9203,880 @@ window.v8API = {
 })();
 </script>
 
+</body>
+</html>
+  }
+}
+
+document.addEventListener('DOMContentLoaded', v8Init);
+
+// ═══════════════════════════════════════════════════════════
+// 13. PAGE ÉQUIPE — dashboard pleine page
+// ═══════════════════════════════════════════════════════════
+function renderEquipe(){
+  const root = document.getElementById('equipe-root');
+  if(!root) return;
+  const org = window.v8 && window.v8.activeOrg;
+
+  if(!org){
+    root.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:48px;text-align:center;">
+        <div style="font-size:48px;">👥</div>
+        <div style="font-size:16px;font-weight:600;color:var(--tx0);">Aucune organisation active</div>
+        <div style="font-size:13px;color:var(--tx2);">Connectez-vous pour gérer votre équipe.</div>
+      </div>`;
+    return;
+  }
+
+  const canManage = typeof canDo === 'function' ? canDo('canManageRoles') : false;
+  const canInvite = typeof canDo === 'function' ? canDo('canInvite') : false;
+
+  root.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:18px;">
+
+      <!-- ── En-tête org ── -->
+      <div style="display:flex;align-items:center;gap:16px;background:var(--bg0);border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;">
+        <div style="font-size:36px;">${typeof orgIcon==='function'?orgIcon(org.company_type):'🏢'}</div>
+        <div style="flex:1;">
+          <div style="font-size:18px;font-weight:700;color:var(--tx0);">${typeof esc==='function'?esc(org.company_name):org.company_name}</div>
+          <div style="font-size:12px;color:var(--tx2);margin-top:3px;">${org.member_count||'—'} membre(s) · ${typeof roleLabel==='function'?roleLabel(org.user_role):org.user_role}</div>
+        </div>
+        ${canInvite?`<button class="btn btn-gr btn-sm" onclick="v8OpenTeamModal()">+ Inviter un membre</button>`:''}
+      </div>
+
+      <!-- ── Tabs ── -->
+      <div style="display:flex;gap:4px;border-bottom:2px solid var(--bd);padding-bottom:0;">
+        <button id="eq-tab-members" class="eq-tab eq-tab-active" onclick="eqTab('members')">👥 Membres</button>
+        <button id="eq-tab-invites" class="eq-tab" onclick="eqTab('invites')">📨 Invitations en attente</button>
+      </div>
+
+      <!-- ── Contenu ── -->
+      <div id="eq-content"><div style="display:flex;justify-content:center;padding:32px;"><div class="v8-spinner"></div></div></div>
+    </div>
+
+    <style>
+      .eq-tab{background:none;border:none;padding:8px 16px;font-size:13px;font-weight:600;color:var(--tx2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;transition:color .15s;}
+      .eq-tab:hover{color:var(--tx0);}
+      .eq-tab-active{color:var(--gr)!important;border-bottom-color:var(--gr)!important;}
+      .eq-member-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg0);border:1px solid var(--bd);border-radius:var(--r);transition:background .12s;}
+      .eq-member-row:hover{background:var(--bg1);}
+      .eq-member-av{width:38px;height:38px;border-radius:50%;background:var(--gr3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--gr);flex-shrink:0;}
+      .eq-inv-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg0);border:1px solid var(--bd);border-radius:var(--r);}
+      .eq-invite-form{background:var(--bg1);border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;margin-bottom:4px;}
+      .eq-invite-form label{font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:4px;}
+      .eq-invite-form input,.eq-invite-form select{width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font-size:13px;background:var(--bg0);color:var(--tx0);font-family:inherit;box-sizing:border-box;}
+    </style>`;
+
+  eqTab('members');
+}
+window.renderEquipe = renderEquipe;
+
+function eqTab(tab){
+  ['members','invites'].forEach(t=>{
+    const btn = document.getElementById('eq-tab-'+t);
+    if(btn){ btn.classList.toggle('eq-tab-active', t===tab); }
+  });
+  if(tab==='members') eqRenderMembers();
+  else eqRenderInvites();
+}
+window.eqTab = eqTab;
+
+async function eqRenderMembers(){
+  const root = document.getElementById('eq-content');
+  if(!root) return;
+  const org = window.v8 && window.v8.activeOrg;
+  if(!org){ root.innerHTML='<div style="padding:24px;color:var(--tx2);">Aucune organisation.</div>'; return; }
+
+  const canManage = typeof canDo==='function' ? canDo('canManageRoles') : false;
+  const canInvite = typeof canDo==='function' ? canDo('canInvite') : false;
+  root.innerHTML = '<div style="display:flex;justify-content:center;padding:32px;"><div class="v8-spinner"></div></div>';
+
+  try {
+    const { data, error } = await v8Rpc('list_org_members', { p_org_id: org.company_id });
+    if(error) throw error;
+
+    const inviteForm = canInvite ? `
+      <div class="eq-invite-form">
+        <div style="font-size:13px;font-weight:700;color:var(--tx0);margin-bottom:12px;">Inviter un nouveau membre</div>
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:end;">
+          <div><label>Adresse email</label><input type="email" id="eq-inv-email" placeholder="collaborateur@societe.fr"></div>
+          <div><label>Rôle</label>
+            <select id="eq-inv-role">
+              ${org.company_type==='accounting_firm' ? `
+                <option value="collaborator">Collaborateur</option>
+                <option value="assistant">Assistant</option>
+                <option value="viewer">Lecteur</option>
+              ` : `
+                <option value="admin">Administrateur</option>
+                <option value="accountant">Comptable</option>
+                <option value="employee">Employé</option>
+                <option value="viewer">Lecteur</option>
+              `}
+            </select>
+          </div>
+          <div><button class="btn btn-gr btn-sm" style="white-space:nowrap;padding:8px 16px;" onclick="eqSendInvite()">✉️ Inviter</button></div>
+        </div>
+      </div>` : '';
+
+    if(!data || !data.length){
+      root.innerHTML = inviteForm + `<div style="text-align:center;padding:32px;color:var(--tx2);">Aucun membre trouvé.</div>`;
+      return;
+    }
+
+    const rows = data.map(m => {
+      const isMe = m.user_id === (window.v8 && window.v8.userId);
+      const isOwner = m.role==='owner'||m.role==='cabinet_owner';
+      const name = (m.full_name||'').trim() || m.email || '—';
+      const initStr = typeof initials==='function' ? initials(name) : name.slice(0,2).toUpperCase();
+      return `
+        <div class="eq-member-row">
+          <div class="eq-member-av">${initStr}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;color:var(--tx0);">${typeof esc==='function'?esc(name):name}${isMe?' <span style="font-size:10px;background:var(--bg2);color:var(--tx2);padding:1px 6px;border-radius:4px;font-weight:500;">vous</span>':''}</div>
+            <div style="font-size:11px;color:var(--tx2);margin-top:2px;">${typeof esc==='function'?esc(m.email||''):m.email||''}</div>
+          </div>
+          <span class="v8-role-badge ${m.role}">${typeof roleLabel==='function'?roleLabel(m.role):m.role}</span>
+          ${canManage && !isMe && !isOwner ? `
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-sm" title="Changer le rôle" onclick="v8ChangeRoleModal('${m.user_id}','${m.role}','${typeof esc==='function'?esc(name):name}')">✏️ Rôle</button>
+              <button class="btn btn-sm" style="color:var(--rd);border-color:var(--rd);" title="Retirer" onclick="eqRemoveMember('${m.user_id}','${typeof esc==='function'?esc(name):name}')">🗑️</button>
+            </div>` : ''}
+        </div>`;
+    }).join('');
+
+    root.innerHTML = inviteForm + `<div style="display:flex;flex-direction:column;gap:8px;">${rows}</div>`;
+
+  } catch(e){
+    root.innerHTML = `<div style="padding:24px;color:var(--rd);">Erreur de chargement : ${typeof esc==='function'?esc(e.message):e.message}</div>`;
+  }
+}
+window.eqRenderMembers = eqRenderMembers;
+
+async function eqRenderInvites(){
+  const root = document.getElementById('eq-content');
+  if(!root) return;
+  const org = window.v8 && window.v8.activeOrg;
+  if(!org){ root.innerHTML='<div style="padding:24px;color:var(--tx2);">Aucune organisation.</div>'; return; }
+
+  root.innerHTML = '<div style="display:flex;justify-content:center;padding:32px;"><div class="v8-spinner"></div></div>';
+
+  try {
+    const { data, error } = await v8Rpc('list_pending_invitations', { p_org_id: org.company_id });
+    if(error) throw error;
+
+    if(!data || !data.length){
+      root.innerHTML = `
+        <div style="text-align:center;padding:48px;">
+          <div style="font-size:40px;margin-bottom:12px;">📭</div>
+          <div style="font-size:14px;font-weight:600;color:var(--tx0);">Aucune invitation en attente</div>
+          <div style="font-size:12px;color:var(--tx2);margin-top:6px;">Les invitations que vous envoyez apparaîtront ici.</div>
+        </div>`;
+      return;
+    }
+
+    const rows = data.map(inv => `
+      <div class="eq-inv-row">
+        <div style="width:38px;height:38px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✉️</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:600;color:var(--tx0);">${typeof esc==='function'?esc(inv.email):inv.email}</div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:2px;">${typeof roleLabel==='function'?roleLabel(inv.role):inv.role} · Expire ${typeof relDate==='function'?relDate(inv.expires_at):inv.expires_at}</div>
+        </div>
+        <button class="btn btn-sm" onclick="eqCopyLink('${inv.token}')">📋 Copier lien</button>
+        <button class="btn btn-sm" style="color:var(--rd);border-color:var(--rd);" onclick="eqCancelInvite('${inv.inv_id}')">✕ Annuler</button>
+      </div>`).join('');
+
+    root.innerHTML = `
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:10px;">${data.length} invitation${data.length>1?'s':''} en attente</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">${rows}</div>`;
+
+  } catch(e){
+    root.innerHTML = `<div style="padding:24px;color:var(--rd);">Erreur : ${typeof esc==='function'?esc(e.message):e.message}</div>`;
+  }
+}
+window.eqRenderInvites = eqRenderInvites;
+
+async function eqSendInvite(){
+  const emailEl = document.getElementById('eq-inv-email');
+  const roleEl  = document.getElementById('eq-inv-role');
+  if(!emailEl||!roleEl) return;
+  const email = emailEl.value.trim().toLowerCase();
+  const role  = roleEl.value;
+  const org   = window.v8 && window.v8.activeOrg;
+  if(!email||!email.includes('@')){ if(typeof v8Toast==='function') v8Toast('Email invalide','error'); return; }
+  if(!org){ if(typeof v8Toast==='function') v8Toast('Aucune organisation active','error'); return; }
+
+  const btn = emailEl.closest('.eq-invite-form').querySelector('button');
+  if(btn){ btn.disabled=true; btn.textContent='…'; }
+
+  try {
+    const { data, error } = await v8Rpc('invite_member', {
+      p_organization_id: org.company_id, p_email: email, p_role: role
+    });
+    if(error) throw error;
+    const res = data||{};
+    if(!res.success) throw new Error(res.error||'Erreur inconnue');
+    const url = `${location.origin}${location.pathname}?invite=${res.token}`;
+    if(typeof v8Toast==='function') v8Toast(`Invitation envoyée à ${email}`,'success');
+    emailEl.value = '';
+    navigator.clipboard.writeText(url).then(()=>{
+      if(typeof v8Toast==='function') v8Toast('Lien copié dans le presse-papiers !','info');
+    });
+    setTimeout(eqRenderMembers, 400);
+  } catch(e){
+    if(typeof v8Toast==='function') v8Toast(e.message||'Erreur','error');
+  } finally {
+    if(btn){ btn.disabled=false; btn.textContent='✉️ Inviter'; }
+  }
+}
+window.eqSendInvite = eqSendInvite;
+
+async function eqRemoveMember(userId, name){
+  if(!confirm(`Retirer ${name} de l'organisation ?`)) return;
+  try {
+    const org = window.v8 && window.v8.activeOrg;
+    const { error } = await v8Rpc('remove_member', { p_user_id: userId, p_org_id: org.company_id });
+    if(error) throw error;
+    if(typeof v8Toast==='function') v8Toast(`${name} retiré(e)`,'info');
+    eqRenderMembers();
+  } catch(e){
+    if(typeof v8Toast==='function') v8Toast(e.message,'error');
+  }
+}
+window.eqRemoveMember = eqRemoveMember;
+
+function eqCopyLink(token){
+  const url = `${location.origin}${location.pathname}?invite=${token}`;
+  navigator.clipboard.writeText(url).then(()=>{
+    if(typeof v8Toast==='function') v8Toast('Lien copié !','success');
+  });
+}
+window.eqCopyLink = eqCopyLink;
+
+async function eqCancelInvite(invId){
+  if(!confirm('Annuler cette invitation ?')) return;
+  const { data, error } = await v8Rpc('cancel_invitation', { p_invitation_id: invId });
+  if(error){ if(typeof v8Toast==='function') v8Toast(error.message,'error'); return; }
+  if((data||{}).success){ if(typeof v8Toast==='function') v8Toast('Invitation annulée','info'); eqRenderInvites(); }
+  else if(typeof v8Toast==='function') v8Toast((data||{}).error||'Erreur','error');
+}
+window.eqCancelInvite = eqCancelInvite;
+
+// ═══════════════════════════════════════════════════════════
+// 14. PAGE ABONNEMENT — Stripe-ready subscription management
+// ═══════════════════════════════════════════════════════════
+
+// Liens Stripe Checkout — remplacer par les vraies URLs Stripe
+const STRIPE_LINKS = {
+  starter:    { monthly: 'https://buy.stripe.com/starter_monthly',    annual: 'https://buy.stripe.com/starter_annual' },
+  pro:        { monthly: 'https://buy.stripe.com/pro_monthly',        annual: 'https://buy.stripe.com/pro_annual' },
+  entreprise: { monthly: 'https://buy.stripe.com/entreprise_monthly', annual: 'https://buy.stripe.com/entreprise_annual' },
+};
+
+const PLAN_DETAILS = {
+  trial: {
+    label: 'Essai gratuit', color: '#7a4a00', bg: '#faeeda', icon: '⏱️',
+    users: 1, factures: 20, clients: 10, storage: '500 Mo',
+    features: ['Facturation (20 factures)', 'Devis', 'Déclaration TVA', '1 utilisateur', 'Export PDF'],
+  },
+  starter: {
+    label: 'Starter', price_m: 19, price_a: 15, color: '#0c447c', bg: '#e6f1fb', icon: '🚀',
+    users: 1, factures: -1, clients: -1, storage: '2 Go',
+    features: ['Facturation illimitée', 'Devis illimités', 'Déclaration TVA', 'Export PDF/CSV', '1 utilisateur'],
+  },
+  pro: {
+    label: 'Pro', price_m: 49, price_a: 39, color: '#0F6E56', bg: '#e1f5ee', icon: '⚡', popular: true,
+    users: 5, factures: -1, clients: -1, storage: '10 Go',
+    features: ['Tout Starter', 'Comptabilité PCG complète', 'Bilan & résultat', 'Salariés & paie', 'Trésorerie', 'Synchronisation bancaire', '5 utilisateurs'],
+  },
+  entreprise: {
+    label: 'Entreprise', price_m: 99, price_a: 79, color: '#3C3489', bg: '#eeedfe', icon: '🏢',
+    users: -1, factures: -1, clients: -1, storage: '50 Go',
+    features: ['Tout Pro', 'Multi-entreprises', 'Analytics avancé', 'API publique', 'Sauvegardes avancées', 'Utilisateurs illimités', 'Account manager dédié'],
+  },
+};
+
+let aboBilling = 'monthly'; // toggle mensuel / annuel
+
+function renderAbonnement(){
+  const root = document.getElementById('abonnement-root');
+  if(!root) return;
+
+  const currentPlan = (me && me.plan) || 'trial';
+  const status      = (me && typeof getStatus === 'function') ? getStatus(me) : { type:'trial', daysLeft:15 };
+  const plan        = PLAN_DETAILS[currentPlan] || PLAN_DETAILS.trial;
+
+  root.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:20px;">
+
+      <!-- ── Carte plan actuel ── -->
+      <div style="display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;background:${plan.bg};border:2px solid ${plan.color}22;border-radius:12px;padding:20px 24px;">
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:${plan.color};margin-bottom:4px;">Plan actuel</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:28px;">${plan.icon}</span>
+            <span style="font-size:24px;font-weight:800;color:var(--tx0);">${plan.label}</span>
+          </div>
+          ${status.type==='trial' ? `
+            <div style="margin-top:8px;font-size:13px;color:${plan.color};font-weight:600;">
+              ⏳ ${status.daysLeft} jour(s) d'essai restant${status.daysLeft>1?'s':''}
+            </div>
+            <div style="font-size:12px;color:var(--tx2);margin-top:4px;">Après l'essai, choisissez un plan payant pour continuer à utiliser LUNO SUITE.</div>` :
+          status.type==='paid' ? `
+            <div style="margin-top:8px;font-size:13px;color:var(--gr);font-weight:600;">✓ Actif — renouvellement dans ${status.daysLeft} jour(s)</div>` :
+          `<div style="margin-top:8px;font-size:13px;color:var(--rd);font-weight:600;">⚠ Abonnement expiré — choisissez un plan ci-dessous</div>`}
+        </div>
+        <div style="text-align:right;">
+          ${currentPlan !== 'trial' && plan.price_m ? `
+            <div style="font-size:32px;font-weight:800;color:var(--tx0);">${aboBilling==='annual'?plan.price_a:plan.price_m}€</div>
+            <div style="font-size:12px;color:var(--tx2);">/ mois${aboBilling==='annual'?' (facturé annuellement)':''}</div>` :
+          currentPlan==='trial' ? `<div style="font-size:15px;font-weight:700;color:${plan.color};">Gratuit</div>` : ''}
+        </div>
+      </div>
+
+      <!-- ── Utilisation ── -->
+      <div style="background:var(--bg0);border:1px solid var(--bd);border-radius:var(--r);padding:16px 20px;">
+        <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:14px;">Utilisation ce mois</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          ${aboUsageStat('Utilisateurs', (window.v8&&window.v8.activeOrg&&window.v8.activeOrg.member_count)||1, plan.users, '👥')}
+          ${aboUsageStat('Factures', (typeof factures!=='undefined'?factures.length:0), plan.factures, '🧾')}
+          ${aboUsageStat('Clients', (typeof clients!=='undefined'?Object.keys(clients).length:0), plan.clients, '🤝')}
+        </div>
+      </div>
+
+      <!-- ── Toggle facturation ── -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;">
+        <span style="font-size:13px;font-weight:${aboBilling==='monthly'?700:400};color:${aboBilling==='monthly'?'var(--tx0)':'var(--tx2)'};">Mensuel</span>
+        <div onclick="aboToggleBilling()" style="width:46px;height:26px;background:${aboBilling==='annual'?'var(--gr)':'var(--bg3)'};border-radius:13px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;">
+          <div style="position:absolute;top:3px;left:${aboBilling==='annual'?'23':'3'}px;width:20px;height:20px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 3px #0002;"></div>
+        </div>
+        <span style="font-size:13px;font-weight:${aboBilling==='annual'?700:400};color:${aboBilling==='annual'?'var(--tx0)':'var(--tx2)'};">Annuel <span style="background:#e6f9f0;color:var(--gr);font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:4px;">−20%</span></span>
+      </div>
+
+      <!-- ── Plans ── -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+        ${['starter','pro','entreprise'].map(pid => aboPlanCard(pid, currentPlan)).join('')}
+      </div>
+
+      <!-- ── Historique facturation ── -->
+      <div style="background:var(--bg0);border:1px solid var(--bd);border-radius:var(--r);">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--bd);font-size:13px;font-weight:700;color:var(--tx0);">📄 Historique de facturation</div>
+        <div style="padding:8px 0;" id="abo-invoices">
+          ${aboMockInvoices(currentPlan)}
+        </div>
+      </div>
+
+      <!-- ── Aide ── -->
+      <div style="background:var(--bg1);border-radius:var(--r);padding:16px 20px;font-size:12px;color:var(--tx2);text-align:center;">
+        Des questions sur votre abonnement ? <a href="mailto:support@luno.app" style="color:var(--gr);font-weight:600;">support@luno.app</a> · Annulation possible à tout moment, sans engagement.
+      </div>
+
+    </div>`;
+}
+window.renderAbonnement = renderAbonnement;
+
+function aboUsageStat(label, used, max, icon){
+  const unlimited = max === -1;
+  const pct = unlimited ? 0 : Math.min(100, Math.round(used/max*100));
+  const color = pct > 90 ? 'var(--rd)' : pct > 70 ? 'var(--yw)' : 'var(--gr)';
+  return `
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="font-size:11px;color:var(--tx2);">${icon} ${label}</div>
+      <div style="font-size:20px;font-weight:700;color:var(--tx0);">${used}${unlimited?'':' / '+max}</div>
+      ${!unlimited ? `
+        <div style="height:4px;background:var(--bg2);border-radius:2px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${color};border-radius:2px;transition:width .4s;"></div>
+        </div>` : `<div style="font-size:10px;color:var(--gr);font-weight:600;">Illimité</div>`}
+    </div>`;
+}
+
+function aboPlanCard(pid, currentPlan){
+  const p = PLAN_DETAILS[pid];
+  const isCurrent = pid === currentPlan;
+  const price = aboBilling === 'annual' ? p.price_a : p.price_m;
+  const stripeUrl = STRIPE_LINKS[pid] && STRIPE_LINKS[pid][aboBilling];
+  return `
+    <div style="border:2px solid ${isCurrent?p.color:'var(--bd)'};background:${isCurrent?p.bg:'var(--bg0)'};border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:12px;position:relative;transition:border-color .15s,box-shadow .15s;${p.popular&&!isCurrent?'box-shadow:0 4px 16px #0001;':''}">
+      ${p.popular ? `<div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--gr);color:#fff;font-size:10px;font-weight:700;padding:2px 12px;border-radius:100px;white-space:nowrap;">⭐ Le plus populaire</div>` : ''}
+      ${isCurrent ? `<div style="position:absolute;top:10px;right:10px;background:${p.color};color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:100px;">ACTUEL</div>` : ''}
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:${p.color};">${p.label}</div>
+        <div style="font-size:28px;font-weight:800;color:var(--tx0);margin-top:4px;">${price}€<span style="font-size:12px;font-weight:400;color:var(--tx2);">/mois</span></div>
+        ${aboBilling==='annual'?`<div style="font-size:10px;color:var(--gr);font-weight:600;">Économisez ${(p.price_m-p.price_a)*12}€/an</div>`:''}
+      </div>
+      <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:5px;flex:1;">
+        ${p.features.map(f=>`<li style="font-size:12px;color:var(--tx1);display:flex;gap:6px;align-items:flex-start;"><span style="color:var(--gr);font-weight:700;flex-shrink:0;">✓</span>${f}</li>`).join('')}
+      </ul>
+      ${isCurrent ?
+        `<button class="btn" disabled style="opacity:.5;cursor:default;font-size:12px;padding:9px;">Plan actuel</button>` :
+        `<button class="btn btn-gr btn-sm" style="font-size:12px;padding:9px;" onclick="aboCheckout('${pid}','${aboBilling}')">
+          ${currentPlan==='trial'||currentPlan==='starter'&&pid!=='starter' ? 'Passer au ' : 'Changer pour '}${p.label} →
+        </button>`
+      }
+    </div>`;
+}
+
+function aboMockInvoices(plan){
+  if(plan==='trial') return `<div style="padding:16px 20px;font-size:12px;color:var(--tx2);text-align:center;">Aucune facture — vous êtes en période d'essai.</div>`;
+  const p = PLAN_DETAILS[plan];
+  if(!p||!p.price_m) return `<div style="padding:16px 20px;font-size:12px;color:var(--tx2);">Aucun historique disponible.</div>`;
+  const now = new Date();
+  return [0,1,2].map(i=>{
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const label = d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 20px;border-bottom:1px solid var(--bd);">
+      <span style="font-size:16px;">🧾</span>
+      <div style="flex:1;font-size:12px;color:var(--tx1);">Abonnement ${p.label} — ${label}</div>
+      <span style="font-size:12px;font-weight:700;color:var(--tx0);">${p.price_m}€</span>
+      <span style="font-size:10px;background:#e6f9f0;color:var(--gr);padding:2px 8px;border-radius:100px;font-weight:600;">Payé</span>
+      <button class="btn btn-sm" style="font-size:11px;padding:3px 8px;" onclick="if(typeof notif==='function')notif('Téléchargement de la facture...')">PDF</button>
+    </div>`;
+  }).join('');
+}
+
+function aboToggleBilling(){
+  aboBilling = aboBilling === 'monthly' ? 'annual' : 'monthly';
+  renderAbonnement();
+}
+window.aboToggleBilling = aboToggleBilling;
+
+function aboCheckout(plan, billing){
+  const p = PLAN_DETAILS[plan];
+  const link = STRIPE_LINKS[plan] && STRIPE_LINKS[plan][billing];
+  // En production : window.location.href = link;
+  // En dev/démo : simuler l'activation
+  v8OpenModal(`
+    <div class="v8-modal v8-modal-sm">
+      <div class="v8-modal-head">
+        <div class="v8-modal-title">${p.icon} Passer au plan ${p.label}</div>
+        <button class="v8-modal-close" onclick="v8CloseModal()">✕</button>
+      </div>
+      <div class="v8-modal-body">
+        <p style="font-size:13px;color:var(--tx1);line-height:1.6;">
+          Vous allez être redirigé vers notre page de paiement sécurisée <strong>Stripe</strong> pour activer le plan <strong>${p.label}</strong> à <strong>${billing==='annual'?p.price_a:p.price_m}€/mois</strong>${billing==='annual'?' (facturé annuellement)':''}.
+        </p>
+        <div style="background:var(--bg1);border-radius:var(--r);padding:12px 16px;font-size:12px;color:var(--tx2);margin-top:12px;">
+          🔒 Paiement 100 % sécurisé via Stripe · Annulable à tout moment
+        </div>
+      </div>
+      <div class="v8-modal-foot">
+        <button class="v8-btn v8-btn-secondary" onclick="v8CloseModal()">Annuler</button>
+        <button class="v8-btn v8-btn-primary" onclick="aboProceedCheckout('${plan}','${billing}');v8CloseModal();">
+          💳 Procéder au paiement
+        </button>
+      </div>
+    </div>`);
+}
+window.aboCheckout = aboCheckout;
+
+function aboProceedCheckout(plan, billing){
+  const link = STRIPE_LINKS[plan] && STRIPE_LINKS[plan][billing];
+  if(link && !link.includes('buy.stripe.com/starter_') && !link.includes('buy.stripe.com/pro_') && !link.includes('buy.stripe.com/entreprise_')){
+    window.location.href = link;
+  } else {
+    // Mode démo — simuler activation locale
+    const stored = JSON.parse(localStorage.getItem('cpme_user') || '{}');
+    stored.plan = plan;
+    stored.plan_billing = billing;
+    stored.plan_activated = new Date().toISOString();
+    stored.trial_end = null;
+    localStorage.setItem('cpme_user', JSON.stringify(stored));
+    if(typeof me !== 'undefined' && me){ me.plan = plan; me.plan_billing = billing; }
+    if(typeof notif === 'function') notif('✅ Plan ' + (PLAN_DETAILS[plan]?.label || plan) + ' activé (mode démo) !');
+    setTimeout(() => nav('abonnement'), 400);
+  }
+}
+window.aboProceedCheckout = aboProceedCheckout;
+
+// ══════════════════════════════════════════════════════
+// § 15 — TASK 19: Multi-step onboarding / registration
+// ══════════════════════════════════════════════════════
+
+/**
+ * renderOnboarding() — remplace la vue auth par un tunnel 4 étapes
+ * Étape 1 : SIREN lookup
+ * Étape 2 : Infos société (pré-remplies si SIREN trouvé)
+ * Étape 3 : Compte utilisateur (email + mot de passe)
+ * Étape 4 : Choix du plan
+ */
+let onbStep = 1;
+let onbData = {};
+
+function renderOnboarding(){
+  const root = document.getElementById('auth-root');
+  if(!root) return;
+  root.innerHTML = `
+  <div class="onb-wrap">
+    <div class="onb-logo">🌙 <span style="font-weight:700;letter-spacing:-0.5px;">LUNO</span> <span style="font-weight:300;opacity:.6;">Suite</span></div>
+    <div class="onb-steps" id="onb-steps">${_onbStepDots()}</div>
+    <div class="onb-card" id="onb-card">${_onbStepContent()}</div>
+  </div>`;
+}
+window.renderOnboarding = renderOnboarding;
+
+function _onbStepDots(){
+  const labels = ['Entreprise','Informations','Compte','Plan'];
+  return labels.map((l,i) => {
+    const s = i+1;
+    const cls = s < onbStep ? 'onb-dot done' : s === onbStep ? 'onb-dot active' : 'onb-dot';
+    return `<div class="${cls}"><span>${s < onbStep ? '✓' : s}</span><small>${l}</small></div>`
+      + (s < 4 ? '<div class="onb-dot-line' + (s < onbStep ? ' done' : '') + '"></div>' : '');
+  }).join('');
+}
+
+function _onbStepContent(){
+  switch(onbStep){
+    case 1: return _onbStep1();
+    case 2: return _onbStep2();
+    case 3: return _onbStep3();
+    case 4: return _onbStep4();
+    default: return _onbStep1();
+  }
+}
+
+function _onbStep1(){
+  return `
+  <div class="onb-step-title">Trouvez votre entreprise</div>
+  <div class="onb-step-sub">Entrez votre numéro SIREN pour pré-remplir vos informations</div>
+  <div class="form-group" style="margin-top:24px;">
+    <label class="form-label">Numéro SIREN</label>
+    <div style="display:flex;gap:8px;">
+      <input class="form-control" id="onb-siren" type="text" placeholder="123 456 789" maxlength="11"
+        style="flex:1;letter-spacing:2px;font-size:16px;" oninput="this.value=this.value.replace(/\D/g,'').slice(0,9)"
+        value="${onbData.siren||''}" />
+      <button class="btn btn-primary" onclick="onbLookupSiren()" style="white-space:nowrap;">🔍 Rechercher</button>
+    </div>
+    <div id="onb-siren-result" style="margin-top:12px;"></div>
+  </div>
+  <div class="onb-nav">
+    <span></span>
+    <button class="btn btn-outline" onclick="onbSkipSiren()">Saisir manuellement →</button>
+  </div>`;
+}
+
+function _onbStep2(){
+  return `
+  <div class="onb-step-title">Informations de la société</div>
+  <div class="onb-step-sub">Vérifiez et complétez les informations de votre entreprise</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;">
+    <div class="form-group" style="grid-column:1/-1;">
+      <label class="form-label">Raison sociale *</label>
+      <input class="form-control" id="onb-name" placeholder="Ma Société SAS" value="${onbData.name||''}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">SIREN</label>
+      <input class="form-control" id="onb-siren2" placeholder="123456789" value="${onbData.siren||''}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Forme juridique</label>
+      <select class="form-control" id="onb-legal">
+        ${['SAS','SASU','SARL','EURL','SA','SNC','EI','EIRL','Association','Autre'].map(v =>
+          `<option value="${v}" ${onbData.legal===v?'selected':''}>${v}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Code APE / NAF</label>
+      <input class="form-control" id="onb-ape" placeholder="6201Z" value="${onbData.ape||''}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">N° TVA intracommunautaire</label>
+      <input class="form-control" id="onb-tva" placeholder="FR12345678901" value="${onbData.tva||''}" />
+    </div>
+    <div class="form-group" style="grid-column:1/-1;">
+      <label class="form-label">Adresse</label>
+      <input class="form-control" id="onb-addr" placeholder="12 rue de la Paix" value="${onbData.addr||''}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Code postal</label>
+      <input class="form-control" id="onb-cp" placeholder="75001" value="${onbData.cp||''}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ville</label>
+      <input class="form-control" id="onb-city" placeholder="Paris" value="${onbData.city||''}" />
+    </div>
+  </div>
+  <div class="onb-nav">
+    <button class="btn btn-outline" onclick="onbGo(1)">← Retour</button>
+    <button class="btn btn-primary" onclick="onbSaveStep2()">Continuer →</button>
+  </div>`;
+}
+
+function _onbStep3(){
+  return `
+  <div class="onb-step-title">Créez votre compte</div>
+  <div class="onb-step-sub">Votre accès personnel à LUNO Suite</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;">
+    <div class="form-group">
+      <label class="form-label">Prénom *</label>
+      <input class="form-control" id="onb-fname" placeholder="Marie" value="${onbData.fname||''}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nom *</label>
+      <input class="form-control" id="onb-lname" placeholder="Dupont" value="${onbData.lname||''}" />
+    </div>
+    <div class="form-group" style="grid-column:1/-1;">
+      <label class="form-label">Email professionnel *</label>
+      <input class="form-control" id="onb-email" type="email" placeholder="m.dupont@masociete.fr" value="${onbData.email||''}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe *</label>
+      <input class="form-control" id="onb-pass" type="password" placeholder="Min. 8 caractères" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmer le mot de passe *</label>
+      <input class="form-control" id="onb-pass2" type="password" placeholder="Répétez le mot de passe" />
+    </div>
+  </div>
+  <div class="onb-nav">
+    <button class="btn btn-outline" onclick="onbGo(2)">← Retour</button>
+    <button class="btn btn-primary" onclick="onbSaveStep3()">Continuer →</button>
+  </div>`;
+}
+
+function _onbStep4(){
+  const plans = ['starter','pro','entreprise'];
+  return `
+  <div class="onb-step-title">Choisissez votre plan</div>
+  <div class="onb-step-sub">14 jours d'essai gratuit · Aucune carte requise</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;">
+    ${plans.map(pid => {
+      const p = PLAN_DETAILS[pid];
+      const sel = onbData.plan === pid;
+      return `<div class="onb-plan-card ${sel?'selected':''}" onclick="onbSelectPlan('${pid}')">
+        <div style="font-size:22px;margin-bottom:4px;">${p.icon}</div>
+        <div style="font-weight:700;font-size:15px;">${p.label}</div>
+        <div style="font-size:22px;font-weight:800;color:${p.color};margin:8px 0;">${p.price_m}€<span style="font-size:12px;font-weight:400;opacity:.7;">/mois</span></div>
+        <ul style="list-style:none;padding:0;margin:0;font-size:11px;color:var(--tx1);text-align:left;">
+          ${p.features.slice(0,4).map(f=>`<li style="margin:3px 0;">✓ ${f}</li>`).join('')}
+        </ul>
+        ${sel ? '<div style="margin-top:10px;font-weight:700;color:'+p.color+';">✓ Sélectionné</div>' : ''}
+      </div>`;
+    }).join('')}
+  </div>
+  <div class="onb-nav" style="margin-top:20px;">
+    <button class="btn btn-outline" onclick="onbGo(3)">← Retour</button>
+    <button class="btn btn-primary" ${!onbData.plan?'disabled':''} id="onb-finish-btn" onclick="onbFinish()">
+      🚀 Créer mon compte gratuitement
+    </button>
+  </div>`;
+}
+
+// ── Onboarding navigation helpers ──
+function onbGo(step){
+  onbStep = step;
+  const stepsEl = document.getElementById('onb-steps');
+  const cardEl = document.getElementById('onb-card');
+  if(stepsEl) stepsEl.innerHTML = _onbStepDots();
+  if(cardEl) cardEl.innerHTML = _onbStepContent();
+}
+window.onbGo = onbGo;
+
+async function onbLookupSiren(){
+  const siren = document.getElementById('onb-siren')?.value?.replace(/\s/g,'');
+  const resEl = document.getElementById('onb-siren-result');
+  if(!siren || siren.length !== 9){ if(resEl) resEl.innerHTML = '<span style="color:var(--ro);font-size:12px;">⚠ Numéro SIREN invalide (9 chiffres requis)</span>'; return; }
+  if(resEl) resEl.innerHTML = '<span style="font-size:12px;color:var(--tx2);">🔍 Recherche en cours...</span>';
+  try {
+    const r = await fetch(`https://api.insee.fr/entreprises/sirene/V3.11/siren/${siren}`, {
+      headers: { 'Accept': 'application/json' }
+    });
+    if(r.ok){
+      const d = await r.json();
+      const u = d.uniteLegale;
+      onbData.siren = siren;
+      onbData.name = (u.periodesUniteLegale?.[0]?.denominationUniteLegale || '').trim();
+      onbData.legal = u.periodesUniteLegale?.[0]?.categorieJuridiqueUniteLegale || '';
+      onbData.ape = u.periodesUniteLegale?.[0]?.activitePrincipaleUniteLegale || '';
+      if(resEl) resEl.innerHTML = `<div style="background:#e6f9f0;border-radius:8px;padding:10px 14px;font-size:12px;">✅ <strong>${onbData.name || 'Entreprise trouvée'}</strong> — SIREN ${siren}</div>`;
+      setTimeout(() => onbGo(2), 800);
+    } else {
+      // Fallback si INSEE indisponible
+      onbData.siren = siren;
+      if(resEl) resEl.innerHTML = `<div style="background:#fff8e6;border-radius:8px;padding:10px 14px;font-size:12px;">⚠ Données INSEE non disponibles. Continuez en saisissant manuellement.</div>`;
+      setTimeout(() => onbGo(2), 1200);
+    }
+  } catch(e){
+    onbData.siren = siren;
+    if(resEl) resEl.innerHTML = `<div style="background:#fff8e6;border-radius:8px;padding:10px 14px;font-size:12px;">⚠ Service INSEE indisponible. Saisie manuelle.</div>`;
+    setTimeout(() => onbGo(2), 1200);
+  }
+}
+window.onbLookupSiren = onbLookupSiren;
+
+function onbSkipSiren(){ onbData.siren = document.getElementById('onb-siren')?.value || ''; onbGo(2); }
+window.onbSkipSiren = onbSkipSiren;
+
+function onbSaveStep2(){
+  const name = document.getElementById('onb-name')?.value?.trim();
+  if(!name){ if(typeof notif==='function') notif('⚠ La raison sociale est requise'); return; }
+  onbData.name  = name;
+  onbData.siren = document.getElementById('onb-siren2')?.value?.trim() || onbData.siren;
+  onbData.legal = document.getElementById('onb-legal')?.value;
+  onbData.ape   = document.getElementById('onb-ape')?.value?.trim();
+  onbData.tva   = document.getElementById('onb-tva')?.value?.trim();
+  onbData.addr  = document.getElementById('onb-addr')?.value?.trim();
+  onbData.cp    = document.getElementById('onb-cp')?.value?.trim();
+  onbData.city  = document.getElementById('onb-city')?.value?.trim();
+  onbGo(3);
+}
+window.onbSaveStep2 = onbSaveStep2;
+
+function onbSaveStep3(){
+  const fname = document.getElementById('onb-fname')?.value?.trim();
+  const lname = document.getElementById('onb-lname')?.value?.trim();
+  const email = document.getElementById('onb-email')?.value?.trim();
+  const pass  = document.getElementById('onb-pass')?.value;
+  const pass2 = document.getElementById('onb-pass2')?.value;
+  if(!fname || !lname){ if(typeof notif==='function') notif('⚠ Prénom et nom requis'); return; }
+  if(!email || !email.includes('@')){ if(typeof notif==='function') notif('⚠ Email invalide'); return; }
+  if(!pass || pass.length < 8){ if(typeof notif==='function') notif('⚠ Mot de passe trop court (min. 8 caractères)'); return; }
+  if(pass !== pass2){ if(typeof notif==='function') notif('⚠ Les mots de passe ne correspondent pas'); return; }
+  onbData.fname = fname;
+  onbData.lname = lname;
+  onbData.email = email;
+  onbData._pass = pass; // kept only in memory, never persisted
+  onbGo(4);
+}
+window.onbSaveStep3 = onbSaveStep3;
+
+function onbSelectPlan(pid){
+  onbData.plan = pid;
+  const cardEl = document.getElementById('onb-card');
+  if(cardEl) cardEl.innerHTML = _onbStepContent();
+}
+window.onbSelectPlan = onbSelectPlan;
+
+async function onbFinish(){
+  if(!onbData.plan){ if(typeof notif==='function') notif('⚠ Choisissez un plan pour continuer'); return; }
+  const btn = document.getElementById('onb-finish-btn');
+  if(btn){ btn.disabled = true; btn.textContent = '⏳ Création du compte...'; }
+  try {
+    // 1 — Supabase Auth signup
+    const { data: authData, error: authErr } = await window.sb.auth.signUp({
+      email: onbData.email,
+      password: onbData._pass,
+      options: {
+        data: {
+          prenom: onbData.fname,
+          nom: onbData.lname,
+          societe: onbData.name,
+          org_name: onbData.name,
+          profile_type: 'entreprise',
+          org_type: 'company',
+          siren: onbData.siren,
+        }
+      }
+    });
+    if(authErr) throw authErr;
+
+    // 2 — Le trigger Supabase handle_new_user crée profile + organisation + trial.
+    // Si une session existe déjà, enrichir la société créée par le trigger.
+    if(authData?.session){
+      const { data: { user: sbUser } } = await window.sb.auth.getUser();
+      if(sbUser){
+        const address = [onbData.addr, [onbData.cp, onbData.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+        const { data: membership } = await window.sb
+          .from('memberships')
+          .select('company_id')
+          .eq('user_id', sbUser.id)
+          .limit(1)
+          .single();
+        if(membership?.company_id){
+          const { error: companyErr } = await window.sb
+            .from('companies')
+            .update({
+              nom: onbData.name,
+              siren: onbData.siren || null,
+              forme: onbData.legal || null,
+              adresse: address || null
+            })
+            .eq('id', membership.company_id);
+          if(companyErr) console.warn('Company enrichment error (non-blocking):', companyErr.message);
+        }
+      }
+    }
+
+    // 3 — Stocker contexte local
+    localStorage.setItem('cpme_onb_complete', '1');
+    localStorage.setItem('cpme_onb_plan', onbData.plan);
+
+    if(typeof notif==='function') notif('🎉 Compte créé ! Vérifiez votre email pour confirmer.');
+    // Show confirmation message in card
+    const cardEl = document.getElementById('onb-card');
+    if(cardEl) cardEl.innerHTML = `
+      <div style="text-align:center;padding:32px 16px;">
+        <div style="font-size:56px;margin-bottom:16px;">🎉</div>
+        <div style="font-weight:700;font-size:20px;margin-bottom:8px;">Compte créé avec succès !</div>
+        <div style="font-size:14px;color:var(--tx1);line-height:1.6;max-width:320px;margin:0 auto 24px;">
+          Un email de confirmation a été envoyé à <strong>${onbData.email}</strong>.<br>
+          Cliquez sur le lien pour activer votre compte.
+        </div>
+        <button class="btn btn-primary" onclick="showLoginForm()">→ Se connecter</button>
+      </div>`;
+  } catch(e){
+    if(typeof notif==='function') notif('❌ Erreur : ' + (e.message || 'Problème de connexion'));
+    if(btn){ btn.disabled = false; btn.textContent = '🚀 Créer mon compte gratuitement'; }
+  }
+}
+window.onbFinish = onbFinish;
+
+// ── Onboarding CSS injected dynamically ──
+(function injectOnbCSS(){
+  if(document.getElementById('onb-css')) return;
+  const s = document.createElement('style');
+  s.id = 'onb-css';
+  s.textContent = `
+.onb-wrap { max-width:620px;margin:0 auto;padding:32px 16px; }
+.onb-logo { text-align:center;font-size:28px;margin-bottom:24px;color:var(--tx0); }
+.onb-steps { display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:28px; }
+.onb-dot { display:flex;flex-direction:column;align-items:center;gap:4px; }
+.onb-dot span { width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:var(--bg2);color:var(--tx2);border:2px solid var(--bg3);transition:all .3s; }
+.onb-dot small { font-size:10px;color:var(--tx2);white-space:nowrap; }
+.onb-dot.active span { background:var(--acc);color:#fff;border-color:var(--acc); }
+.onb-dot.done span { background:#e6f9f0;color:var(--gr);border-color:var(--gr); }
+.onb-dot.done small,.onb-dot.active small { color:var(--tx0); }
+.onb-dot-line { width:48px;height:2px;background:var(--bg3);margin-bottom:14px;transition:background .3s; }
+.onb-dot-line.done { background:var(--gr); }
+.onb-card { background:var(--bg1);border-radius:var(--r2);padding:28px 28px 20px;box-shadow:var(--shadow-card); }
+.onb-step-title { font-size:20px;font-weight:700;color:var(--tx0);margin-bottom:6px; }
+.onb-step-sub { font-size:13px;color:var(--tx2);margin-bottom:4px; }
+.onb-nav { display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--bg3); }
+.onb-plan-card { border:2px solid var(--bg3);border-radius:var(--r);padding:16px 12px;cursor:pointer;text-align:center;transition:all .2s;background:var(--bg0); }
+.onb-plan-card:hover { border-color:var(--acc);background:var(--bg1); }
+.onb-plan-card.selected { border-color:var(--acc);background:var(--acc-bg, #f0f7ff); }
+  `;
+  document.head.appendChild(s);
+})();
+
+// ══════════════════════════════════════════════════════
+// § 16 — Expose showLoginForm / showRegisterForm globally
+// (patched to wire onboarding into existing auth UI)
+// ══════════════════════════════════════════════════════
+
+const _origShowRegister = window.showRegisterForm;
+const _origShowLogin = window.showLoginForm;
+window.showLoginForm = function(){
+  const authWrap = document.getElementById('auth-wrap');
+  if(authWrap) authWrap.style.display = 'flex';
+  const loginTab = Array.from(document.querySelectorAll('.atab')).find(el => el.textContent.includes('Connexion'));
+  if(typeof aTab === 'function' && loginTab){
+    aTab('login', loginTab);
+  } else if(typeof _origShowLogin === 'function'){
+    _origShowLogin();
+  }
+};
+
+window.showRegisterForm = function(){
+  onbStep = 1;
+  onbData = {};
+  // If an auth-root container exists, render onboarding there
+  const root = document.getElementById('auth-root');
+  if(root){
+    renderOnboarding();
+  } else if(typeof _origShowRegister === 'function'){
+    _origShowRegister();
+  }
+};
+
+</script>
 </body>
 </html>
