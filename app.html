@@ -4514,7 +4514,7 @@ document.head.appendChild(cabStyle);
     const bar = document.getElementById('onb-bar');
     const msg = document.getElementById('onb-msg');
     const list = document.getElementById('onb-list');
-    if(fab) fab.style.display = (done === total) ? 'none' : 'inline-flex';
+    if(fab) fab.style.display = (s.dismissed || done === total) ? 'none' : 'inline-flex';
     if(cnt) cnt.textContent = done + '/' + total;
     if(bar) bar.style.width = (100 * done / total) + '%';
     if(msg) msg.textContent = done === total ? '🎉 Bravo, tout est fait !' : (done > 0 ? done + ' / ' + total + ' validées' : '');
@@ -4638,6 +4638,15 @@ document.head.appendChild(cabStyle);
 
   window.lunoOnboardingInit = function(user){
     user = user || currentUser();
+    if(user && user.email === 'demo@luno.fr'){
+      const s = get();
+      s.dismissed = true;
+      set(s);
+      render();
+      const panel = document.getElementById('onb-panel');
+      if(panel) panel.classList.remove('open');
+      return;
+    }
     const s = get();
     if(user && user.logo) s.logo = true;
     if(user && user.tva)  s.tva  = true;
@@ -5586,7 +5595,9 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
 
   function tourKey(){ const u = curUser(); return 'luno_tour_done_' + (u?u.email:'anon'); }
   function tourShouldRun(){
-    if(!curUser()) return false;
+    const user = curUser();
+    if(!user) return false;
+    if(user.email === 'demo@luno.fr') return false;
     if(localStorage.getItem(tourKey())) return false;
     // Ne pas afficher si le user est encore sur l'écran auth
     const wrap = document.getElementById('app-wrap');
@@ -9220,14 +9231,6 @@ window.v8API = {
 };
 
 })();
-</script>
-
-</body>
-</html>
-  }
-}
-
-document.addEventListener('DOMContentLoaded', v8Init);
 
 // ═══════════════════════════════════════════════════════════
 // 13. PAGE ÉQUIPE — dashboard pleine page
