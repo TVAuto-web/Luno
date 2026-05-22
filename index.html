@@ -336,10 +336,10 @@ section { padding: 100px 2rem; background: var(--paper); }
   color: #f8e6b8 !important;
   border: 1px solid rgba(248,230,184,.28);
 }
-.pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 4rem; }
+.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.15rem; margin-top: 4rem; }
 .pricing-card {
   background: #fff8eb; border: 2px solid rgba(255,255,255,.48);
-  border-radius: var(--r); padding: 2.5rem 2rem;
+  border-radius: var(--r); padding: 2.25rem 1.35rem;
   transition: transform .2s, box-shadow .2s, border-color .2s;
   position: relative; overflow: hidden;
   color: #081a16;
@@ -356,6 +356,12 @@ section { padding: 100px 2rem; background: var(--paper); }
   color: #fff8eb;
   box-shadow: 0 34px 92px rgba(0,0,0,.48);
 }
+.pricing-card.cabinet-card {
+  background: linear-gradient(145deg, #14231f, #061410);
+  border-color: rgba(248,230,184,.62);
+  color: #fff8eb;
+  box-shadow: 0 34px 92px rgba(0,0,0,.55);
+}
 .pricing-badge {
   position: absolute; top: 1.25rem; right: 1.25rem;
   background: var(--gold); color: #1d160b;
@@ -363,29 +369,75 @@ section { padding: 100px 2rem; background: var(--paper); }
 }
 .pricing-tier { font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); margin-bottom: .75rem; }
 .pricing-card.featured .pricing-tier { color: rgba(29,22,11,.58); }
-.pricing-card.premium-card .pricing-tier { color: rgba(255,248,235,.66); }
-.pricing-price { font-family: 'Instrument Serif', serif; font-size: 52px; letter-spacing: -2px; line-height: 1; margin-bottom: .25rem; }
+.pricing-card.premium-card .pricing-tier, .pricing-card.cabinet-card .pricing-tier { color: rgba(255,248,235,.66); }
+.pricing-price { font-family: 'Instrument Serif', serif; font-size: clamp(40px, 4vw, 52px); letter-spacing: -1px; line-height: 1; margin-bottom: .25rem; }
 .pricing-card.featured .pricing-price { color: #1d160b !important; }
-.pricing-card.premium-card .pricing-price { color: #fff8eb !important; }
+.pricing-card.premium-card .pricing-price, .pricing-card.cabinet-card .pricing-price { color: #fff8eb !important; }
 .pricing-period { font-size: 13px; color: var(--muted); margin-bottom: .5rem; }
 .pricing-card.featured .pricing-period { color: rgba(29,22,11,.62); }
-.pricing-card.premium-card .pricing-period { color: rgba(255,248,235,.66) !important; }
+.pricing-card.premium-card .pricing-period, .pricing-card.cabinet-card .pricing-period { color: rgba(255,248,235,.66) !important; }
 .pricing-desc { font-size: 14px; color: var(--muted); margin-bottom: 2rem; line-height: 1.55; }
 .pricing-card.featured .pricing-desc { color: rgba(29,22,11,.68); }
-.pricing-card.premium-card .pricing-desc { color: rgba(255,248,235,.76) !important; }
+.pricing-card.premium-card .pricing-desc, .pricing-card.cabinet-card .pricing-desc { color: rgba(255,248,235,.76) !important; }
 .pricing-divider { height: 1px; background: var(--border); margin-bottom: 1.5rem; }
 .pricing-card.featured .pricing-divider { background: rgba(29,22,11,.14); }
-.pricing-card.premium-card .pricing-divider { background: rgba(248,230,184,.2); }
+.pricing-card.premium-card .pricing-divider, .pricing-card.cabinet-card .pricing-divider { background: rgba(248,230,184,.2); }
 .pricing-features { list-style: none; display: flex; flex-direction: column; gap: .65rem; margin-bottom: 2rem; }
 .pricing-features li { display: flex; align-items: flex-start; gap: .65rem; font-size: 14px; }
 .pricing-features li::before { content: '✓'; color: var(--sage); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
 .pricing-card.featured .pricing-features li::before { color: var(--sage-dark); }
 .pricing-card.featured .pricing-features li { color: rgba(29,22,11,.86); }
-.pricing-card.premium-card .pricing-features li { color: rgba(255,248,235,.88) !important; }
-.pricing-card.premium-card .pricing-features li::before { color: var(--gold-light); }
+.pricing-card.premium-card .pricing-features li, .pricing-card.cabinet-card .pricing-features li { color: rgba(255,248,235,.88) !important; }
+.pricing-card.premium-card .pricing-features li::before, .pricing-card.cabinet-card .pricing-features li::before { color: var(--gold-light); }
 .pricing-cta { width: 100%; justify-content: center; }
 .trial-note { text-align: center; margin-top: 2rem; font-size: 14px; color: var(--muted); }
 .trial-note strong { color: var(--sage); }
+.pricing-detail-wrap {
+  margin-top: 2rem;
+  border: 1px solid rgba(248,230,184,.2);
+  border-radius: var(--r);
+  overflow: auto;
+  background: rgba(255,255,255,.045);
+  box-shadow: 0 28px 70px rgba(0,0,0,.22);
+}
+.pricing-detail-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  color: rgba(255,255,255,.82);
+  text-align: left;
+}
+.pricing-detail-table th,
+.pricing-detail-table td {
+  width: 25%;
+  vertical-align: top;
+  padding: 1.1rem 1rem;
+  border-right: 1px solid rgba(248,230,184,.14);
+  border-bottom: 1px solid rgba(248,230,184,.14);
+}
+.pricing-detail-table th:last-child,
+.pricing-detail-table td:last-child { border-right: none; }
+.pricing-detail-table thead th {
+  position: sticky;
+  top: 0;
+  background: #0b211c;
+  color: #fff8eb;
+  font-size: 13px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  z-index: 1;
+}
+.pricing-detail-table ul { list-style: none; display: flex; flex-direction: column; gap: .45rem; }
+.pricing-detail-table li { font-size: 13px; line-height: 1.35; }
+.pricing-detail-table li::before { content: '✓'; color: var(--gold-light); font-weight: 700; margin-right: .45rem; }
+.pricing-objective {
+  margin-top: .9rem;
+  padding-top: .85rem;
+  border-top: 1px solid rgba(248,230,184,.14);
+  color: rgba(255,255,255,.64);
+  font-size: 12px;
+  line-height: 1.45;
+}
 
 /* ── FAQ ── */
 .faq-grid { max-width: 760px; margin: 4rem auto 0; }
@@ -556,6 +608,9 @@ footer {
   .preview-sidebar { display: none; }
   .pm-stats { grid-template-columns: 1fr 1fr; }
 }
+@media (min-width: 901px) and (max-width: 1180px) {
+  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+}
 </style>
 </head>
 <body>
@@ -567,7 +622,6 @@ footer {
     <li><a href="#features">Fonctionnalités</a></li>
     <li><a href="#pourquoi">Pourquoi nous</a></li>
     <li><a href="#tarifs">Tarifs</a></li>
-    <li><a href="/pricing" target="_blank">Tarifs détaillés ↗</a></li>
     <li><a href="#faq">FAQ</a></li>
   </ul>
   <div class="nav-cta">
@@ -794,110 +848,88 @@ footer {
 <section id="tarifs">
   <div class="container">
     <div class="reveal" style="text-align:center;">
-      <div class="section-tag">✦ Tarifs</div>
+      <div class="section-tag">? Tarifs</div>
       <h2 class="section-title">Simple, <em>transparent</em>, sans surprise</h2>
-      <p class="section-sub" style="margin: 0 auto;">Commencez gratuitement, évoluez à votre rythme. Sans carte bancaire. Sans engagement.</p>
+      <p class="section-sub" style="margin:0 auto;">Commencez gratuitement, puis passez sur l'offre qui correspond ? votre niveau d'automatisation. Tous les prix sont HT.</p>
 
-      <!-- Toggle mensuel / annuel -->
       <div style="display:flex;align-items:center;justify-content:center;gap:.75rem;margin-top:1.5rem;">
         <span id="lbl-monthly" style="font-size:14px;font-weight:500;">Mensuel</span>
-        <button onclick="toggleBillingVitrine()" id="billing-toggle-v" class="billing-toggle">
+        <button onclick="toggleBillingVitrine()" id="billing-toggle-v" class="billing-toggle" aria-label="Basculer entre mensuel et annuel">
           <span id="toggle-dot-v" style="transform:translateX(20px);"></span>
         </button>
-        <span id="lbl-annual" style="font-size:14px;font-weight:700;">
-          Annuel <span style="margin-left:6px;padding:2px 8px;background:var(--sage-light);color:var(--sage);font-size:11px;font-weight:700;border-radius:6px;">−20%</span>
-        </span>
+        <span id="lbl-annual" style="font-size:14px;font-weight:700;">Annuel <span style="margin-left:6px;padding:2px 8px;background:rgba(211,162,64,.2);color:#f8e6b8;font-size:11px;font-weight:700;border-radius:6px;border:1px solid rgba(248,230,184,.28);">meilleur prix</span></span>
       </div>
     </div>
 
     <div class="pricing-grid reveal" style="margin-top:2.5rem;">
-
-      <!-- ESSENTIEL -->
       <div class="pricing-card">
-        <div class="pricing-tier">Essentiel</div>
-        <div class="pricing-price">0<span style="font-size:22px;">€</span></div>
-        <div class="pricing-period">pour toujours · gratuit</div>
-        <div class="pricing-desc">Pour les indépendants et petites entreprises qui veulent commencer gratuitement.</div>
+        <div class="pricing-tier">Gratuit</div>
+        <div class="pricing-price">0<span style="font-size:22px;">?</span></div>
+        <div class="pricing-period">D?couverte ? pour commencer</div>
+        <div class="pricing-desc">Pour auto-entrepreneurs, freelances et tr?s petites structures qui veulent entrer dans LUNO sans friction.</div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>Factures <strong>illimitées</strong></li>
-          <li>Devis illimités</li>
-          <li>Génération PDF</li>
-          <li>Tableau de bord</li>
-          <li>Gestion clients & produits</li>
-          <li>Facturation électronique 2026</li>
-          <li>1 utilisateur</li>
-          <li>Support email basique</li>
+          <li>1 utilisateur</li><li>Tableau de bord simplifi?</li><li>Devis et factures</li><li>Suivi basique clients</li><li>Calcul TVA simple</li><li>Export PDF</li><li>Sauvegarde cloud</li><li>Acc?s mobile</li><li>Documents mensuels limit?s</li>
         </ul>
         <button class="btn btn-outline btn-lg pricing-cta" onclick="openModal('register')">Commencer gratuitement</button>
       </div>
 
-      <!-- PLUS (featured) -->
       <div class="pricing-card featured">
         <div class="pricing-badge">Le plus populaire</div>
-        <div class="pricing-tier">Plus</div>
-        <div style="display:flex;align-items:flex-end;gap:3px;margin-bottom:.25rem;">
-          <div class="pricing-price" id="price-plus" style="color:#fff;">7.90<span style="font-size:22px;">€</span></div>
-        </div>
-        <div class="pricing-period" id="period-plus">par mois · facturé annuellement</div>
-        <div class="pricing-desc">Pour les entreprises qui veulent automatiser leur facturation.</div>
+        <div class="pricing-tier">Essentiel</div>
+        <div class="pricing-price" id="price-essentiel">7.90<span style="font-size:22px;">?</span></div>
+        <div class="pricing-period" id="period-essentiel">HT/mois ? factur? annuellement</div>
+        <div class="pricing-desc">Le plan principal pour ind?pendants et petites entreprises, concurrent direct des offres standard type Indy.</div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>Tout le plan Essentiel</li>
-          <li>Suppression du branding</li>
-          <li>Relances automatiques</li>
-          <li>Signature électronique devis</li>
-          <li>Export comptable</li>
-          <li>Synchronisation bancaire</li>
-          <li>OCR IA <span style="font-size:11px;background:rgba(255,255,255,.2);padding:1px 6px;border-radius:4px;">limité</span></li>
-          <li>Automatisations simples</li>
-          <li>Jusqu'à <strong>3 utilisateurs</strong></li>
-          <li>Support prioritaire email</li>
+          <li>Tout le plan Gratuit</li><li>Factures illimit?es</li><li>Devis illimit?s</li><li>Gestion compl?te TVA</li><li>D?penses et charges</li><li>Synchronisation bancaire</li><li>Cat?gorisation automatique IA</li><li>Relances clients automatiques</li><li>Sans publicit?</li>
         </ul>
-        <button class="btn btn-gold btn-lg pricing-cta" onclick="openModal('register')">Essayer 15 jours gratuits</button>
+        <button class="btn btn-gold btn-lg pricing-cta" onclick="openModal('register')">Choisir Essentiel</button>
       </div>
 
-      <!-- PREMIUM -->
       <div class="pricing-card premium-card">
-        <div class="pricing-badge" style="background:var(--gold);">Automatisation avancée</div>
-        <div class="pricing-tier">Premium</div>
-        <div style="display:flex;align-items:flex-end;gap:3px;margin-bottom:.25rem;">
-          <div class="pricing-price" id="price-premium" style="color:#fff;">15.90<span style="font-size:22px;">€</span></div>
-        </div>
-        <div class="pricing-period" id="period-premium" style="color:rgba(255,255,255,.5);">par mois · facturé annuellement</div>
-        <div class="pricing-desc" style="color:rgba(255,255,255,.65);">Pour les PME et utilisateurs avancés qui veulent automatiser toute leur gestion.</div>
+        <div class="pricing-badge" style="background:var(--gold);">Automatisation</div>
+        <div class="pricing-tier">Pro</div>
+        <div class="pricing-price" id="price-pro">15.90<span style="font-size:22px;">?</span></div>
+        <div class="pricing-period" id="period-pro">HT/mois ? factur? annuellement</div>
+        <div class="pricing-desc">Pour PME, ?quipes et utilisateurs avanc?s qui veulent une automatisation r?elle et un cadre plus robuste.</div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li style="color:rgba(255,255,255,.85);">Tout le plan Plus</li>
-          <li style="color:rgba(255,255,255,.85);">IA avancée</li>
-          <li style="color:rgba(255,255,255,.85);">Catégorisation auto dépenses</li>
-          <li style="color:rgba(255,255,255,.85);">TVA automatique</li>
-          <li style="color:rgba(255,255,255,.85);">Multi-utilisateurs <strong>illimités</strong></li>
-          <li style="color:rgba(255,255,255,.85);">Multi-entreprises</li>
-          <li style="color:rgba(255,255,255,.85);">API publique</li>
-          <li style="color:rgba(255,255,255,.85);">Dashboard analytics avancé</li>
-          <li style="color:rgba(255,255,255,.85);">Automatisations avancées</li>
-          <li style="color:rgba(255,255,255,.85);">Support chat prioritaire</li>
-          <li style="color:rgba(255,255,255,.85);">Sauvegardes avancées</li>
+          <li>Tout le plan Essentiel</li><li>Multi-utilisateurs</li><li>R?les et permissions</li><li>Workflow d'approbation</li><li>OCR factures intelligent</li><li>Notes de frais</li><li>Rapports financiers d?taill?s</li><li>Int?grations Stripe</li><li>Export FEC</li>
         </ul>
-        <button class="btn btn-gold btn-lg pricing-cta" onclick="openModal('register')">Passer au Premium</button>
+        <button class="btn btn-gold btn-lg pricing-cta" onclick="openModal('register')">Choisir Pro</button>
+      </div>
+
+      <div class="pricing-card cabinet-card">
+        <div class="pricing-badge" style="background:#fff8eb;color:#102d26;">Cabinets & groupes</div>
+        <div class="pricing-tier">Business</div>
+        <div class="pricing-price" id="price-business">28.90<span style="font-size:22px;">?</span></div>
+        <div class="pricing-period" id="period-business">HT/mois ? factur? annuellement</div>
+        <div class="pricing-desc">Pour cabinets comptables, grosses structures et organisations multi-soci?t?s qui ont besoin d'un pilotage avanc?.</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Tout le plan Pro</li><li>Utilisateurs ?lev?s</li><li>Multi-soci?t?s avanc?</li><li>Gestion cabinet comptable</li><li>Portefeuille clients</li><li>IA comptable avanc?e</li><li>Portail client d?di?</li><li>White-label</li><li>API compl?te et webhooks</li>
+        </ul>
+        <button class="btn btn-gold btn-lg pricing-cta" onclick="openModal('register')">Choisir Business</button>
       </div>
     </div>
 
-    <div style="text-align:center;margin-top:1.5rem;" class="reveal">
-      <p class="trial-note">
-        Tous les plans payants démarrent par <strong>15 jours d'essai gratuit</strong> — aucune carte bancaire requise.<br>
-        Vous pouvez annuler à tout moment depuis votre espace.
-      </p>
-      <a href="/pricing" target="_blank"
-        style="display:inline-flex;align-items:center;gap:6px;margin-top:1rem;font-size:14px;color:var(--sage);font-weight:600;text-decoration:none;">
-        Voir le comparatif complet des fonctionnalités →
-      </a>
+    <div class="pricing-detail-wrap reveal">
+      <table class="pricing-detail-table">
+        <thead><tr><th>Gratuit</th><th>Essentiel</th><th>Pro</th><th>Business</th></tr></thead>
+        <tbody><tr>
+          <td><ul><li>1 utilisateur</li><li>Tableau de bord simplifi?</li><li>Gestion devis + factures</li><li>Suivi basique clients</li><li>Calcul TVA simple</li><li>Export PDF</li><li>Sauvegarde cloud</li><li>Acc?s mobile</li><li>Templates basiques</li><li>Support email limit?</li><li>Branding l?ger LUNO</li><li>Documents mensuels limit?s</li></ul><div class="pricing-objective"><strong>Objectif :</strong> faire entrer rapidement les utilisateurs dans l'?cosyst?me, puis les convertir vers le payant.</div></td>
+          <td><ul><li>Tout le plan Gratuit</li><li>Factures illimit?es</li><li>Devis illimit?s</li><li>Gestion compl?te TVA</li><li>Gestion d?penses / charges</li><li>Dashboard financier avanc?</li><li>Synchronisation bancaire</li><li>Cat?gorisation automatique IA</li><li>Pi?ces jointes / justificatifs</li><li>Relances automatiques</li><li>Multi-entreprises limit?</li><li>Exports comptables</li><li>Collaborateurs limit?s</li><li>Signature ?lectronique simple</li><li>API basique</li><li>Sans publicit?</li><li>Support prioritaire l?ger</li></ul><div class="pricing-objective"><strong>Positionnement :</strong> l'offre standard pour ind?pendants et petites entreprises.</div></td>
+          <td><ul><li>Tout le plan Essentiel</li><li>Multi-utilisateurs</li><li>R?les & permissions</li><li>Interface personnalisable</li><li>Workflow d'approbation</li><li>Automatisation avanc?e</li><li>OCR factures intelligent</li><li>TVA avanc?e</li><li>Notes de frais</li><li>Rapports financiers d?taill?s</li><li>Abonnements clients</li><li>Int?grations Stripe</li><li>Int?grations bancaires avanc?es</li><li>Historique complet</li><li>Sauvegardes avanc?es</li><li>Export FEC</li><li>Mode simple ? expert</li><li>Support prioritaire rapide</li></ul><div class="pricing-objective"><strong>Positionnement :</strong> le plan entreprise s?rieuse avec automatisation r?elle.</div></td>
+          <td><ul><li>Tout le plan Pro</li><li>Utilisateurs ?lev?s / quasi illimit?s</li><li>Multi-soci?t?s avanc?</li><li>Gestion cabinet comptable compl?te</li><li>Portefeuille clients</li><li>Espaces collaborateurs</li><li>?quipes comptables</li><li>Validation hi?rarchique</li><li>Permissions ultra d?taill?es</li><li>Dashboard cabinet</li><li>Centralisation multi-entreprises</li><li>IA comptable avanc?e</li><li>D?tection anomalies</li><li>Pr?-r?vision comptable</li><li>Workflow de production</li><li>Signature multi-niveaux</li><li>Portail client d?di?</li><li>White-label</li><li>API compl?te</li><li>Webhooks</li><li>Int?grations ERP</li><li>Logs avanc?s</li><li>Sauvegardes premium</li><li>Priorit? serveurs</li><li>Support ultra prioritaire</li><li>Onboarding accompagn?</li></ul></td>
+        </tr></tbody>
+      </table>
     </div>
+
+    <div style="text-align:center;margin-top:1.5rem;" class="reveal"><p class="trial-note">Tous les prix sont exprim?s HT. Les plans payants peuvent ?tre test?s avant engagement, sans carte bancaire au d?marrage.</p></div>
   </div>
 </section>
 
-<!-- ══ FAQ ══ -->
 <section id="faq">
   <div class="container" style="text-align:center;">
     <div class="reveal">
@@ -943,7 +975,7 @@ footer {
           Combien d'utilisateurs peuvent accéder au logiciel ?
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a"><div class="faq-a-inner">Cela dépend de votre plan : 1 utilisateur pour le plan Starter, 3 pour le plan Pro, et illimité pour le plan Entreprise. Chaque utilisateur dispose de son propre compte avec ses propres identifiants. La gestion des droits d'accès est disponible sur le plan Entreprise.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Cela d?pend de votre plan : 1 utilisateur sur Gratuit, collaborateurs limit?s sur Essentiel, multi-utilisateurs sur Pro, et utilisateurs ?lev?s sur Business. Chaque utilisateur dispose de son propre compte avec ses propres identifiants. La gestion avanc?e des droits est disponible ? partir du plan Pro, avec permissions ultra d?taill?es sur Business.</div></div>
       </div>
 
       <div class="faq-item">
@@ -959,7 +991,7 @@ footer {
           Comment fonctionne le support client ?
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a"><div class="faq-a-inner">Le support est disponible par email pour tous les plans, avec un délai de réponse inférieur à 24h. Le plan Pro bénéficie d'un support prioritaire (réponse en 4h). Le plan Entreprise inclut un account manager dédié, une session d'onboarding vidéo et un support téléphonique.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Le support est disponible par email pour tous les plans. Essentiel b?n?ficie d?un support prioritaire l?ger, Pro d?un support prioritaire rapide, et Business d?un support ultra prioritaire avec accompagnement onboarding.</div></div>
       </div>
 
       <div class="faq-item">
@@ -1289,10 +1321,11 @@ footer {
 // ══════════════════════════════════════════════════════
 
 const PLANS = {
-  trial:      { label:'Essai Pro (15j)', price:0,   features:['facturation','tva','comptabilite','bilan','salaries','tresorerie','sauvegarde'] },
-  starter:    { label:'Starter',         price:19,  features:['facturation','tva'] },
-  pro:        { label:'Pro',             price:49,  features:['facturation','tva','comptabilite','bilan','salaries','tresorerie','sauvegarde'] },
-  entreprise: { label:'Entreprise',      price:99,  features:['facturation','tva','comptabilite','bilan','salaries','tresorerie','sauvegarde','multi','immob','budget'] },
+  trial:     { label:'Essai Pro (15j)', price:0,     features:['facturation','tva','comptabilite','bilan','salaries','tresorerie','sauvegarde'] },
+  gratuit:   { label:'Gratuit',          price:0,     features:['facturation','tva','sauvegarde'] },
+  essentiel: { label:'Essentiel',        price:10.90, features:['facturation','tva','depenses','banque','ia','sauvegarde'] },
+  pro:       { label:'Pro',              price:19.90, features:['facturation','tva','comptabilite','bilan','tresorerie','multi','stripe','fec','sauvegarde'] },
+  business:  { label:'Business',         price:34.90, features:['facturation','tva','comptabilite','bilan','tresorerie','multi','cabinet','api','webhooks','sauvegarde'] },
 };
 
 function lsGet(k)    { try { return JSON.parse(localStorage.getItem(k)||'null'); } catch{ return null; } }
@@ -1402,10 +1435,10 @@ const TRANCHES_EFFECTIF = {
 };
 
 const PLAN_SELON_TAILLE = {
-  '00':'starter','01':'starter','02':'starter','03':'starter',
-  '11':'pro','12':'pro','21':'pro','22':'pro','31':'pro',
-  '32':'entreprise','41':'entreprise','42':'entreprise',
-  '51':'entreprise','52':'entreprise','53':'entreprise'
+  '00':'essentiel','01':'essentiel','02':'essentiel','03':'essentiel',
+  '11':'pro','12':'pro','21':'business','22':'business','31':'business',
+  '32':'business','41':'business','42':'business',
+  '51':'business','52':'business','53':'business'
 };
 
 function onSirenInput(el) {
@@ -1514,7 +1547,7 @@ async function lookupSiren() {
     document.getElementById('sc-taille').textContent = tailleLabel;
     document.getElementById('sc-adresse').textContent = adresse;
     document.getElementById('sc-date').textContent = dateCreation;
-    document.getElementById('sc-plan').textContent = {starter:'Starter (19€/mois)',pro:'Pro (49€/mois)',entreprise:'Entreprise (99€/mois)'}[planReco];
+    document.getElementById('sc-plan').textContent = {gratuit:'Gratuit (0?/mois)',essentiel:'Essentiel (10,90? HT/mois)',pro:'Pro (19,90? HT/mois)',business:'Business (34,90? HT/mois)'}[planReco];
 
     const badge = document.getElementById('sc-statut-badge');
     if (etat === 'active') {
@@ -1607,7 +1640,7 @@ function buildManualCompanyData() {
   const taille = document.getElementById('r-taille').value || 'Non renseigné';
   const adresse = document.getElementById('r-company-address').value.trim() || 'Non renseignée';
   const sirenDigits = document.getElementById('r-siren').value.replace(/\D/g, '');
-  const planReco = registerProfile === 'cabinet' ? 'entreprise' : (taille.includes('50') ? 'entreprise' : taille.includes('10') ? 'pro' : 'starter');
+  const planReco = registerProfile === 'cabinet' ? 'business' : (taille.includes('50') ? 'business' : taille.includes('10') ? 'pro' : 'essentiel');
   return {
     siren: sirenDigits.length >= 9 ? sirenDigits.slice(0, 9) : '',
     siret: sirenDigits.length === 14 ? sirenDigits : '',
@@ -1713,7 +1746,7 @@ function showPaywall(user, status) {
         <span style="font-size:12px;color:#a32d2d;">⚠ L'essai gratuit n'est pas renouvelable.</span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1.5rem;text-align:left;">
-        ${['starter','pro','entreprise'].map(p => `
+        ${['essentiel','pro','business'].map(p => `
           <div onclick="selectPlan('${p}')" id="plan-${p}" style="border:2px solid ${p==='pro'?'#1d7a5f':'#dddad0'};border-radius:12px;padding:1rem;cursor:pointer;transition:all .2s;background:${p==='pro'?'#f2f9f6':'#fff'};">
             <div style="font-size:11px;font-weight:700;color:#7a7870;text-transform:uppercase;letter-spacing:.5px;">${PLANS[p].label}</div>
             <div style="font-family:'Instrument Serif',serif;font-size:28px;font-weight:700;margin:.25rem 0;">${PLANS[p].price}€<span style="font-size:13px;font-weight:400;">/mois</span></div>
@@ -1734,7 +1767,7 @@ function showPaywall(user, status) {
 let selectedPlan = 'pro';
 function selectPlan(p) {
   selectedPlan = p;
-  ['starter','pro','entreprise'].forEach(x => {
+  ['essentiel','pro','business'].forEach(x => {
     const el = document.getElementById('plan-'+x);
     if (!el) return;
     el.style.borderColor = x===p ? '#1d7a5f' : '#dddad0';
@@ -1771,8 +1804,9 @@ function simulatePay(email) {
 // ── BILLING TOGGLE ──
 let isAnnualV = true;
 const pricesV = {
-  plus:    { annual:'7.90', monthly:'9.90',   annualNote:'par mois · facturé annuellement (94.80€/an)', monthlyNote:'par mois · facturé mensuellement' },
-  premium: { annual:'15.90', monthly:'20.90', annualNote:'par mois · facturé annuellement (190.80€/an)', monthlyNote:'par mois · facturé mensuellement' },
+  essentiel: { annual:'7.90',  monthly:'10.90', annualNote:'HT/mois ? factur? annuellement', monthlyNote:'HT/mois ? factur? mensuellement' },
+  pro:       { annual:'15.90', monthly:'19.90', annualNote:'HT/mois ? factur? annuellement', monthlyNote:'HT/mois ? factur? mensuellement' },
+  business:  { annual:'28.90', monthly:'34.90', annualNote:'HT/mois ? factur? annuellement', monthlyNote:'HT/mois ? factur? mensuellement' },
 };
 function toggleBillingVitrine() {
   isAnnualV = !isAnnualV;
@@ -1782,7 +1816,7 @@ function toggleBillingVitrine() {
   dot.style.transform = isAnnualV ? 'translateX(20px)' : 'translateX(0)';
   lblM.style.fontWeight = isAnnualV ? '500' : '700'; lblM.style.color = isAnnualV ? 'rgba(255,255,255,.54)' : '#fff8eb';
   lblA.style.fontWeight = isAnnualV ? '700' : '500'; lblA.style.color = isAnnualV ? '#fff8eb' : 'rgba(255,255,255,.54)';
-  ['plus','premium'].forEach(p => {
+  ['essentiel','pro','business'].forEach(p => {
     const prEl = document.getElementById('price-'+p);
     const ntEl = document.getElementById('period-'+p);
     if (!prEl || !ntEl) return;
@@ -1791,7 +1825,7 @@ function toggleBillingVitrine() {
       const val = isAnnualV ? pricesV[p].annual : pricesV[p].monthly;
       const note = isAnnualV ? pricesV[p].annualNote : pricesV[p].monthlyNote;
       // price includes span for € sign — rebuild
-      prEl.innerHTML = val + '<span style="font-size:22px;">€</span>';
+      prEl.innerHTML = val + '<span style="font-size:22px;">?</span>';
       ntEl.textContent = note;
       prEl.style.opacity = '1'; prEl.style.transform = 'translateY(0)';
       prEl.style.transition = 'opacity .15s, transform .15s';
@@ -1929,9 +1963,10 @@ const LEGAL = {
       <table>
         <thead><tr><th>Plan</th><th>Mensuel HT</th><th>Annuel HT</th><th>Utilisateurs</th></tr></thead>
         <tbody>
-          <tr><td><strong>Starter</strong></td><td>19 €/mois</td><td>190 €/an</td><td>1</td></tr>
-          <tr><td><strong>Pro</strong></td><td>49 €/mois</td><td>490 €/an</td><td>3</td></tr>
-          <tr><td><strong>Entreprise</strong></td><td>99 €/mois</td><td>990 €/an</td><td>Illimité</td></tr>
+          <tr><td><strong>Gratuit</strong></td><td>0 ?</td><td>0 ?</td><td>1</td></tr>
+          <tr><td><strong>Essentiel</strong></td><td>10,90 ? HT/mois</td><td>7,90 ? HT/mois annuel</td><td>Collaborateurs limit?s</td></tr>
+          <tr><td><strong>Pro</strong></td><td>19,90 ? HT/mois</td><td>15,90 ? HT/mois annuel</td><td>Multi-utilisateurs</td></tr>
+          <tr><td><strong>Business</strong></td><td>34,90 ? HT/mois</td><td>28,90 ? HT/mois annuel</td><td>Utilisateurs ?lev?s</td></tr>
         </tbody>
       </table>
       <p>Tous les prix sont exprimés HT. La TVA applicable est de 20% (taux standard français). L'Éditeur se réserve le droit de modifier ses tarifs avec un préavis de 60 jours.</p>
@@ -2087,7 +2122,7 @@ const LEGAL = {
       <table>
         <thead><tr><th>Plan</th><th>Canal de support</th><th>Délai garanti</th></tr></thead>
         <tbody>
-          <tr><td><strong>Starter</strong></td><td>Email</td><td>24h ouvrées</td></tr>
+          <tr><td><strong>Gratuit</strong></td><td>Email limit?</td><td>Selon disponibilit?</td></tr>
           <tr><td><strong>Pro</strong></td><td>Email prioritaire</td><td>4h ouvrées</td></tr>
           <tr><td><strong>Entreprise</strong></td><td>Email + Téléphone + Account manager dédié</td><td>1h ouvrées</td></tr>
         </tbody>
@@ -2103,7 +2138,7 @@ const LEGAL = {
       <h2>🕐 Horaires du support</h2>
       <ul>
         <li>Lundi – Vendredi : 9h00 – 18h30 (heure de Paris)</li>
-        <li>Samedi : 9h00 – 12h30 (plan Pro et Entreprise uniquement)</li>
+        <li>Samedi : 9h00 ? 12h30 (plans Pro et Business uniquement)</li>
         <li>Dimanches et jours fériés français : fermé</li>
       </ul>
       <h2>🚨 Urgences (plan Entreprise)</h2>
