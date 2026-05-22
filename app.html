@@ -824,7 +824,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
         <div class="afield">
           <label id="siren-label-text">Numéro SIREN de votre entreprise</label>
           <div style="display:flex;gap:6px;">
-            <input id="r-siren" type="text" placeholder="123 456 789" maxlength="11"
+            <input id="r-siren" type="text" placeholder="123 456 789 00012" maxlength="17"
               style="font-family:monospace;letter-spacing:2px;"
               oninput="this.value=this.value.replace(/[^\d\s]/g,'');onSirenInputApp(this)"
               onkeydown="if(event.key==='Enter')lookupSirenApp()">
@@ -2255,13 +2255,15 @@ const PLAN_TAILLE = {'00':'starter','01':'starter','02':'starter','03':'starter'
 
 function onSirenInputApp(el) {
   const d=el.value.replace(/\D/g,'');
-  if(d.length===9) setTimeout(lookupSirenApp,200);
+  if(d.length===9 || d.length===14) setTimeout(lookupSirenApp,200);
   ['app-siren-card','app-siren-err'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='none';});
   const nb=document.getElementById('app-siren-next');if(nb) nb.style.display='none';
   appSirenData=null;
 }
 async function lookupSirenApp() {
-  const raw=document.getElementById('r-siren').value.replace(/\D/g,'');
+  const digits=document.getElementById('r-siren').value.replace(/\D/g,'');
+  const isSiret=digits.length===14;
+  const raw=isSiret?digits.slice(0,9):digits;
   const errEl=document.getElementById('app-siren-err');
   const loadEl=document.getElementById('app-siren-loading');
   const cardEl=document.getElementById('app-siren-card');
@@ -2270,29 +2272,37 @@ async function lookupSirenApp() {
   if(cardEl) cardEl.style.display='none';
   if(nextBtn) nextBtn.style.display='none';
   appSirenData=null;
-  if(raw.length!==9){if(errEl){errEl.textContent='9 chiffres requis.';errEl.style.display='block';} return;}
+  if(digits.length!==9 && digits.length!==14){if(errEl){errEl.textContent='SIREN 9 chiffres ou SIRET 14 chiffres requis.';errEl.style.display='block';} return;}
   if(loadEl) loadEl.style.display='flex';
   const btn=document.getElementById('app-siren-btn');if(btn) btn.disabled=true;
   try {
-    const res=await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${raw}&page=1&per_page=1`);
+    const res=await fetch(`https://recherche-entreprises.api.gouv.fr/search?q=${digits}&page=1&per_page=1&minimal=true&include=siege,matching_etablissements`);
     if(!res.ok) throw new Error('HTTP '+res.status);
     const json=await res.json();
     if(loadEl) loadEl.style.display='none';
     if(btn) btn.disabled=false;
-    const ent=(json.results||[]).find(r=>r.siren===raw)||(json.results||[])[0];
+    const ent=(json.results||[]).find(r=>{
+      if(!isSiret) return r.siren===raw;
+      const siegeMatch=r.siege&&r.siege.siret===digits;
+      const etabMatch=(r.matching_etablissements||[]).some(e=>e.siret===digits);
+      return r.siren===raw&&(siegeMatch||etabMatch);
+    })||(json.results||[])[0];
     if(!ent){if(errEl){errEl.textContent='Aucune entreprise trouvée pour ce SIREN.';errEl.style.display='block';} return;}
-    const siege=ent.siege||{};
+    const matchingEtab=isSiret?(ent.matching_etablissements||[]).find(e=>e.siret===digits):null;
+    const siege=matchingEtab||ent.siege||{};
+    if(isSiret&&siege.siret!==digits){if(errEl){errEl.textContent='Entreprise trouvée, mais le SIRET exact ne correspond pas à un établissement public.';errEl.style.display='block';} return;}
     const tranche=ent.tranche_effectif_salarie||'00';
     const planReco=PLAN_TAILLE[tranche]||'pro';
     appSirenData={
-      siren:raw,nom:ent.nom_complet||ent.nom_raison_sociale||'—',
+      siren:raw,siret:isSiret?digits:(siege.siret||''),siretValide:isSiret,etablissementSiege:!!siege.est_siege,etablissementEtat:siege.etat_administratif==='F'?'fermé':'actif',nom:ent.nom_complet||ent.nom_raison_sociale||'—',
       formeJuridique:ent.nature_juridique_label||'—',
-      codeApe:ent.activite_principale||'—',libelleApe:ent.libelle_activite_principale||'—',
-      taille:TRANCHES[tranche]||'—',etat:ent.etat_administratif==='A'?'Active':'Fermée',
+      codeApe:siege.activite_principale||ent.activite_principale||'—',libelleApe:ent.libelle_activite_principale||'—',
+      taille:TRANCHES[tranche]||'—',etat:ent.etat_administratif==='A'&&(!siege.etat_administratif||siege.etat_administratif==='A')?'Active':'Fermée',
       dateCreation:ent.date_creation?new Date(ent.date_creation).toLocaleDateString('fr-FR'):'—',
       adresse:[siege.numero_voie,siege.type_voie,siege.libelle_voie,siege.code_postal,siege.libelle_commune].filter(Boolean).join(' ')||'—',
       planReco,rawData:ent
     };
+    window.appSirenData=appSirenData;
     const d=appSirenData;
     document.getElementById('asc-nom').textContent=d.nom;
     document.getElementById('asc-forme').textContent=d.formeJuridique;
@@ -3220,7 +3230,8 @@ function doRegister(){
   const newUser={
     email, pwd, prenom:parts[0], nom:parts.slice(1).join(' ')||parts[0],
     poste:E('r-poste')?.value||'',
-    societe:appSirenData.nom, siren:appSirenData.siren,
+    societe:appSirenData.nom, siren:appSirenData.siren, siret:appSirenData.siret||'',
+    siretValide:!!appSirenData.siretValide,
     formeJuridique:appSirenData.formeJuridique, codeApe:appSirenData.codeApe,
     libelleApe:appSirenData.libelleApe, taille:appSirenData.taille,
     adresse:appSirenData.adresse, planReco:appSirenData.planReco,
@@ -7684,7 +7695,8 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         const prenom = f('r-prenom') || f('app-prenom') || nameParts[0] || '';
         const nom = f('r-prenom') ? fullName : (nameParts.slice(1).join(' ') || nameParts[0] || '');
         const societe = f('r-societe') || f('app-societe-nom') || (window.appSirenData && window.appSirenData.nom) || 'Mon entreprise';
-        const siren = f('r-siren') || (window.appSirenData && window.appSirenData.siren) || null;
+        const siren = (window.appSirenData && window.appSirenData.siren) || (f('r-siren') || '').replace(/\D/g,'').slice(0,9) || null;
+        const siret = (window.appSirenData && window.appSirenData.siret) || (((f('r-siren') || '').replace(/\D/g,'').length === 14) ? (f('r-siren') || '').replace(/\D/g,'') : null);
         const errEl = document.getElementById('rerr') || document.getElementById('app-err');
 
         if(!email || !pwd){
@@ -7699,7 +7711,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         try {
           const { data, error } = await window.sb.auth.signUp({
             email, password: pwd,
-            options: { data: { prenom, nom, societe, org_name: societe, siren, profile_type: window.selectedProfile || 'entreprise', selected_plan: window.selectedPlan || 'pro' } }
+            options: { data: { prenom, nom, societe, org_name: societe, siren, siret, company_lookup: window.appSirenData || null, profile_type: window.selectedProfile || 'entreprise', selected_plan: window.selectedPlan || 'pro' } }
           });
           if(error){
             // Email déjà pris → essai legacy

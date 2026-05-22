@@ -1393,7 +1393,8 @@ function onSirenInput(el) {
 
 async function lookupSiren() {
   const digits = document.getElementById('r-siren').value.replace(/\D/g, '');
-  const raw = digits.length === 14 ? digits.slice(0, 9) : digits;
+  const isSiret = digits.length === 14;
+  const raw = isSiret ? digits.slice(0, 9) : digits;
   const errEl = document.getElementById('siren-err');
   const loadEl = document.getElementById('siren-loading');
   const cardEl = document.getElementById('siren-card');
@@ -1413,7 +1414,7 @@ async function lookupSiren() {
   document.getElementById('siren-btn').disabled = true;
 
   try {
-    const url = `https://recherche-entreprises.api.gouv.fr/search?q=${raw}&page=1&per_page=1`;
+    const url = `https://recherche-entreprises.api.gouv.fr/search?q=${digits}&page=1&per_page=1&minimal=true&include=siege,matching_etablissements`;
     const res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
@@ -1423,7 +1424,12 @@ async function lookupSiren() {
 
     const results = json.results || [];
     // Chercher exactement le SIREN demandé
-    const ent = results.find(r => r.siren === raw) || results[0];
+    const ent = results.find(r => {
+      if (!isSiret) return r.siren === raw;
+      const siegeMatch = r.siege && r.siege.siret === digits;
+      const etabMatch = (r.matching_etablissements || []).some(e => e.siret === digits);
+      return r.siren === raw && (siegeMatch || etabMatch);
+    }) || results[0];
 
     if (!ent) {
       errEl.textContent = `Aucune entreprise trouvée pour le SIREN ${raw}. Vérifiez le numéro sur votre Kbis.`;
@@ -1431,14 +1437,19 @@ async function lookupSiren() {
     }
 
     // Extraire les infos
-    const siege = ent.siege || {};
+    const matchingEtab = isSiret ? (ent.matching_etablissements || []).find(e => e.siret === digits) : null;
+    const siege = matchingEtab || ent.siege || {};
+    if (isSiret && siege.siret !== digits) {
+      errEl.textContent = 'Entreprise trouvée, mais le SIRET exact ne correspond pas à un établissement public. Vérifiez les 14 chiffres ou continuez avec le SIREN.';
+      errEl.style.display = 'block'; return;
+    }
     const nomComplet = ent.nom_complet || ent.nom_raison_sociale || '—';
     const formeJuridique = ent.nature_juridique_label || siege.libelle_nature_juridique_etablissement || '—';
-    const codeApe = ent.activite_principale || siege.activite_principale || '—';
+    const codeApe = siege.activite_principale || ent.activite_principale || '—';
     const libelleApe = ent.libelle_activite_principale || '—';
     const tranche = ent.tranche_effectif_salarie || '00';
     const tailleLabel = TRANCHES_EFFECTIF[tranche] || 'Non renseigné';
-    const etat = ent.etat_administratif === 'A' ? 'active' : 'fermée';
+    const etat = ent.etat_administratif === 'A' && (!siege.etat_administratif || siege.etat_administratif === 'A') ? 'active' : 'fermée';
     const dateCreation = ent.date_creation ? new Date(ent.date_creation).toLocaleDateString('fr-FR') : '—';
     const adresse = [siege.numero_voie, siege.type_voie, siege.libelle_voie, siege.code_postal, siege.libelle_commune].filter(Boolean).join(' ') || '—';
     const planReco = PLAN_SELON_TAILLE[tranche] || 'pro';
@@ -1446,7 +1457,10 @@ async function lookupSiren() {
     // Stocker les données validées
     sirenData = {
       siren: raw,
-      siret: digits.length === 14 ? digits : '',
+      siret: isSiret ? digits : (siege.siret || ''),
+      siretValide: isSiret,
+      etablissementSiege: !!siege.est_siege,
+      etablissementEtat: siege.etat_administratif === 'F' ? 'fermé' : 'actif',
       nom: nomComplet,
       formeJuridique,
       codeApe,
@@ -1463,7 +1477,7 @@ async function lookupSiren() {
     // Afficher la fiche
     document.getElementById('sc-nom').textContent = nomComplet;
     document.getElementById('sc-forme').textContent = formeJuridique;
-    document.getElementById('sc-siren').textContent = digits.length === 14 ? `${raw} / ${digits}` : raw;
+    document.getElementById('sc-siren').textContent = isSiret ? `${raw} / ${digits}` : raw;
     document.getElementById('sc-ape').textContent = codeApe;
     document.getElementById('sc-secteur').textContent = libelleApe;
     document.getElementById('sc-taille').textContent = tailleLabel;
