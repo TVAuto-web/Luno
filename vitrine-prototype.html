@@ -282,36 +282,76 @@ section { padding: 100px 2rem; background: var(--paper); }
 #tarifs .section-title em { color: var(--gold); }
 #tarifs .section-sub, #tarifs .trial-note { color: rgba(255,255,255,.62); }
 #tarifs .section-tag { background: rgba(255,255,255,.08); color: var(--gold-light); }
+#tarifs #lbl-monthly { color: rgba(255,255,255,.54); }
+#tarifs #lbl-annual { color: #fff8eb; }
+.billing-toggle {
+  position: relative; width: 44px; height: 24px; border-radius: 100px;
+  background: linear-gradient(135deg, #d3a240, #f8e6b8);
+  border: 1px solid rgba(255,255,255,.32); cursor: pointer; outline: none;
+  box-shadow: 0 10px 24px rgba(0,0,0,.24);
+}
+.billing-toggle span {
+  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+  border-radius: 50%; background: #fff8eb; box-shadow: 0 2px 8px rgba(0,0,0,.28);
+  transition: transform .22s cubic-bezier(.4,0,.2,1); display: block;
+}
+.billing-save {
+  margin-left: 6px; padding: 2px 8px; background: rgba(211,162,64,.2);
+  color: #f8e6b8; font-size: 11px; font-weight: 700; border-radius: 6px;
+  border: 1px solid rgba(248,230,184,.28);
+}
+#tarifs #lbl-annual span {
+  background: rgba(211,162,64,.2) !important;
+  color: #f8e6b8 !important;
+  border: 1px solid rgba(248,230,184,.28);
+}
 .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 4rem; }
 .pricing-card {
-  background: rgba(255,252,245,.94); border: 1.5px solid rgba(255,255,255,.12);
+  background: #fff8eb; border: 2px solid rgba(255,255,255,.48);
   border-radius: var(--r); padding: 2.5rem 2rem;
-  transition: transform .2s, box-shadow .2s;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
   position: relative; overflow: hidden;
+  color: #081a16;
+  box-shadow: 0 28px 70px rgba(0,0,0,.32);
 }
-.pricing-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(15,14,12,.1); }
+.pricing-card:hover { transform: translateY(-4px); box-shadow: 0 34px 86px rgba(0,0,0,.42); border-color: rgba(248,230,184,.86); }
 .pricing-card.featured {
-  background: linear-gradient(145deg, #f8e6b8, #d3a240); border-color: rgba(255,255,255,.25); color: #1d160b;
+  background: linear-gradient(145deg, #fff0bc, #d3a240); border-color: #fff3c8; color: #1d160b;
+  box-shadow: 0 34px 92px rgba(211,162,64,.28);
+}
+.pricing-card.premium-card {
+  background: #0b2a24;
+  border-color: #d3a240;
+  color: #fff8eb;
+  box-shadow: 0 34px 92px rgba(0,0,0,.48);
 }
 .pricing-badge {
   position: absolute; top: 1.25rem; right: 1.25rem;
-  background: var(--gold); color: #fff;
+  background: var(--gold); color: #1d160b;
   font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 100px;
 }
 .pricing-tier { font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); margin-bottom: .75rem; }
 .pricing-card.featured .pricing-tier { color: rgba(29,22,11,.58); }
+.pricing-card.premium-card .pricing-tier { color: rgba(255,248,235,.66); }
 .pricing-price { font-family: 'Instrument Serif', serif; font-size: 52px; letter-spacing: -2px; line-height: 1; margin-bottom: .25rem; }
+.pricing-card.featured .pricing-price { color: #1d160b !important; }
+.pricing-card.premium-card .pricing-price { color: #fff8eb !important; }
 .pricing-period { font-size: 13px; color: var(--muted); margin-bottom: .5rem; }
 .pricing-card.featured .pricing-period { color: rgba(29,22,11,.62); }
+.pricing-card.premium-card .pricing-period { color: rgba(255,248,235,.66) !important; }
 .pricing-desc { font-size: 14px; color: var(--muted); margin-bottom: 2rem; line-height: 1.55; }
 .pricing-card.featured .pricing-desc { color: rgba(29,22,11,.68); }
+.pricing-card.premium-card .pricing-desc { color: rgba(255,248,235,.76) !important; }
 .pricing-divider { height: 1px; background: var(--border); margin-bottom: 1.5rem; }
-.pricing-card.featured .pricing-divider { background: rgba(255,255,255,.12); }
+.pricing-card.featured .pricing-divider { background: rgba(29,22,11,.14); }
+.pricing-card.premium-card .pricing-divider { background: rgba(248,230,184,.2); }
 .pricing-features { list-style: none; display: flex; flex-direction: column; gap: .65rem; margin-bottom: 2rem; }
 .pricing-features li { display: flex; align-items: flex-start; gap: .65rem; font-size: 14px; }
 .pricing-features li::before { content: '✓'; color: var(--sage); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
 .pricing-card.featured .pricing-features li::before { color: var(--sage-dark); }
 .pricing-card.featured .pricing-features li { color: rgba(29,22,11,.86); }
+.pricing-card.premium-card .pricing-features li { color: rgba(255,248,235,.88) !important; }
+.pricing-card.premium-card .pricing-features li::before { color: var(--gold-light); }
 .pricing-cta { width: 100%; justify-content: center; }
 .trial-note { text-align: center; margin-top: 2rem; font-size: 14px; color: var(--muted); }
 .trial-note strong { color: var(--sage); }
@@ -720,7 +760,7 @@ footer {
 </section>
 
 <!-- ══ TARIFS ══ -->
-<section id="tarifs" style="background: var(--cream);">
+<section id="tarifs">
   <div class="container">
     <div class="reveal" style="text-align:center;">
       <div class="section-tag">✦ Tarifs</div>
@@ -729,12 +769,11 @@ footer {
 
       <!-- Toggle mensuel / annuel -->
       <div style="display:flex;align-items:center;justify-content:center;gap:.75rem;margin-top:1.5rem;">
-        <span id="lbl-monthly" style="font-size:14px;font-weight:500;color:var(--muted);">Mensuel</span>
-        <button onclick="toggleBillingVitrine()" id="billing-toggle-v"
-          style="position:relative;width:44px;height:24px;border-radius:100px;background:var(--sage);border:none;cursor:pointer;outline:none;">
-          <span id="toggle-dot-v" style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .22s cubic-bezier(.4,0,.2,1);display:block;"></span>
+        <span id="lbl-monthly" style="font-size:14px;font-weight:500;">Mensuel</span>
+        <button onclick="toggleBillingVitrine()" id="billing-toggle-v" class="billing-toggle">
+          <span id="toggle-dot-v" style="transform:translateX(20px);"></span>
         </button>
-        <span id="lbl-annual" style="font-size:14px;font-weight:600;color:var(--ink);">
+        <span id="lbl-annual" style="font-size:14px;font-weight:700;">
           Annuel <span style="margin-left:6px;padding:2px 8px;background:var(--sage-light);color:var(--sage);font-size:11px;font-weight:700;border-radius:6px;">−20%</span>
         </span>
       </div>
@@ -788,15 +827,15 @@ footer {
       </div>
 
       <!-- PREMIUM -->
-      <div class="pricing-card" style="background:var(--ink);color:#fff;border-color:var(--ink);">
+      <div class="pricing-card premium-card">
         <div class="pricing-badge" style="background:var(--gold);">Automatisation avancée</div>
-        <div class="pricing-tier" style="color:rgba(255,255,255,.5);">Premium</div>
+        <div class="pricing-tier">Premium</div>
         <div style="display:flex;align-items:flex-end;gap:3px;margin-bottom:.25rem;">
           <div class="pricing-price" id="price-premium" style="color:#fff;">15.90<span style="font-size:22px;">€</span></div>
         </div>
         <div class="pricing-period" id="period-premium" style="color:rgba(255,255,255,.5);">par mois · facturé annuellement</div>
         <div class="pricing-desc" style="color:rgba(255,255,255,.65);">Pour les PME et utilisateurs avancés qui veulent automatiser toute leur gestion.</div>
-        <div class="pricing-divider" style="background:rgba(255,255,255,.12);"></div>
+        <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li style="color:rgba(255,255,255,.85);">Tout le plan Plus</li>
           <li style="color:rgba(255,255,255,.85);">IA avancée</li>
@@ -1695,9 +1734,9 @@ function toggleBillingVitrine() {
   const dot = document.getElementById('toggle-dot-v');
   const lblM = document.getElementById('lbl-monthly');
   const lblA = document.getElementById('lbl-annual');
-  dot.style.transform = isAnnualV ? 'translateX(0)' : 'translateX(20px)';
-  lblM.style.fontWeight = isAnnualV ? '500' : '700'; lblM.style.color = isAnnualV ? 'var(--muted)' : 'var(--ink)';
-  lblA.style.fontWeight = isAnnualV ? '700' : '500'; lblA.style.color = isAnnualV ? 'var(--ink)' : 'var(--muted)';
+  dot.style.transform = isAnnualV ? 'translateX(20px)' : 'translateX(0)';
+  lblM.style.fontWeight = isAnnualV ? '500' : '700'; lblM.style.color = isAnnualV ? 'rgba(255,255,255,.54)' : '#fff8eb';
+  lblA.style.fontWeight = isAnnualV ? '700' : '500'; lblA.style.color = isAnnualV ? '#fff8eb' : 'rgba(255,255,255,.54)';
   ['plus','premium'].forEach(p => {
     const prEl = document.getElementById('price-'+p);
     const ntEl = document.getElementById('period-'+p);
