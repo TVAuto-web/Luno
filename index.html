@@ -385,6 +385,22 @@ section { padding: 100px 2rem; }
 .manual-company { display: none; background: var(--cream); border: 1px solid var(--border); border-radius: var(--r); padding: .85rem; margin-top: .75rem; }
 .inline-choice { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--muted); line-height: 1.45; margin: .75rem 0 .25rem; }
 .inline-choice input { margin-top: 3px; flex-shrink: 0; }
+.reg-progress { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 0 0 1rem; }
+.reg-progress span { height: 4px; border-radius: 999px; background: var(--mist); transition: background .2s; }
+.reg-progress span.on { background: var(--sage); }
+.reg-question { display: none; }
+.reg-question.on { display: block; animation: fadeUp .25s ease both; }
+.quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin-bottom: 1rem; }
+.quick-card {
+  border: 1.5px solid var(--border); border-radius: var(--rs); background: #fff;
+  padding: .8rem; text-align: left; cursor: pointer; font-family: inherit;
+  transition: border-color .2s, background .2s, box-shadow .2s;
+}
+.quick-card:hover, .quick-card.on { border-color: var(--sage); background: var(--sage-light); box-shadow: 0 1px 8px rgba(29,122,95,.08); }
+.quick-card strong { display: block; color: var(--ink); font-size: 13px; }
+.quick-card span { display: block; color: var(--muted); font-size: 11px; line-height: 1.35; margin-top: 3px; }
+.reg-nav { display: flex; gap: .75rem; align-items: center; margin-top: 1rem; }
+.modal-btn-secondary { flex: 1; padding: 11px; border: 1.5px solid var(--border); background: #fff; color: var(--text); border-radius: var(--rs); font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .modal-btn { width: 100%; padding: 12px; background: var(--sage); color: #fff; border: none; border-radius: var(--rs); font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: .5rem; transition: background .2s; }
 .modal-btn:hover { background: var(--sage-dark); }
 .modal-close { float: right; background: none; border: none; font-size: 22px; color: var(--muted); cursor: pointer; line-height: 1; }
@@ -971,26 +987,83 @@ footer {
       </div>
     </div>
 
-    <!-- REGISTER -->
-    <div id="form-register" style="display:none;">
-      <div class="trial-banner"><span>🎉</span> 15 jours d'essai gratuit — sans carte bancaire requise</div>
+      <!-- REGISTER -->
+      <div id="form-register" style="display:none;">
+        <div class="trial-banner"><span>🎉</span> 15 jours d'essai gratuit — sans carte bancaire requise</div>
+        <div class="reg-progress" aria-hidden="true">
+          <span id="rp-1" class="on"></span><span id="rp-2"></span><span id="rp-3"></span><span id="rp-4"></span>
+        </div>
 
-      <!-- ÉTAPE 1 : Profil + entreprise -->
-      <div id="reg-step1">
-        <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:.65rem;">Quel espace souhaitez-vous créer ?</div>
+      <!-- ÉTAPE 1 : Situation -->
+      <div id="reg-step1" class="reg-question on">
+        <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:.35rem;">Commençons par votre situation</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:.9rem;">Comme Indy, on vous pose quelques questions pour préparer le bon espace.</div>
         <input type="hidden" id="r-profile" value="entreprise">
+        <input type="hidden" id="r-situation" value="existing">
         <div class="profile-grid">
-          <button type="button" class="profile-card on" id="profile-entreprise" onclick="selectRegisterProfile('entreprise')">
+          <button type="button" class="profile-card on" id="profile-entreprise" onclick="selectRegisterProfile('entreprise','existing')">
             🏢 <strong>Entreprise</strong><span>TPE, PME, association</span>
           </button>
-          <button type="button" class="profile-card" id="profile-independant" onclick="selectRegisterProfile('independant')">
+          <button type="button" class="profile-card" id="profile-independant" onclick="selectRegisterProfile('independant','existing')">
             ⚡ <strong>Indépendant</strong><span>Freelance, micro</span>
           </button>
-          <button type="button" class="profile-card" id="profile-cabinet" onclick="selectRegisterProfile('cabinet')">
+          <button type="button" class="profile-card" id="profile-cabinet" onclick="selectRegisterProfile('cabinet','existing')">
             🏛️ <strong>Cabinet</strong><span>Expert-comptable</span>
           </button>
         </div>
+        <div class="quick-grid">
+          <button type="button" class="quick-card on" id="situation-existing" onclick="selectSituation('existing')"><strong>J'ai déjà une activité</strong><span>J'ai un SIREN/SIRET ou une structure existante</span></button>
+          <button type="button" class="quick-card" id="situation-creating" onclick="selectSituation('creating')"><strong>Je suis en création</strong><span>Je veux préparer mon compte avant immatriculation</span></button>
+        </div>
+        <button class="modal-btn" onclick="goRegisterStep(2)">Continuer →</button>
+      </div>
 
+      <!-- ÉTAPE 2 : Activité -->
+      <div id="reg-step2" class="reg-question">
+        <button onclick="goRegisterStep(1)" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;padding:0;margin-bottom:.8rem;">← Retour</button>
+        <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:.35rem;">Votre activité</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:.9rem;">Ces informations servent à adapter le tableau de bord et les obligations proposées.</div>
+        <div class="field">
+          <label>Secteur principal *</label>
+          <select id="r-activity">
+            <option value="">Sélectionner</option>
+            <option>Conseil / prestation de services</option>
+            <option>Commerce / e-commerce</option>
+            <option>Artisanat</option>
+            <option>Profession libérale</option>
+            <option>Immobilier / LMNP</option>
+            <option>Cabinet comptable</option>
+            <option>Autre activité</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Régime TVA</label>
+            <select id="r-vat">
+              <option>Je ne sais pas encore</option>
+              <option>Franchise en base</option>
+              <option>TVA réelle simplifiée</option>
+              <option>TVA réelle normale</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Volume prévu</label>
+            <select id="r-volume">
+              <option>Moins de 50 factures/an</option>
+              <option>50 à 250 factures/an</option>
+              <option>Plus de 250 factures/an</option>
+              <option>Plusieurs dossiers clients</option>
+            </select>
+          </div>
+        </div>
+        <button class="modal-btn" onclick="goRegisterStep(3)">Continuer →</button>
+      </div>
+
+      <!-- ÉTAPE 3 : Organisation -->
+      <div id="reg-step3" class="reg-question">
+        <button onclick="goRegisterStep(2)" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;padding:0;margin-bottom:.8rem;">← Retour</button>
+        <div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:.35rem;">Votre organisation</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:.9rem;">Le SIREN/SIRET est optionnel mais permet de préremplir les informations officielles.</div>
         <div class="field">
           <label>SIREN / SIRET de l'organisation</label>
           <div style="display:flex;gap:8px;">
@@ -1078,10 +1151,10 @@ footer {
         </button>
       </div>
 
-      <!-- ÉTAPE 2 : Administrateur du compte -->
-      <div id="reg-step2" style="display:none;">
+      <!-- ÉTAPE 4 : Administrateur du compte -->
+      <div id="reg-step4" class="reg-question">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;">
-          <button onclick="goStep1()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;padding:0;">← Modifier l'entreprise</button>
+          <button onclick="goRegisterStep(3)" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;font-family:inherit;padding:0;">← Modifier l'organisation</button>
         </div>
         <!-- Résumé entreprise compact -->
         <div id="step2-company-recap" style="background:var(--sage-light);border-radius:var(--r);padding:.65rem .85rem;margin-bottom:1rem;font-size:13px;color:var(--sage-dark);font-weight:600;display:flex;align-items:center;gap:8px;">
@@ -1194,6 +1267,7 @@ function switchTab(tab) {
     ? 'Accédez à votre espace comptabilité' : 'Créez votre compte — essai gratuit 15 jours';
   document.getElementById('m-err').style.display='none';
   document.getElementById('m-ok').style.display='none';
+  if (tab === 'register') goRegisterStep(1, true);
 }
 function showErr(msg){ const e=document.getElementById('m-err'); e.textContent=msg; e.style.display='block'; document.getElementById('m-ok').style.display='none'; }
 function showOk(msg) { const e=document.getElementById('m-ok'); e.textContent=msg; e.style.display='block'; document.getElementById('m-err').style.display='none'; }
@@ -1231,6 +1305,7 @@ function doLogin() {
 // ══ SIREN LOOKUP (API Annuaire des Entreprises — data.gouv.fr) ══
 let sirenData = null; // données entreprise validées
 let registerProfile = 'entreprise';
+let registerSituation = 'existing';
 
 const TRANCHES_EFFECTIF = {
   '00':'Non employeur','01':'1 à 2 salariés','02':'3 à 5 salariés',
@@ -1382,11 +1457,42 @@ function bypassSiren() {
   showManualCompany();
 }
 
-function selectRegisterProfile(profile) {
+function goRegisterStep(step, silent) {
+  if (step === 3 && !document.getElementById('r-activity').value) {
+    showErr('Sélectionnez votre secteur principal pour continuer.');
+    return;
+  }
+  document.querySelectorAll('.reg-question').forEach(el => el.classList.remove('on'));
+  const target = document.getElementById('reg-step' + step);
+  if (target) target.classList.add('on');
+  for (let i = 1; i <= 4; i++) {
+    const bar = document.getElementById('rp-' + i);
+    if (bar) bar.classList.toggle('on', i <= step);
+  }
+  if (!silent) {
+    document.getElementById('m-err').style.display='none';
+    document.getElementById('m-ok').style.display='none';
+  }
+}
+
+function selectRegisterProfile(profile, situation) {
   registerProfile = profile;
   document.getElementById('r-profile').value = profile;
   document.querySelectorAll('.profile-card').forEach(card => card.classList.remove('on'));
   const active = document.getElementById('profile-' + profile);
+  if (active) active.classList.add('on');
+  if (situation) selectSituation(situation);
+  if (profile === 'cabinet') {
+    document.getElementById('r-activity').value = 'Cabinet comptable';
+    document.getElementById('r-volume').value = 'Plusieurs dossiers clients';
+  }
+}
+
+function selectSituation(situation) {
+  registerSituation = situation;
+  document.getElementById('r-situation').value = situation;
+  document.querySelectorAll('[id^="situation-"]').forEach(card => card.classList.remove('on'));
+  const active = document.getElementById('situation-' + situation);
   if (active) active.classList.add('on');
 }
 
@@ -1431,14 +1537,12 @@ function goStep2() {
     }
     sirenData = manual;
   }
-  document.getElementById('reg-step1').style.display = 'none';
-  document.getElementById('reg-step2').style.display = 'block';
   document.getElementById('step2-company-name').textContent = `${sirenData.nom} — ${sirenData.formeJuridique} · ${registerProfile === 'cabinet' ? 'Cabinet' : registerProfile === 'independant' ? 'Indépendant' : 'Entreprise'}`;
+  goRegisterStep(4);
 }
 
 function goStep1() {
-  document.getElementById('reg-step2').style.display = 'none';
-  document.getElementById('reg-step1').style.display = 'block';
+  goRegisterStep(3);
 }
 
 // ── INSCRIPTION ──
@@ -1469,6 +1573,10 @@ function doRegister() {
     poste,
     telephone: phone,
     profile: registerProfile,
+    situation: registerSituation,
+    activite: document.getElementById('r-activity').value,
+    regimeTva: document.getElementById('r-vat').value,
+    volume: document.getElementById('r-volume').value,
     uiMode: registerProfile === 'cabinet' ? 'avance' : 'simple',
     societe: sirenData.nom,
     siren: sirenData.siren,
