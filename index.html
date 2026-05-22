@@ -3,23 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ComptaPME Pro — La comptabilité qui vous libère</title>
+<title>ComptaPME Pro — Gestion comptable pour PME</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ink: #0f0e0c;
-  --paper: #faf9f6;
-  --cream: #f2f0ea;
-  --mist: #e8e5dc;
-  --sage: #1d7a5f;
-  --sage-light: #d4ede6;
-  --sage-dark: #0d4d3a;
-  --gold: #c8962a;
-  --gold-light: #fdf3dc;
-  --text: #2d2c29;
-  --muted: #7a7870;
-  --border: #dddad0;
+  --ink: #081a16;
+  --paper: #f7f2e8;
+  --cream: #efe5d4;
+  --mist: #d8cbb6;
+  --sage: #1f8a68;
+  --sage-light: #cdebdc;
+  --sage-dark: #0a3d32;
+  --gold: #d3a240;
+  --gold-light: #fbefd0;
+  --text: #24312c;
+  --muted: #6f776e;
+  --border: rgba(8,26,22,.16);
+  --deep: #061f1a;
+  --deep-2: #0d332b;
+  --panel: rgba(255,252,245,.88);
   --r: 14px;
   --rs: 8px;
 }
@@ -27,7 +30,7 @@
 html { scroll-behavior: smooth; }
 body {
   font-family: 'DM Sans', sans-serif;
-  background: var(--paper);
+  background: var(--deep);
   color: var(--text);
   font-size: 15px;
   line-height: 1.6;
@@ -39,25 +42,25 @@ nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; padding: 0 2rem;
   height: 64px;
-  background: rgba(250,249,246,.92);
+  background: rgba(6,31,26,.86);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(255,255,255,.1);
   transition: all .3s;
 }
 .nav-logo {
   font-family: 'Instrument Serif', serif;
-  font-size: 22px; color: var(--sage); letter-spacing: -.3px;
+  font-size: 22px; color: var(--gold-light); letter-spacing: -.3px;
   display: flex; align-items: center; gap: 8px; text-decoration: none;
 }
 .nav-logo span { font-size: 22px; }
 .nav-links { display: flex; gap: 2rem; margin: 0 auto; list-style: none; }
-.nav-links a { text-decoration: none; color: var(--muted); font-size: 14px; font-weight: 500; transition: color .2s; }
-.nav-links a:hover { color: var(--ink); }
+.nav-links a { text-decoration: none; color: rgba(255,255,255,.62); font-size: 14px; font-weight: 500; transition: color .2s; }
+.nav-links a:hover { color: #fff; }
 .nav-cta { display: flex; gap: .75rem; align-items: center; }
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 20px; border-radius: var(--rs); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; border: 1.5px solid transparent; transition: all .2s; font-family: inherit; }
-.btn-ghost { border-color: var(--border); color: var(--text); background: transparent; }
-.btn-ghost:hover { background: var(--cream); }
-.btn-primary { background: var(--sage); color: #fff; border-color: var(--sage); }
+.btn-ghost { border-color: rgba(255,255,255,.2); color: rgba(255,255,255,.88); background: rgba(255,255,255,.04); }
+.btn-ghost:hover { background: rgba(255,255,255,.1); }
+.btn-primary { background: var(--gold); color: #17120a; border-color: var(--gold); box-shadow: 0 12px 28px rgba(211,162,64,.22); }
 .btn-primary:hover { background: var(--sage-dark); border-color: var(--sage-dark); }
 .btn-lg { padding: 14px 28px; font-size: 15px; border-radius: var(--r); }
 .btn-gold { background: var(--gold); color: #fff; border-color: var(--gold); }
@@ -67,28 +70,31 @@ nav {
 
 /* ── HERO ── */
 .hero {
-  min-height: 100vh;
+  min-height: 96vh;
   display: flex; flex-direction: column; justify-content: center; align-items: center;
   text-align: center;
   padding: 120px 2rem 80px;
   position: relative;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 80%, #d4ede640 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 20%, #fdf3dc40 0%, transparent 55%),
-    var(--paper);
+    linear-gradient(180deg, rgba(6,31,26,.94), rgba(10,61,50,.9)),
+    radial-gradient(ellipse 70% 50% at 14% 84%, rgba(31,138,104,.34) 0%, transparent 62%),
+    radial-gradient(ellipse 54% 44% at 84% 18%, rgba(211,162,64,.28) 0%, transparent 58%),
+    var(--deep);
   overflow: hidden;
 }
 .hero::before {
   content: '';
   position: absolute; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8962a' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  opacity: .5; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+  opacity: .7; pointer-events: none;
 }
 .hero-badge {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 6px 16px; border-radius: 100px;
-  background: var(--gold-light); border: 1px solid #e8c570;
-  color: var(--gold); font-size: 13px; font-weight: 600;
+  background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16);
+  color: var(--gold-light); font-size: 13px; font-weight: 600;
   margin-bottom: 2rem;
   animation: fadeUp .6s ease both;
 }
@@ -98,14 +104,14 @@ h1 {
   font-size: clamp(46px, 7vw, 80px);
   line-height: 1.08;
   letter-spacing: -2px;
-  color: var(--ink);
+  color: #fff8eb;
   margin-bottom: 1.5rem;
   max-width: 820px;
   animation: fadeUp .6s .1s ease both;
 }
-h1 em { font-style: italic; color: var(--sage); }
+h1 em { font-style: italic; color: var(--gold); }
 .hero-sub {
-  font-size: 18px; color: var(--muted); max-width: 540px;
+  font-size: 18px; color: rgba(255,248,235,.72); max-width: 580px;
   line-height: 1.65; margin-bottom: 2.5rem;
   animation: fadeUp .6s .2s ease both;
 }
@@ -114,17 +120,17 @@ h1 em { font-style: italic; color: var(--sage); }
   animation: fadeUp .6s .3s ease both;
 }
 .hero-social-proof {
-  margin-top: 3.5rem; color: var(--muted); font-size: 13px;
+  margin-top: 3.5rem; color: rgba(255,255,255,.62); font-size: 13px;
   display: flex; align-items: center; gap: 1rem; justify-content: center;
   animation: fadeUp .6s .4s ease both;
 }
 .avatar-stack { display: flex; }
 .avatar-stack img, .avatar-pill {
   width: 34px; height: 34px; border-radius: 50%;
-  border: 2.5px solid var(--paper);
-  margin-left: -10px; background: var(--mist);
+  border: 2.5px solid rgba(6,31,26,.95);
+  margin-left: -10px; background: rgba(255,255,255,.12);
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: var(--sage);
+  font-size: 12px; font-weight: 700; color: var(--gold-light);
 }
 .avatar-pill:first-child { margin-left: 0; }
 .hero-app-preview {
@@ -133,11 +139,11 @@ h1 em { font-style: italic; color: var(--sage); }
   animation: fadeUp .7s .5s ease both;
 }
 .preview-window {
-  background: var(--cream);
-  border: 1px solid var(--border);
+  background: rgba(247,242,232,.96);
+  border: 1px solid rgba(255,255,255,.22);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 40px 80px rgba(15,14,12,.12), 0 8px 24px rgba(15,14,12,.06);
+  box-shadow: 0 50px 110px rgba(0,0,0,.38), 0 10px 32px rgba(0,0,0,.18);
 }
 .preview-bar {
   background: #fff; border-bottom: 1px solid var(--border);
@@ -183,7 +189,7 @@ h1 em { font-style: italic; color: var(--sage); }
 .b-er { background: #fcebeb; color: #a32d2d; }
 
 /* ── SECTIONS COMMUNES ── */
-section { padding: 100px 2rem; }
+section { padding: 100px 2rem; background: var(--paper); }
 .container { max-width: 1160px; margin: 0 auto; }
 .section-tag {
   display: inline-flex; align-items: center; gap: 6px;
@@ -202,29 +208,33 @@ section { padding: 100px 2rem; }
 .section-sub { font-size: 17px; color: var(--muted); max-width: 520px; line-height: 1.65; }
 
 /* ── FEATURES ── */
-#features { background: var(--cream); }
+#features { background: #102d26; color: rgba(255,255,255,.86); }
+#features .section-title { color: #fff8eb; }
+#features .section-title em { color: var(--gold); }
+#features .section-sub { color: rgba(255,255,255,.64); }
+#features .section-tag { background: rgba(255,255,255,.08); color: var(--gold-light); }
 .features-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 1.5px; background: var(--border);
-  border: 1.5px solid var(--border); border-radius: var(--r); overflow: hidden;
+  gap: 1px; background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.12); border-radius: var(--r); overflow: hidden;
   margin-top: 4rem;
 }
 .feature-card {
-  background: var(--paper);
+  background: rgba(255,255,255,.055);
   padding: 2.5rem 2rem;
   transition: background .2s;
 }
-.feature-card:hover { background: #fff; }
+.feature-card:hover { background: rgba(255,255,255,.09); }
 .feature-icon {
   width: 48px; height: 48px; border-radius: var(--rs);
-  background: var(--sage-light);
+  background: rgba(211,162,64,.14);
   display: flex; align-items: center; justify-content: center;
   font-size: 22px; margin-bottom: 1.25rem;
 }
-.feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: .5rem; color: var(--ink); }
-.feature-card p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: .5rem; color: #fff8eb; }
+.feature-card p { font-size: 14px; color: rgba(255,255,255,.64); line-height: 1.6; }
 .feature-highlight {
-  grid-column: 1 / -1; background: var(--ink); color: #fff;
+  grid-column: 1 / -1; background: linear-gradient(135deg, rgba(6,31,26,.96), rgba(31,138,104,.55)); color: #fff;
   display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
   padding: 3rem 3rem; align-items: center;
 }
@@ -239,22 +249,23 @@ section { padding: 100px 2rem; }
 .fh-row strong { color: #fff; }
 
 /* ── WHY DIFFERENT ── */
+#pourquoi { background: #f4eadb; }
 .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-top: 4rem; }
 .why-list { display: flex; flex-direction: column; gap: 1.75rem; }
 .why-item { display: flex; gap: 1.25rem; }
 .why-num {
   width: 36px; height: 36px; border-radius: 50%;
-  background: var(--ink); color: var(--paper);
+  background: var(--sage-dark); color: #fff8eb;
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
 }
 .why-item h4 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: .3rem; }
 .why-item p { font-size: 14px; color: var(--muted); line-height: 1.6; }
 .compare-table {
-  background: var(--paper); border: 1.5px solid var(--border); border-radius: var(--r);
-  overflow: hidden;
+  background: rgba(255,252,245,.88); border: 1.5px solid rgba(8,26,22,.14); border-radius: var(--r);
+  overflow: hidden; box-shadow: 0 26px 70px rgba(8,26,22,.12);
 }
-.ct-header { background: var(--ink); padding: 1rem 1.5rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.ct-header { background: var(--deep); padding: 1rem 1.5rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
 .ct-header span { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.7); }
 .ct-header span:first-child { color: rgba(255,255,255,.4); }
 .ct-header span.hl { color: var(--sage-light); }
@@ -266,37 +277,81 @@ section { padding: 100px 2rem; }
 .ct-row.hl-row { background: var(--sage-light); }
 
 /* ── TARIFS ── */
-#tarifs { background: var(--cream); }
+#tarifs { background: linear-gradient(180deg, #102d26 0%, #081a16 100%); color: rgba(255,255,255,.86); }
+#tarifs .section-title { color: #fff8eb; }
+#tarifs .section-title em { color: var(--gold); }
+#tarifs .section-sub, #tarifs .trial-note { color: rgba(255,255,255,.62); }
+#tarifs .section-tag { background: rgba(255,255,255,.08); color: var(--gold-light); }
+#tarifs #lbl-monthly { color: rgba(255,255,255,.54); }
+#tarifs #lbl-annual { color: #fff8eb; }
+.billing-toggle {
+  position: relative; width: 44px; height: 24px; border-radius: 100px;
+  background: linear-gradient(135deg, #d3a240, #f8e6b8);
+  border: 1px solid rgba(255,255,255,.32); cursor: pointer; outline: none;
+  box-shadow: 0 10px 24px rgba(0,0,0,.24);
+}
+.billing-toggle span {
+  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px;
+  border-radius: 50%; background: #fff8eb; box-shadow: 0 2px 8px rgba(0,0,0,.28);
+  transition: transform .22s cubic-bezier(.4,0,.2,1); display: block;
+}
+.billing-save {
+  margin-left: 6px; padding: 2px 8px; background: rgba(211,162,64,.2);
+  color: #f8e6b8; font-size: 11px; font-weight: 700; border-radius: 6px;
+  border: 1px solid rgba(248,230,184,.28);
+}
+#tarifs #lbl-annual span {
+  background: rgba(211,162,64,.2) !important;
+  color: #f8e6b8 !important;
+  border: 1px solid rgba(248,230,184,.28);
+}
 .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 4rem; }
 .pricing-card {
-  background: var(--paper); border: 1.5px solid var(--border);
+  background: #fff8eb; border: 2px solid rgba(255,255,255,.48);
   border-radius: var(--r); padding: 2.5rem 2rem;
-  transition: transform .2s, box-shadow .2s;
+  transition: transform .2s, box-shadow .2s, border-color .2s;
   position: relative; overflow: hidden;
+  color: #081a16;
+  box-shadow: 0 28px 70px rgba(0,0,0,.32);
 }
-.pricing-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(15,14,12,.1); }
+.pricing-card:hover { transform: translateY(-4px); box-shadow: 0 34px 86px rgba(0,0,0,.42); border-color: rgba(248,230,184,.86); }
 .pricing-card.featured {
-  background: var(--ink); border-color: var(--ink); color: #fff;
+  background: linear-gradient(145deg, #fff0bc, #d3a240); border-color: #fff3c8; color: #1d160b;
+  box-shadow: 0 34px 92px rgba(211,162,64,.28);
+}
+.pricing-card.premium-card {
+  background: #0b2a24;
+  border-color: #d3a240;
+  color: #fff8eb;
+  box-shadow: 0 34px 92px rgba(0,0,0,.48);
 }
 .pricing-badge {
   position: absolute; top: 1.25rem; right: 1.25rem;
-  background: var(--gold); color: #fff;
+  background: var(--gold); color: #1d160b;
   font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 100px;
 }
 .pricing-tier { font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); margin-bottom: .75rem; }
-.pricing-card.featured .pricing-tier { color: rgba(255,255,255,.5); }
+.pricing-card.featured .pricing-tier { color: rgba(29,22,11,.58); }
+.pricing-card.premium-card .pricing-tier { color: rgba(255,248,235,.66); }
 .pricing-price { font-family: 'Instrument Serif', serif; font-size: 52px; letter-spacing: -2px; line-height: 1; margin-bottom: .25rem; }
+.pricing-card.featured .pricing-price { color: #1d160b !important; }
+.pricing-card.premium-card .pricing-price { color: #fff8eb !important; }
 .pricing-period { font-size: 13px; color: var(--muted); margin-bottom: .5rem; }
-.pricing-card.featured .pricing-period { color: rgba(255,255,255,.5); }
+.pricing-card.featured .pricing-period { color: rgba(29,22,11,.62); }
+.pricing-card.premium-card .pricing-period { color: rgba(255,248,235,.66) !important; }
 .pricing-desc { font-size: 14px; color: var(--muted); margin-bottom: 2rem; line-height: 1.55; }
-.pricing-card.featured .pricing-desc { color: rgba(255,255,255,.65); }
+.pricing-card.featured .pricing-desc { color: rgba(29,22,11,.68); }
+.pricing-card.premium-card .pricing-desc { color: rgba(255,248,235,.76) !important; }
 .pricing-divider { height: 1px; background: var(--border); margin-bottom: 1.5rem; }
-.pricing-card.featured .pricing-divider { background: rgba(255,255,255,.12); }
+.pricing-card.featured .pricing-divider { background: rgba(29,22,11,.14); }
+.pricing-card.premium-card .pricing-divider { background: rgba(248,230,184,.2); }
 .pricing-features { list-style: none; display: flex; flex-direction: column; gap: .65rem; margin-bottom: 2rem; }
 .pricing-features li { display: flex; align-items: flex-start; gap: .65rem; font-size: 14px; }
 .pricing-features li::before { content: '✓'; color: var(--sage); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
-.pricing-card.featured .pricing-features li::before { color: var(--sage-light); }
-.pricing-card.featured .pricing-features li { color: rgba(255,255,255,.85); }
+.pricing-card.featured .pricing-features li::before { color: var(--sage-dark); }
+.pricing-card.featured .pricing-features li { color: rgba(29,22,11,.86); }
+.pricing-card.premium-card .pricing-features li { color: rgba(255,248,235,.88) !important; }
+.pricing-card.premium-card .pricing-features li::before { color: var(--gold-light); }
 .pricing-cta { width: 100%; justify-content: center; }
 .trial-note { text-align: center; margin-top: 2rem; font-size: 14px; color: var(--muted); }
 .trial-note strong { color: var(--sage); }
@@ -319,7 +374,7 @@ section { padding: 100px 2rem; }
 
 /* ── CTA BAND ── */
 .cta-band {
-  background: var(--ink);
+  background: linear-gradient(135deg, var(--deep), #124437);
   padding: 100px 2rem;
   text-align: center;
   position: relative; overflow: hidden;
@@ -327,7 +382,7 @@ section { padding: 100px 2rem; }
 .cta-band::before {
   content: '';
   position: absolute; top: -50%; left: -20%; right: -20%; bottom: -50%;
-  background: radial-gradient(ellipse 60% 70% at 50% 40%, #1d7a5f20 0%, transparent 70%);
+  background: radial-gradient(ellipse 60% 70% at 50% 40%, rgba(211,162,64,.22) 0%, transparent 70%);
 }
 .cta-band h2 {
   font-family: 'Instrument Serif', serif;
@@ -705,7 +760,7 @@ footer {
 </section>
 
 <!-- ══ TARIFS ══ -->
-<section id="tarifs" style="background: var(--cream);">
+<section id="tarifs">
   <div class="container">
     <div class="reveal" style="text-align:center;">
       <div class="section-tag">✦ Tarifs</div>
@@ -714,12 +769,11 @@ footer {
 
       <!-- Toggle mensuel / annuel -->
       <div style="display:flex;align-items:center;justify-content:center;gap:.75rem;margin-top:1.5rem;">
-        <span id="lbl-monthly" style="font-size:14px;font-weight:500;color:var(--muted);">Mensuel</span>
-        <button onclick="toggleBillingVitrine()" id="billing-toggle-v"
-          style="position:relative;width:44px;height:24px;border-radius:100px;background:var(--sage);border:none;cursor:pointer;outline:none;">
-          <span id="toggle-dot-v" style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .22s cubic-bezier(.4,0,.2,1);display:block;"></span>
+        <span id="lbl-monthly" style="font-size:14px;font-weight:500;">Mensuel</span>
+        <button onclick="toggleBillingVitrine()" id="billing-toggle-v" class="billing-toggle">
+          <span id="toggle-dot-v" style="transform:translateX(20px);"></span>
         </button>
-        <span id="lbl-annual" style="font-size:14px;font-weight:600;color:var(--ink);">
+        <span id="lbl-annual" style="font-size:14px;font-weight:700;">
           Annuel <span style="margin-left:6px;padding:2px 8px;background:var(--sage-light);color:var(--sage);font-size:11px;font-weight:700;border-radius:6px;">−20%</span>
         </span>
       </div>
@@ -773,15 +827,15 @@ footer {
       </div>
 
       <!-- PREMIUM -->
-      <div class="pricing-card" style="background:var(--ink);color:#fff;border-color:var(--ink);">
+      <div class="pricing-card premium-card">
         <div class="pricing-badge" style="background:var(--gold);">Automatisation avancée</div>
-        <div class="pricing-tier" style="color:rgba(255,255,255,.5);">Premium</div>
+        <div class="pricing-tier">Premium</div>
         <div style="display:flex;align-items:flex-end;gap:3px;margin-bottom:.25rem;">
           <div class="pricing-price" id="price-premium" style="color:#fff;">15.90<span style="font-size:22px;">€</span></div>
         </div>
         <div class="pricing-period" id="period-premium" style="color:rgba(255,255,255,.5);">par mois · facturé annuellement</div>
         <div class="pricing-desc" style="color:rgba(255,255,255,.65);">Pour les PME et utilisateurs avancés qui veulent automatiser toute leur gestion.</div>
-        <div class="pricing-divider" style="background:rgba(255,255,255,.12);"></div>
+        <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li style="color:rgba(255,255,255,.85);">Tout le plan Plus</li>
           <li style="color:rgba(255,255,255,.85);">IA avancée</li>
@@ -1680,9 +1734,9 @@ function toggleBillingVitrine() {
   const dot = document.getElementById('toggle-dot-v');
   const lblM = document.getElementById('lbl-monthly');
   const lblA = document.getElementById('lbl-annual');
-  dot.style.transform = isAnnualV ? 'translateX(0)' : 'translateX(20px)';
-  lblM.style.fontWeight = isAnnualV ? '500' : '700'; lblM.style.color = isAnnualV ? 'var(--muted)' : 'var(--ink)';
-  lblA.style.fontWeight = isAnnualV ? '700' : '500'; lblA.style.color = isAnnualV ? 'var(--ink)' : 'var(--muted)';
+  dot.style.transform = isAnnualV ? 'translateX(20px)' : 'translateX(0)';
+  lblM.style.fontWeight = isAnnualV ? '500' : '700'; lblM.style.color = isAnnualV ? 'rgba(255,255,255,.54)' : '#fff8eb';
+  lblA.style.fontWeight = isAnnualV ? '700' : '500'; lblA.style.color = isAnnualV ? '#fff8eb' : 'rgba(255,255,255,.54)';
   ['plus','premium'].forEach(p => {
     const prEl = document.getElementById('price-'+p);
     const ntEl = document.getElementById('period-'+p);
