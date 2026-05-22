@@ -143,23 +143,38 @@ body {
   color: var(--gr);
   margin-bottom: 1.75rem;
 }
+.luno-logo {
+  display: inline-flex; align-items: center; gap: .55rem;
+}
+.luno-mark {
+  width: 34px; height: 34px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--gr), #8df0c8 52%, var(--bl) 100%);
+  position: relative; flex-shrink: 0;
+  box-shadow: 0 10px 24px rgba(29,158,117,.24);
+}
+.luno-mark::before {
+  content: '';
+  position: absolute; inset: 8px;
+  border: 2px solid white; border-radius: 50%;
+}
+.luno-mark::after {
+  content: '';
+  position: absolute; width: 8px; height: 8px; right: 6px; top: 6px;
+  border-radius: 50%; background: white;
+}
 .luno-wordmark {
-  display: inline-flex; align-items: center;
   font-family: var(--font);
   font-weight: 850;
-  letter-spacing: .16em;
+  letter-spacing: .1em;
   line-height: 1;
   color: var(--gr);
   text-transform: uppercase;
 }
-.luno-wordmark .luno-o {
-  width: .48em; height: .48em; margin-left: .08em;
-  border: 2px solid currentColor; border-radius: 50%;
-  box-shadow: inset 0 0 0 3px var(--gr3);
-  color: transparent;
-  overflow: hidden;
-}
-.luno-wordmark-sm { font-size: 15px; letter-spacing: .14em; }
+.luno-logo-sm { gap: .42rem; }
+.luno-logo-sm .luno-mark { width: 24px; height: 24px; border-radius: 8px; }
+.luno-logo-sm .luno-mark::before { inset: 6px; border-width: 1.5px; }
+.luno-logo-sm .luno-mark::after { width: 5px; height: 5px; right: 4px; top: 4px; }
+.luno-wordmark-sm { font-size: 15px; letter-spacing: .09em; }
 
 /* Segmented control — iOS style */
 .atabs {
@@ -768,7 +783,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
   </div>
   <div class="auth-box">
     <div class="auth-logo">
-      <span class="luno-wordmark" aria-label="LUNO">LUN<span class="luno-o">O</span></span>
+      <span class="luno-logo" aria-label="LUNO"><span class="luno-mark" aria-hidden="true"></span><span class="luno-wordmark">LUNO</span></span>
     </div>
     <div class="atabs">
       <div class="atab on" onclick="aTab('login',this)">Connexion</div>
@@ -906,7 +921,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
   <div id="sub-banner" style="display:none;"></div>
   <div class="topbar">
     <div class="t-logo">
-      <span class="luno-wordmark luno-wordmark-sm" aria-label="LUNO">LUN<span class="luno-o">O</span></span>
+      <span class="luno-logo luno-logo-sm" aria-label="LUNO"><span class="luno-mark" aria-hidden="true"></span><span class="luno-wordmark luno-wordmark-sm">LUNO</span></span>
     </div>
     <!-- Mode indicator -->
     <div id="mode-indicator" style="display:none;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;margin-left:6px;"></div>
@@ -9710,7 +9725,7 @@ function renderOnboarding(){
   if(!root) return;
   root.innerHTML = `
   <div class="onb-wrap">
-    <div class="onb-logo"><span class="luno-wordmark" aria-label="LUNO">LUN<span class="luno-o">O</span></span></div>
+    <div class="onb-logo"><span class="luno-logo" aria-label="LUNO"><span class="luno-mark" aria-hidden="true"></span><span class="luno-wordmark">LUNO</span></span></div>
     <div class="onb-steps" id="onb-steps">${_onbStepDots()}</div>
     <div class="onb-card" id="onb-card">${_onbStepContent()}</div>
   </div>`;
