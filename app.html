@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>ComptaPME Pro</title>
+<title>LUNO</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════════════
-   ComptaPME Pro — Design System
+   LUNO — Design System
    Premium SaaS · iOS-inspired clarity · macOS material language
 ═══════════════════════════════════════════════════════════════ */
 :root {
@@ -140,21 +140,26 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
   color: var(--gr);
   margin-bottom: 1.75rem;
 }
-.auth-logo-mark {
-  width: 40px; height: 40px;
-  background: linear-gradient(135deg, var(--gr), var(--gr2));
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px;
-  box-shadow: 0 4px 12px rgba(29,158,117,.30);
+.luno-wordmark {
+  display: inline-flex; align-items: center;
+  font-family: var(--font);
+  font-weight: 850;
+  letter-spacing: .16em;
+  line-height: 1;
+  color: var(--gr);
+  text-transform: uppercase;
 }
+.luno-wordmark .luno-o {
+  width: .48em; height: .48em; margin-left: .08em;
+  border: 2px solid currentColor; border-radius: 50%;
+  box-shadow: inset 0 0 0 3px var(--gr3);
+  color: transparent;
+  overflow: hidden;
+}
+.luno-wordmark-sm { font-size: 15px; letter-spacing: .14em; }
 
 /* Segmented control — iOS style */
 .atabs {
@@ -284,18 +289,7 @@ body {
   position: relative; z-index: 50;
 }
 .t-logo {
-  font-size: 15px; font-weight: 700;
-  letter-spacing: -.4px;
-  color: var(--tx0);
   display: flex; align-items: center; gap: 9px;
-}
-.t-logo-icon {
-  width: 28px; height: 28px;
-  background: linear-gradient(135deg, var(--gr), var(--gr2));
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(29,158,117,.25);
 }
 .t-sp { flex: 1; }
 .t-user {
@@ -774,8 +768,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
   </div>
   <div class="auth-box">
     <div class="auth-logo">
-      <div class="auth-logo-mark">📒</div>
-      ComptaPME Pro
+      <span class="luno-wordmark" aria-label="LUNO">LUN<span class="luno-o">O</span></span>
     </div>
     <div class="atabs">
       <div class="atab on" onclick="aTab('login',this)">Connexion</div>
@@ -784,10 +777,10 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
     <!-- LOGIN -->
     <div id="al-login">
       <div class="aerr" id="lerr"></div>
-      <div class="afield"><label>Email</label><input id="l-email" type="email" value="demo@comptapme.fr"></div>
+      <div class="afield"><label>Email</label><input id="l-email" type="email" value="demo@luno.fr"></div>
       <div class="afield"><label>Mot de passe</label><input id="l-pwd" type="password" value="demo1234"></div>
       <button class="abtn" onclick="doLogin()">Se connecter →</button>
-      <div class="ahint">Compte démo : demo@comptapme.fr / demo1234</div>
+      <div class="ahint">Compte démo : demo@luno.fr / demo1234</div>
     </div>
     <!-- REGISTER -->
     <div id="al-reg" style="display:none;">
@@ -913,8 +906,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
   <div id="sub-banner" style="display:none;"></div>
   <div class="topbar">
     <div class="t-logo">
-      <div class="t-logo-icon">📒</div>
-      ComptaPME Pro
+      <span class="luno-wordmark luno-wordmark-sm" aria-label="LUNO">LUN<span class="luno-o">O</span></span>
     </div>
     <!-- Mode indicator -->
     <div id="mode-indicator" style="display:none;font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;margin-left:6px;"></div>
@@ -1423,7 +1415,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
         <div style="margin-bottom:1rem;">
           <div style="font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:.35rem;">CLÉ API (production)</div>
           <div style="display:flex;gap:6px;">
-            <input id="api-key-prod" type="password" value="cpme_live_sk_a1b2c3d4e5f6g7h8i9j0" readonly style="font-family:monospace;font-size:11px;background:var(--bg1);">
+            <input id="api-key-prod" type="password" value="luno_live_sk_a1b2c3d4e5f6g7h8i9j0" readonly style="font-family:monospace;font-size:11px;background:var(--bg1);">
             <button class="btn btn-sm" onclick="revealApiKey('api-key-prod')">👁</button>
             <button class="btn btn-sm" onclick="copyToClipboard('api-key-prod')">📋</button>
           </div>
@@ -1431,7 +1423,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
         <div style="margin-bottom:1rem;">
           <div style="font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:.35rem;">CLÉ API (test / sandbox)</div>
           <div style="display:flex;gap:6px;">
-            <input id="api-key-test" type="password" value="cpme_test_sk_z9y8x7w6v5u4t3s2r1q0" readonly style="font-family:monospace;font-size:11px;background:var(--bg1);">
+            <input id="api-key-test" type="password" value="luno_test_sk_z9y8x7w6v5u4t3s2r1q0" readonly style="font-family:monospace;font-size:11px;background:var(--bg1);">
             <button class="btn btn-sm" onclick="revealApiKey('api-key-test')">👁</button>
             <button class="btn btn-sm" onclick="copyToClipboard('api-key-test')">📋</button>
           </div>
@@ -1459,7 +1451,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
     <div class="ch">🔗 Webhooks</div>
     <div style="padding:.85rem 1rem;">
       <div style="display:flex;gap:6px;margin-bottom:.75rem;">
-        <input type="url" id="webhook-url" placeholder="https://votre-app.fr/webhook/comptapme" style="font-size:12px;">
+        <input type="url" id="webhook-url" placeholder="https://votre-app.fr/webhook/luno" style="font-size:12px;">
         <button class="btn btn-gr btn-sm" onclick="saveWebhook()">Enregistrer</button>
       </div>
       <div id="webhook-list"></div>
@@ -1731,7 +1723,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
       <div style="padding:.85rem 1rem;">
         <p style="font-size:12px;color:var(--tx2);margin-bottom:.75rem;">Partagez ce lien avec votre client pour qu'il accède à son espace sécurisé : documents, factures, messages.</p>
         <div style="display:flex;gap:6px;">
-          <input type="text" id="portail-url" value="https://app.comptapme.fr/portail/[code-client]" readonly style="font-size:11px;font-family:monospace;background:var(--bg1);">
+          <input type="text" id="portail-url" value="https://app.luno.fr/portail/[code-client]" readonly style="font-size:11px;font-family:monospace;background:var(--bg1);">
           <button class="btn btn-sm" onclick="copyPortailUrl()">📋 Copier</button>
         </div>
       </div>
@@ -2124,8 +2116,8 @@ const PLANS={
 };
 function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||'null');}catch{return null;}}
 function lsSet(k,v){localStorage.setItem(k,JSON.stringify(v));}
-function getUsers(){return lsGet('cpme_users')||[];}
-function saveUsers(u){lsSet('cpme_users',u);}
+function getUsers(){return lsGet('luno_users')||[];}
+function saveUsers(u){lsSet('luno_users',u);}
 function findUser(email){return getUsers().find(u=>u.email===email.toLowerCase().trim())||null;}
 function getStatus(user){
   const now=Date.now();
@@ -2137,8 +2129,8 @@ function getStatus(user){
 }
 function initDemoAccounts(){
   const now=Date.now();let users=getUsers();
-  if(!users.find(u=>u.email==='demo@comptapme.fr'))
-    users.push({email:'demo@comptapme.fr',pwd:'demo1234',prenom:'Sophie',nom:'Dupuis',
+  if(!users.find(u=>u.email==='demo@luno.fr'))
+    users.push({email:'demo@luno.fr',pwd:'demo1234',prenom:'Sophie',nom:'Dupuis',
       societe:'Demo SAS',plan:'pro',paidUntil:now+25*86400000,
       trialEnd:now-1,trialUsed:true,createdAt:now-5*86400000,
       profile:'entreprise',uiMode:'avance',data:{}});
@@ -2162,9 +2154,9 @@ let me=null;
 // ══ BOOT : vérifié session dès le chargement ══
 function bootApp(){
   initDemoAccounts();
-  const session=lsGet('cpme_session');
+  const session=lsGet('luno_session');
   if(!session){showAuthForm();return;}
-  if(Date.now()-session.ts>7*24*60*60*1000){localStorage.removeItem('cpme_session');showAuthForm();return;}
+  if(Date.now()-session.ts>7*24*60*60*1000){localStorage.removeItem('luno_session');showAuthForm();return;}
   const user=findUser(session.email);
   if(!user){showAuthForm();return;}
   const status=getStatus(user);
@@ -2213,7 +2205,7 @@ function launchApp(user,status){
   setTimeout(applySidebarLocks, 80);
   setTimeout(()=>{ if(typeof backupHistory!=='undefined'&&backupHistory.length===0) createAutoSave(); }, 150);
   renderDash();
-  if(typeof cpmeOnboardingInit==='function') cpmeOnboardingInit(user);
+  if(typeof lunoOnboardingInit==='function') lunoOnboardingInit(user);
 }
 
 function loadUserData(email){
@@ -2240,7 +2232,7 @@ function persistUserData(){
 function doLogout(){
   if(me) persistUserData();
   addH('auth','Déconnexion','inf');
-  localStorage.removeItem('cpme_session');
+  localStorage.removeItem('luno_session');
   me=null;
   E('app-wrap').style.display='none';
   const wall=document.getElementById('paywall-screen');if(wall) wall.style.display='none';
@@ -2327,7 +2319,7 @@ function bypassSirenApp(){
 
 
 // ╔══════════════════════════════════════════════════════════════╗
-// ║   SYSTÈME DE DROITS PAR PLAN — ComptaPME Pro                ║
+// ║   SYSTÈME DE DROITS PAR PLAN — LUNO                ║
 // ║   Définit précisément ce que chaque plan peut faire          ║
 // ╚══════════════════════════════════════════════════════════════╝
 
@@ -3048,7 +3040,7 @@ function renderApi() {
 }
 
 function testEndpoint(method, path) {
-  const key = E('api-key-test')?.value || 'cpme_test_sk_...';
+  const key = E('api-key-test')?.value || 'luno_test_sk_...';
   const responses = {
     '/v1/factures': JSON.stringify({data: factures.slice(0,2).map(f=>({id:'fac_'+f.num,num:f.num,ht:f.ht,ttc:f.ttc,statut:f.st})), meta:{total:factures.length}}, null, 2),
     '/v1/clients':  JSON.stringify({data: clients.slice(0,2).map(c=>({id:'cli_'+c.nom,nom:c.nom,email:c.email})), meta:{total:clients.length}}, null, 2),
@@ -3077,8 +3069,8 @@ function regenerateApiKey() {
   const rnd = n => Array.from({length:n},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
   const prodEl = E('api-key-prod');
   const testEl = E('api-key-test');
-  if (prodEl) prodEl.value = 'cpme_live_sk_' + rnd(20);
-  if (testEl) testEl.value = 'cpme_test_sk_' + rnd(20);
+  if (prodEl) prodEl.value = 'luno_live_sk_' + rnd(20);
+  if (testEl) testEl.value = 'luno_test_sk_' + rnd(20);
   notif('🔄 Clés API régénérées');
   addH('client','Clés API régénérées','wa');
 }
@@ -3208,7 +3200,7 @@ function doLogin(){
   if(!user||user.pwd!==pwd){E('lerr').textContent='Email ou mot de passe incorrect.';E('lerr').style.display='block';return;}
   E('lerr').style.display='none';
   const status=getStatus(user);
-  lsSet('cpme_session',{email:user.email,ts:Date.now()});
+  lsSet('luno_session',{email:user.email,ts:Date.now()});
   if(status.type==='blocked'){me=user;showPaywall(user);return;}
   me=user;launchApp(user,status);
 }
@@ -3242,7 +3234,7 @@ function doRegister(){
     data:{}
   };
   const users=getUsers(); users.push(newUser); saveUsers(users);
-  lsSet('cpme_session',{email:newUser.email,ts:now});
+  lsSet('luno_session',{email:newUser.email,ts:now});
   me=newUser; launchApp(newUser,getStatus(newUser));
 }
 
@@ -3289,7 +3281,7 @@ function showPaywall(user){
         </button>
         <div style="font-size:12px;color:var(--tx2);margin-bottom:1rem;">Paiement sécurisé via Stripe · Sans engagement · Annulable à tout moment</div>
         <div style="display:flex;gap:1.5rem;justify-content:center;font-size:13px;">
-          <a href="comptapme_vitrine.html" style="color:var(--tx2);text-decoration:none;">← Retour au site</a>
+          <a href="/" style="color:var(--tx2);text-decoration:none;">← Retour au site</a>
           <a href="#" onclick="doLogout();return false;" style="color:var(--tx2);text-decoration:none;">Changer de compte</a>
         </div>
       </div>
@@ -3315,7 +3307,7 @@ function doPaywall(email){
     if(idx!==-1){
       const now=Date.now();
       users[idx].plan=selectedPlan;users[idx].paidUntil=now+30*24*60*60*1000;users[idx].blocked=false;
-      saveUsers(users);lsSet('cpme_session',{email,ts:now});me=users[idx];
+      saveUsers(users);lsSet('luno_session',{email,ts:now});me=users[idx];
     }
     const wall=document.getElementById('paywall-screen');if(wall) wall.style.display='none';
     launchApp(me,getStatus(me));
@@ -3463,7 +3455,7 @@ function imprimerDevis(i){
   <table><thead><tr><th>Description</th><th style="text-align:right;">HT</th><th style="text-align:right;">TVA ${d.tva}%</th><th style="text-align:right;">TTC</th></tr></thead>
   <tbody><tr><td>${d.desc||'Prestation'}</td><td style="text-align:right;">${fmtN(d.ht)} €</td><td style="text-align:right;">${fmtN(d.ht*d.tva/100)} €</td><td style="text-align:right;font-weight:bold;">${fmtN(d.ttc)} €</td></tr></tbody>
   <tfoot><tr class="tot"><td>TOTAL</td><td style="text-align:right;">${fmtN(d.ht)} €</td><td style="text-align:right;">${fmtN(d.ht*d.tva/100)} €</td><td style="text-align:right;">${fmtN(d.ttc)} €</td></tr></tfoot></table>
-  <p style="margin-top:2rem;font-size:11px;color:#999;">Valable jusqu'au ${d.val} — ComptaPME Pro</p></body></html>`);
+  <p style="margin-top:2rem;font-size:11px;color:#999;">Valable jusqu'au ${d.val} — LUNO</p></body></html>`);
   w.document.close();w.print();addH('export','Impression devis '+d.num,'inf');
 }
 function renderDevis(){
@@ -3506,7 +3498,7 @@ function printFacIdx(i){
   <table><thead style="background:#f6f6f4;"><tr><th style="text-align:left;">Description</th><th style="text-align:right;">HT</th><th style="text-align:right;">TVA (${f.tva}%)</th><th style="text-align:right;">TTC</th></tr></thead>
   <tbody><tr><td>${f.desc||'Prestation de services'}</td><td style="text-align:right;">${fmtN(f.ht)} €</td><td style="text-align:right;">${fmtN(f.tvaA)} €</td><td style="text-align:right;font-weight:bold;">${fmtN(f.ttc)} €</td></tr></tbody>
   <tfoot><tr class="tot"><td>TOTAL</td><td style="text-align:right;">${fmtN(f.ht)} €</td><td style="text-align:right;">${fmtN(f.tvaA)} €</td><td style="text-align:right;color:#1D9E75;">${fmtN(f.ttc)} €</td></tr></tfoot></table>
-  <p style="margin-top:3rem;font-size:11px;color:#aaa;text-align:center;">Généré par ComptaPME Pro · ${new Date().toLocaleDateString('fr-FR')} · TVA non applicable selon l'article 293B du CGI (si applicable)</p></body></html>`);
+  <p style="margin-top:3rem;font-size:11px;color:#aaa;text-align:center;">Généré par LUNO · ${new Date().toLocaleDateString('fr-FR')} · TVA non applicable selon l'article 293B du CGI (si applicable)</p></body></html>`);
   w.document.close();w.print();
 }
 function renderFactures(){
@@ -3635,7 +3627,7 @@ function printBilan(){
   addH('export','Impression bilan & résultat','inf');
   const w=window.open('','_blank');
   w.document.write(`<html><head><title>Bilan ${yr}</title><style>body{font-family:sans-serif;padding:2rem;font-size:13px;max-width:700px;margin:auto;}h1{color:#1D9E75;}h3{margin:1.5rem 0 .5rem;border-bottom:1px solid #ccc;padding-bottom:.25rem;}table{width:100%;border-collapse:collapse;}td{padding:5px 8px;border-bottom:1px solid #eee;}.tot{font-weight:bold;border-top:2px solid #1D9E75;background:#f6f6f4;}.pos{color:green;}.neg{color:red;}</style></head><body>
-  <h1>📒 ComptaPME Pro — Bilan & Résultat</h1><p style="color:#888;">Exercice ${yr} · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p>
+  <h1>LUNO — Bilan & Résultat</h1><p style="color:#888;">Exercice ${yr} · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p>
   <h3>Compte de résultat</h3>
   <table><tr><td>Total produits d'exploitation</td><td style="text-align:right;">${fmt(pr)}</td></tr><tr><td>Total charges d'exploitation</td><td style="text-align:right;color:red;">– ${fmt(ch)}</td></tr><tr class="tot"><td>Résultat net de l'exercice</td><td style="text-align:right;" class="${res>=0?'pos':'neg'}">${fmt(res)}</td></tr></table>
   <h3>Soldes intermédiaires</h3>
@@ -3730,7 +3722,7 @@ function printPaie(nom,mois,brut,net,cs,pat){
   <tr class="tot"><td>Net à payer</td><td style="text-align:right;color:green;">${net.toFixed(2)} €</td></tr>
   <tr style="margin-top:1rem;"><td style="color:#888;">Charges patronales</td><td style="text-align:right;color:#888;">${pat.toFixed(2)} €</td></tr>
   <tr class="tot"><td>Coût total employeur</td><td style="text-align:right;">${(brut+pat).toFixed(2)} €</td></tr></table>
-  <p style="margin-top:2rem;font-size:11px;color:#aaa;">ComptaPME Pro · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p></body></html>`);
+  <p style="margin-top:2rem;font-size:11px;color:#aaa;">LUNO · ${me?.societe||''} · ${new Date().toLocaleDateString('fr-FR')}</p></body></html>`);
   w.document.close();w.print();
 }
 
@@ -3760,7 +3752,7 @@ function getDB(){return{v:'4.0',date:new Date().toISOString(),user:me?.email,soc
 function exportSauvegarde(){
   const db=getDB();
   const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`comptapme_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`luno_${new Date().toISOString().slice(0,10)}.json`;a.click();
   addH('export','Sauvegarde exportée','ok');notif('Sauvegarde téléchargée ✓');createAutoSave();
 }
 function importSauvegarde(evt){
@@ -3788,7 +3780,7 @@ function renderSauvegarde(){
 
 
 // ══════════════════════════════════════════════════════════════
-//  SYSTÈME DE MODULES & PROFILS — ComptaPME Pro
+//  SYSTÈME DE MODULES & PROFILS — LUNO
 //  Couche d'adaptation multi-profil (Entreprise / Cabinet)
 //  ⚠ Ne modifie pas les données existantes, uniquement l'UI
 // ══════════════════════════════════════════════════════════════
@@ -4443,7 +4435,7 @@ document.head.appendChild(cabStyle);
 <div class="onb-panel" id="onb-panel">
   <button class="onb-x" onclick="onbToggle()" aria-label="Fermer">×</button>
   <div class="onb-head">
-    <div class="onb-title">Bienvenue dans ComptaPME Pro 👋</div>
+    <div class="onb-title">Bienvenue dans LUNO 👋</div>
     <div class="onb-sub">Lancez-vous en 5 étapes — environ 3 min.</div>
     <div class="onb-progress"><div class="onb-bar" id="onb-bar"></div></div>
   </div>
@@ -4487,14 +4479,14 @@ document.head.appendChild(cabStyle);
   // ─ Helper : récupère le user courant depuis localStorage (let me=null pas exposé sur window) ─
   function currentUser(){
     try {
-      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      const s = JSON.parse(localStorage.getItem('luno_session')||'null');
       if(!s) return null;
-      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
       return us.find(u => u.email === s.email) || null;
     } catch(e){ return null; }
   }
 
-  function key(){ const u = currentUser(); return 'cpme_onboarding_' + (u ? u.email : 'anon'); }
+  function key(){ const u = currentUser(); return 'luno_onboarding_' + (u ? u.email : 'anon'); }
   function get(){ return Object.assign({company:false,client:false,invoice:false,logo:false,tva:false,dismissed:false}, JSON.parse(localStorage.getItem(key())||'null') || {}); }
   function set(s){ localStorage.setItem(key(), JSON.stringify(s)); }
   function countDone(s){ return STEPS.filter(st => s[st.id]).length; }
@@ -4589,9 +4581,9 @@ document.head.appendChild(cabStyle);
     if(!pendingLogo){ alert('Choisissez une image'); return; }
     const u = currentUser();
     if(u){
-      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
       const idx = us.findIndex(x => x.email === u.email);
-      if(idx >= 0){ us[idx].logo = pendingLogo; localStorage.setItem('cpme_users', JSON.stringify(us)); }
+      if(idx >= 0){ us[idx].logo = pendingLogo; localStorage.setItem('luno_users', JSON.stringify(us)); }
     }
     if(typeof closeOv==='function') closeOv('ov-onb-logo');
     mark('logo');
@@ -4607,9 +4599,9 @@ document.head.appendChild(cabStyle);
     };
     const u = currentUser();
     if(u){
-      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
       const idx = us.findIndex(x => x.email === u.email);
-      if(idx >= 0){ us[idx].tva = cfg; localStorage.setItem('cpme_users', JSON.stringify(us)); }
+      if(idx >= 0){ us[idx].tva = cfg; localStorage.setItem('luno_users', JSON.stringify(us)); }
     }
     if(typeof closeOv==='function') closeOv('ov-onb-tva');
     mark('tva');
@@ -4629,7 +4621,7 @@ document.head.appendChild(cabStyle);
   wrap('saveClient',  function(){ mark('client');  });
   wrap('saveFac',     function(){ mark('invoice'); });
 
-  window.cpmeOnboardingInit = function(user){
+  window.lunoOnboardingInit = function(user){
     user = user || currentUser();
     const s = get();
     if(user && user.logo) s.logo = true;
@@ -4645,14 +4637,14 @@ document.head.appendChild(cabStyle);
   };
 
   // Auto-bootstrap : launchApp peut avoir déjà tourné AVANT que mon script soit parsé
-  function selfBoot(){ const u = currentUser(); if(u) window.cpmeOnboardingInit(u); else render(); }
+  function selfBoot(){ const u = currentUser(); if(u) window.lunoOnboardingInit(u); else render(); }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', () => setTimeout(selfBoot, 250));
   } else {
     setTimeout(selfBoot, 100);
   }
   // Hook launchApp pour les logins ultérieurs (depuis le formulaire)
-  setTimeout(() => wrap('launchApp', function(user){ try { window.cpmeOnboardingInit(user); } catch(e){} }), 50);
+  setTimeout(() => wrap('launchApp', function(user){ try { window.lunoOnboardingInit(user); } catch(e){} }), 50);
 })();
 </script>
 
@@ -4822,7 +4814,7 @@ document.head.appendChild(cabStyle);
   </div>
   <div class="ux-help-section">
     <h4>Besoin d'aide ?</h4>
-    <div style="font-size:12px;color:var(--tx1,#62604b);">📧 <a href="mailto:hello@comptapme.fr" style="color:var(--gr,#1D9E75);">hello@comptapme.fr</a></div>
+    <div style="font-size:12px;color:var(--tx1,#62604b);">📧 <a href="mailto:hello@luno.fr" style="color:var(--gr,#1D9E75);">hello@luno.fr</a></div>
     <div style="font-size:12px;color:var(--tx1,#62604b);margin-top:.25rem;">⏱ Réponse sous 24 h ouvrées</div>
   </div>
 </div>
@@ -4844,9 +4836,9 @@ document.head.appendChild(cabStyle);
   // ═══════ HELPERS ═══════
   function currentUser(){
     try {
-      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      const s = JSON.parse(localStorage.getItem('luno_session')||'null');
       if(!s) return null;
-      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
       return us.find(u => u.email === s.email) || null;
     } catch(e){ return null; }
   }
@@ -5038,7 +5030,7 @@ document.head.appendChild(cabStyle);
     {id:'banque',        ttl:'Trésorerie / Banque', ico:'🏦'},
     {id:'salaries',      ttl:'Salariés',            ico:'👔'},
     {id:'journal',       ttl:'Journal général',     ico:'📚'},
-    {id:'plan',          ttl:'Plan comptable',      ico:'📒'},
+    {id:'plan',          ttl:'Plan comptable',      ico:''},
     {id:'tva',           ttl:'% TVA',               ico:'%'},
     {id:'bilan',         ttl:'Bilan & Résultat',    ico:'📈'},
     {id:'treso',         ttl:'Trésorerie',          ico:'💰'},
@@ -5295,7 +5287,7 @@ tbody tr:only-child td[colspan]::before{
 #ac-tbl   tbody tr:only-child td[colspan]::before{ content:'🧾'; }
 #sal-tbl  tbody tr:only-child td[colspan]::before{ content:'👔'; }
 #j-tbl    tbody tr:only-child td[colspan]::before{ content:'📚'; }
-#plan-tbl tbody tr:only-child td[colspan]::before{ content:'📒'; }
+#plan-tbl tbody tr:only-child td[colspan]::before{ content:''; }
 #tr-tbl   tbody tr:only-child td[colspan]::before{ content:'💰'; }
 /* Fallback générique */
 tbody tr:only-child td[colspan]:not([data-emptyset])::before{ content:'📭'; }
@@ -5437,9 +5429,9 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
   // ════════ HELPER ════════
   function curUser(){
     try {
-      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      const s = JSON.parse(localStorage.getItem('luno_session')||'null');
       if(!s) return null;
-      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
       return us.find(u => u.email === s.email) || null;
     } catch(e){ return null; }
   }
@@ -5449,7 +5441,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
   // Sur openOv(), si un brouillon existe, on propose la restauration via une bannière.
   // Sur save réussi (saveClient/saveFac/etc.), on clear le brouillon.
 
-  const DRAFT_PREFIX = 'cpme_draft_';
+  const DRAFT_PREFIX = 'luno_draft_';
   let draftDebounce = null;
 
   function draftKey(ovId){ const u = curUser(); return DRAFT_PREFIX + (u?u.email:'anon') + '_' + ovId; }
@@ -5577,7 +5569,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
   ];
   let tourIdx = 0;
 
-  function tourKey(){ const u = curUser(); return 'cpme_tour_done_' + (u?u.email:'anon'); }
+  function tourKey(){ const u = curUser(); return 'luno_tour_done_' + (u?u.email:'anon'); }
   function tourShouldRun(){
     if(!curUser()) return false;
     if(localStorage.getItem(tourKey())) return false;
@@ -5691,7 +5683,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
     ocr:         { tier:'plus', title:'OCR & Reconnaissance IA', sub:'Photographiez une facture, on extrait tout. Le scan papier devient une donnée comptable en 1 clic.', bullets:['Photo → écriture comptable','Multi-format (PDF, image)','Détection automatique TVA, total, fournisseur','50 documents/mois inclus'] },
     analytics:   { tier:'premium', title:'Analytics avancé', sub:'Tableaux de bord détaillés, prévisions de trésorerie, KPIs métier. Pilotez votre activité avec précision.', bullets:['Prévisions de trésorerie à 90 jours','KPI par client, produit, période','Comparaisons multi-exercices','Export Excel automatisé'] },
     'multi-company': { tier:'premium', title:'Multi-entreprises', sub:'Gérez plusieurs sociétés en un seul abonnement. Idéal pour les holdings et groupes.', bullets:['Jusqu\'à 5 entreprises','Vue consolidée','Bascule rapide entre dossiers','TVA et bilans séparés'] },
-    api:         { tier:'premium', title:'API publique', sub:'Connectez ComptaPME à votre stack. Webhooks, REST, lecture/écriture sécurisée.', bullets:['REST API complète','Webhooks événements','Tokens scoped','Documentation interactive'] },
+    api:         { tier:'premium', title:'API publique', sub:'Connectez LUNO à votre stack. Webhooks, REST, lecture/écriture sécurisée.', bullets:['REST API complète','Webhooks événements','Tokens scoped','Documentation interactive'] },
     'sauvegarde-avancee': { tier:'premium', title:'Sauvegardes avancées', sub:'Continuité d\'activité maximale. Vos données protégées avec une rétention longue durée.', bullets:['Rétention 1 an minimum','Sauvegardes chiffrées multi-régions','Restauration ponctuelle','Audit complet'] }
   };
   const PRICES = {
@@ -5897,7 +5889,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
       <div class="ux-settings-section" id="ux-sec-documents">
         <div class="fld">
           <label>En-tête personnalisé (visible sur les factures et devis PDF)</label>
-          <textarea id="ux-doc-header" rows="3" placeholder="ComptaPME Pro\n123 rue de la République, 75001 Paris\nSIRET 123 456 789 00012"></textarea>
+          <textarea id="ux-doc-header" rows="3" placeholder="LUNO\n123 rue de la République, 75001 Paris\nSIRET 123 456 789 00012"></textarea>
         </div>
         <div class="fld">
           <label>Mention de pied de page (facultative)</label>
@@ -5983,17 +5975,17 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
   // ════════ HELPERS (reprises de V1/V2) ════════
   function curUser(){
     try {
-      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      const s = JSON.parse(localStorage.getItem('luno_session')||'null');
       if(!s) return null;
-      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
       return us.find(u => u.email === s.email) || null;
     } catch(e){ return null; }
   }
   function saveUserField(field, value){
     const u = curUser(); if(!u) return;
-    const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+    const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
     const i = us.findIndex(x => x.email === u.email);
-    if(i >= 0){ us[i][field] = value; localStorage.setItem('cpme_users', JSON.stringify(us)); }
+    if(i >= 0){ us[i][field] = value; localStorage.setItem('luno_users', JSON.stringify(us)); }
   }
 
   // ════════ 1. SWITCHER ENTREPRISE (toolbar) ════════
@@ -6412,9 +6404,9 @@ body.has-brand .sc-v[style*="color:var(--gr)"], body.has-brand .sc-v[style*="col
   // ════════ HELPER ════════
   function curUser(){
     try {
-      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      const s = JSON.parse(localStorage.getItem('luno_session')||'null');
       if(!s) return null;
-      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
       return us.find(u => u.email === s.email) || null;
     } catch(e){ return null; }
   }
@@ -6696,9 +6688,9 @@ body.has-brand .sc-v[style*="color:var(--gr)"], body.has-brand .sc-v[style*="col
 (function(){
   function curUser(){
     try {
-      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      const s = JSON.parse(localStorage.getItem('luno_session')||'null');
       if(!s) return null;
-      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
       return us.find(u => u.email === s.email) || null;
     } catch(e){ return null; }
   }
@@ -6863,7 +6855,7 @@ body.has-brand .sc-v[style*="color:var(--gr)"], body.has-brand .sc-v[style*="col
           '<td style="text-align:right;">' + fmtNumber(f.ttc) + ' ' + sym + '</td></tr></tfoot>' +
       '</table>' +
       footerHtml +
-      '<div style="margin-top:2.5rem;font-size:10px;color:#aaa;text-align:center;">Document généré par ComptaPME Pro · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
+      '<div style="margin-top:2.5rem;font-size:10px;color:#aaa;text-align:center;">Document généré par LUNO · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
       '</body></html>';
   }
   // Override printFacIdx — toujours utiliser le nouveau template (qui fallback proprement si pas de settings)
@@ -6949,7 +6941,7 @@ body.has-brand .sc-v[style*="color:var(--gr)"], body.has-brand .sc-v[style*="col
   setInterval(injectExportBtns, 2000);
 
   // ════════ 4. SEARCH HISTORY (Ctrl+K) ════════
-  const RECENT_KEY = 'cpme_recent_searches';
+  const RECENT_KEY = 'luno_recent_searches';
   function recentGet(){ try { return JSON.parse(localStorage.getItem(RECENT_KEY)||'[]'); } catch(e){ return []; } }
   function recentPush(q){
     if(!q || q.length < 2) return;
@@ -7114,9 +7106,9 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
 (function(){
   function curUser(){
     try {
-      const s = JSON.parse(localStorage.getItem('cpme_session')||'null');
+      const s = JSON.parse(localStorage.getItem('luno_session')||'null');
       if(!s) return null;
-      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
       return us.find(u => u.email === s.email) || null;
     } catch(e){ return null; }
   }
@@ -7196,7 +7188,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
       '</table>' +
       '<div class="valid">⏳ <strong>Validité de l\'offre</strong> : ce devis est valable jusqu\'au ' + escHtml(d.val) + '. Pour accepter, retournez-le signé avec la mention « Bon pour accord ».</div>' +
       footerHtml +
-      '<div style="margin-top:2rem;font-size:10px;color:#aaa;text-align:center;">Document généré par ComptaPME Pro · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
+      '<div style="margin-top:2rem;font-size:10px;color:#aaa;text-align:center;">Document généré par LUNO · ' + new Date().toLocaleDateString('fr-FR') + '</div>' +
       '</body></html>';
   }
   const origImpDevis = window.imprimerDevis;
@@ -7601,7 +7593,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: false,
-        storageKey: 'cpme_sb_auth'
+        storageKey: 'luno_sb_auth'
       }
     });
     console.log('[Supabase] Client initialisé');
@@ -7660,7 +7652,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         if(!email || !pwd){ if(errEl){ errEl.textContent='Email et mot de passe requis.'; errEl.style.display='block'; } return; }
 
         // Comptes démo → fallback localStorage (pour ne pas casser les comptes de test existants)
-        if(email === 'demo@comptapme.fr' || email === 'test@test.fr' || email.includes('demo')){
+        if(email === 'demo@luno.fr' || email === 'test@test.fr' || email.includes('demo')){
           return origLogin.apply(this, arguments);
         }
 
@@ -7806,14 +7798,14 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         trialEnds: sub && sub.trial_ends_at,
         data: {} // sera rempli en V8 (sync clients/factures)
       };
-      // Cache dans cpme_users pour que le système legacy ait accès
-      const us = JSON.parse(localStorage.getItem('cpme_users')||'[]');
+      // Cache dans luno_users pour que le système legacy ait accès
+      const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
       const idx = us.findIndex(u => u.email === legacyUser.email);
       if(idx >= 0) us[idx] = Object.assign(us[idx], legacyUser);
       else us.push(legacyUser);
-      localStorage.setItem('cpme_users', JSON.stringify(us));
+      localStorage.setItem('luno_users', JSON.stringify(us));
       // Crée la session legacy
-      localStorage.setItem('cpme_session', JSON.stringify({ email: legacyUser.email, ts: Date.now() }));
+      localStorage.setItem('luno_session', JSON.stringify({ email: legacyUser.email, ts: Date.now() }));
       // Lance launchApp via bootApp
       if(typeof bootApp === 'function'){
         setTimeout(bootApp, 100);
@@ -7831,7 +7823,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
   });
 
   // Helpers globaux pour V8/V9
-  window.cpmeSb = {
+  window.lunoSb = {
     client: () => window.sb,
     isAuth: async () => { const { data: { session } } = await window.sb.auth.getSession(); return !!session; },
     user:   async () => { const { data: { user } } = await window.sb.auth.getUser(); return user; },
@@ -9532,7 +9524,7 @@ function renderAbonnement(){
             <div style="margin-top:8px;font-size:13px;color:${plan.color};font-weight:600;">
               ⏳ ${status.daysLeft} jour(s) d'essai restant${status.daysLeft>1?'s':''}
             </div>
-            <div style="font-size:12px;color:var(--tx2);margin-top:4px;">Après l'essai, choisissez un plan payant pour continuer à utiliser LUNO SUITE.</div>` :
+            <div style="font-size:12px;color:var(--tx2);margin-top:4px;">Après l'essai, choisissez un plan payant pour continuer à utiliser LUNO.</div>` :
           status.type==='paid' ? `
             <div style="margin-top:8px;font-size:13px;color:var(--gr);font-weight:600;">✓ Actif — renouvellement dans ${status.daysLeft} jour(s)</div>` :
           `<div style="margin-top:8px;font-size:13px;color:var(--rd);font-weight:600;">⚠ Abonnement expiré — choisissez un plan ci-dessous</div>`}
@@ -9686,12 +9678,12 @@ function aboProceedCheckout(plan, billing){
     window.location.href = link;
   } else {
     // Mode démo — simuler activation locale
-    const stored = JSON.parse(localStorage.getItem('cpme_user') || '{}');
+    const stored = JSON.parse(localStorage.getItem('luno_user') || '{}');
     stored.plan = plan;
     stored.plan_billing = billing;
     stored.plan_activated = new Date().toISOString();
     stored.trial_end = null;
-    localStorage.setItem('cpme_user', JSON.stringify(stored));
+    localStorage.setItem('luno_user', JSON.stringify(stored));
     if(typeof me !== 'undefined' && me){ me.plan = plan; me.plan_billing = billing; }
     if(typeof notif === 'function') notif('✅ Plan ' + (PLAN_DETAILS[plan]?.label || plan) + ' activé (mode démo) !');
     setTimeout(() => nav('abonnement'), 400);
@@ -9718,7 +9710,7 @@ function renderOnboarding(){
   if(!root) return;
   root.innerHTML = `
   <div class="onb-wrap">
-    <div class="onb-logo">🌙 <span style="font-weight:700;letter-spacing:-0.5px;">LUNO</span> <span style="font-weight:300;opacity:.6;">Suite</span></div>
+    <div class="onb-logo"><span class="luno-wordmark" aria-label="LUNO">LUN<span class="luno-o">O</span></span></div>
     <div class="onb-steps" id="onb-steps">${_onbStepDots()}</div>
     <div class="onb-card" id="onb-card">${_onbStepContent()}</div>
   </div>`;
@@ -9815,7 +9807,7 @@ function _onbStep2(){
 function _onbStep3(){
   return `
   <div class="onb-step-title">Créez votre compte</div>
-  <div class="onb-step-sub">Votre accès personnel à LUNO Suite</div>
+  <div class="onb-step-sub">Votre accès personnel à LUNO</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;">
     <div class="form-group">
       <label class="form-label">Prénom *</label>
@@ -10008,8 +10000,8 @@ async function onbFinish(){
     }
 
     // 3 — Stocker contexte local
-    localStorage.setItem('cpme_onb_complete', '1');
-    localStorage.setItem('cpme_onb_plan', onbData.plan);
+    localStorage.setItem('luno_onb_complete', '1');
+    localStorage.setItem('luno_onb_plan', onbData.plan);
 
     if(typeof notif==='function') notif('🎉 Compte créé ! Vérifiez votre email pour confirmer.');
     // Show confirmation message in card

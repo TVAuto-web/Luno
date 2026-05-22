@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ComptaPME Pro — Gestion comptable pour PME</title>
+<title>LUNO — Gestion comptable pour PME</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -48,11 +48,26 @@ nav {
   transition: all .3s;
 }
 .nav-logo {
-  font-family: 'Instrument Serif', serif;
-  font-size: 22px; color: var(--gold-light); letter-spacing: -.3px;
   display: flex; align-items: center; gap: 8px; text-decoration: none;
 }
-.nav-logo span { font-size: 22px; }
+.luno-wordmark {
+  display: inline-flex; align-items: center;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 800;
+  letter-spacing: .16em;
+  line-height: 1;
+  color: var(--gold-light);
+  text-transform: uppercase;
+}
+.luno-wordmark .luno-o {
+  width: .46em; height: .46em; margin-left: .08em;
+  border: 2px solid currentColor; border-radius: 50%;
+  box-shadow: inset 0 0 0 3px rgba(211,162,64,.18);
+  color: transparent;
+  overflow: hidden;
+}
+.luno-wordmark-sm { font-size: 13px; letter-spacing: .14em; }
+.luno-wordmark-dark { color: var(--sage); }
 .nav-links { display: flex; gap: 2rem; margin: 0 auto; list-style: none; }
 .nav-links a { text-decoration: none; color: rgba(255,255,255,.62); font-size: 14px; font-weight: 500; transition: color .2s; }
 .nav-links a:hover { color: #fff; }
@@ -410,7 +425,7 @@ section { padding: 100px 2rem; background: var(--paper); }
   max-height: 90vh; overflow-y: auto;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.modal-logo { font-family: 'Instrument Serif', serif; font-size: 20px; color: var(--sage); margin-bottom: .25rem; }
+.modal-logo { margin-bottom: .45rem; }
 .modal-sub { font-size: 14px; color: var(--muted); margin-bottom: 2rem; }
 .modal-tabs { display: flex; background: var(--cream); border-radius: var(--rs); padding: 4px; margin-bottom: 1.5rem; }
 .modal-tab {
@@ -475,7 +490,7 @@ footer {
   padding: 60px 2rem 40px;
 }
 .footer-grid { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
-.footer-brand { font-family: 'Instrument Serif', serif; font-size: 20px; color: var(--sage-light); margin-bottom: .75rem; }
+.footer-brand { margin-bottom: .75rem; }
 .footer-tagline { font-size: 14px; line-height: 1.6; }
 .footer-col h4 { font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 1rem; }
 .footer-col a { display: block; color: rgba(255,255,255,.55); font-size: 14px; margin-bottom: .5rem; text-decoration: none; transition: color .2s; }
@@ -531,7 +546,7 @@ footer {
 
 <!-- ══ NAV ══ -->
 <nav>
-  <a href="/" class="nav-logo"><span>📒</span> ComptaPME Pro</a>
+  <a href="/" class="nav-logo"><span class="luno-wordmark">LUN<span class="luno-o">O</span></span></a>
   <ul class="nav-links">
     <li><a href="#features">Fonctionnalités</a></li>
     <li><a href="#pourquoi">Pourquoi nous</a></li>
@@ -561,7 +576,7 @@ footer {
       <div class="avatar-pill" style="background:#e8e5dc;">TC</div>
       <div class="avatar-pill" style="background:#d4ede6;">AB</div>
     </div>
-    <span>+2 400 PME font leur comptabilité avec ComptaPME Pro</span>
+    <span>+2 400 PME font leur comptabilité avec LUNO</span>
   </div>
 
   <!-- APP PREVIEW -->
@@ -573,11 +588,11 @@ footer {
           <span style="background:#febc2e;"></span>
           <span style="background:#28c840;"></span>
         </div>
-        <div class="preview-url">📒 app.comptapme.fr/dashboard</div>
+        <div class="preview-url">app.luno.fr/dashboard</div>
       </div>
       <div class="preview-body">
         <div class="preview-sidebar">
-          <div class="ps-logo">📒 ComptaPME Pro</div>
+          <div class="ps-logo"><span class="luno-wordmark luno-wordmark-sm luno-wordmark-dark">LUN<span class="luno-o">O</span></span></div>
           <div class="ps-section">Général</div>
           <div class="ps-item on">📊 Tableau de bord</div>
           <div class="ps-item">🕐 Historique</div>
@@ -708,7 +723,7 @@ footer {
 <section id="pourquoi">
   <div class="container">
     <div class="reveal">
-      <div class="section-tag">✦ Pourquoi ComptaPME Pro</div>
+      <div class="section-tag">✦ Pourquoi LUNO</div>
       <h2 class="section-title">Ce qui nous rend <em>vraiment différents</em></h2>
     </div>
     <div class="why-grid reveal">
@@ -746,7 +761,7 @@ footer {
         <div class="ct-header">
           <span>Fonctionnalité</span>
           <span>Concurrents</span>
-          <span class="hl">ComptaPME Pro</span>
+          <span class="hl">LUNO</span>
         </div>
         <div class="ct-row"><span>Facturation & devis</span><span class="ct-check">✓</span><span class="ct-check" style="color:var(--sage);">✓</span></div>
         <div class="ct-row hl-row"><span>Comptabilité PCG</span><span class="ct-cross">✗ (option payante)</span><span class="ct-check" style="color:var(--sage);">✓ inclus</span></div>
@@ -888,7 +903,7 @@ footer {
           Dois-je avoir des connaissances en comptabilité ?
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a"><div class="faq-a-inner">Non. ComptaPME Pro est conçu pour être utilisé par des dirigeants, gérants et entrepreneurs sans formation comptable spécifique. Les écritures comptables de base (ventes, achats, salaires) sont pré-configurées. Vous pouvez tout de même saisir des écritures manuelles si vous le souhaitez.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Non. LUNO est conçu pour être utilisé par des dirigeants, gérants et entrepreneurs sans formation comptable spécifique. Les écritures comptables de base (ventes, achats, salaires) sont pré-configurées. Vous pouvez tout de même saisir des écritures manuelles si vous le souhaitez.</div></div>
       </div>
 
       <div class="faq-item">
@@ -896,7 +911,7 @@ footer {
           Le logiciel est-il conforme à la législation française ?
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a"><div class="faq-a-inner">ComptaPME Pro utilise le Plan Comptable Général (PCG) français, les taux de TVA en vigueur (20%, 10%, 5,5%, 0%), et les cotisations sociales conformes aux barèmes de l'URSSAF. Il est adapté aux SARL, SAS, EURL et entreprises individuelles. Nous mettons régulièrement à jour les paramètres légaux.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">LUNO utilise le Plan Comptable Général (PCG) français, les taux de TVA en vigueur (20%, 10%, 5,5%, 0%), et les cotisations sociales conformes aux barèmes de l'URSSAF. Il est adapté aux SARL, SAS, EURL et entreprises individuelles. Nous mettons régulièrement à jour les paramètres légaux.</div></div>
       </div>
 
       <div class="faq-item">
@@ -920,7 +935,7 @@ footer {
           Puis-je remplacer mon expert-comptable avec ce logiciel ?
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-a"><div class="faq-a-inner">ComptaPME Pro vous permet de tenir votre comptabilité courante en toute autonomie (factures, TVA, journal, bilan). Pour les déclarations fiscales complexes (liasse fiscale, IS, DSN salariés), nous recommandons de conserver un expert-comptable en supervision. Le logiciel facilite néanmoins grandement la collaboration — vous lui transmettez vos exports et il gagne du temps.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">LUNO vous permet de tenir votre comptabilité courante en toute autonomie (factures, TVA, journal, bilan). Pour les déclarations fiscales complexes (liasse fiscale, IS, DSN salariés), nous recommandons de conserver un expert-comptable en supervision. Le logiciel facilite néanmoins grandement la collaboration — vous lui transmettez vos exports et il gagne du temps.</div></div>
       </div>
 
       <div class="faq-item">
@@ -959,7 +974,7 @@ footer {
 <footer>
   <div class="footer-grid">
     <div>
-      <div class="footer-brand">📒 ComptaPME Pro</div>
+      <div class="footer-brand"><span class="luno-wordmark">LUN<span class="luno-o">O</span></span></div>
       <p class="footer-tagline">La comptabilité enfin simple pour les PME françaises. Factures, TVA, bilan, paie — tout en un.</p>
     </div>
     <div class="footer-col">
@@ -979,13 +994,13 @@ footer {
     </div>
     <div class="footer-col">
       <h4>Contact</h4>
-      <a href="mailto:hello@comptapme.fr">hello@comptapme.fr</a>
+      <a href="mailto:hello@luno.fr">hello@luno.fr</a>
       <a href="#" onclick="openLegal('support');return false;">Support</a>
       <a href="#" onclick="openLegal('documentation');return false;">Documentation</a>
     </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2025 ComptaPME Pro SAS — Tous droits réservés</span>
+    <span>© 2025 LUNO SAS — Tous droits réservés</span>
     <span>
       <a href="#" onclick="openLegal('mentions');return false;">Mentions légales</a> ·
       <a href="#" onclick="openLegal('confidentialite');return false;">Confidentialité</a> ·
@@ -1007,7 +1022,7 @@ footer {
 <div class="modal-bg" id="auth-modal" onclick="closeModal(event)">
   <div class="modal-box">
     <button class="modal-close" onclick="document.getElementById('auth-modal').classList.remove('open')">✕</button>
-    <div class="modal-logo">📒 ComptaPME Pro</div>
+    <div class="modal-logo"><span class="luno-wordmark luno-wordmark-dark">LUN<span class="luno-o">O</span></span></div>
     <div class="modal-sub" id="modal-sub">Accédez à votre espace comptabilité</div>
 
     <div class="modal-tabs">
@@ -1037,7 +1052,7 @@ footer {
         Pas encore de compte ? <a href="#" onclick="switchTab('register');return false;" style="color:var(--sage);font-weight:600;">Créer un compte gratuit</a>
       </div>
       <div style="margin-top:1rem;text-align:center;font-size:12px;color:var(--muted);">
-        Compte démo : <strong>demo@comptapme.fr</strong> / <strong>demo1234</strong>
+        Compte démo : <strong>demo@luno.fr</strong> / <strong>demo1234</strong>
       </div>
     </div>
 
@@ -1253,7 +1268,7 @@ footer {
 
 <script>
 // ══════════════════════════════════════════════════════
-//  ComptaPME Pro — Système d'authentification (vitrine)
+//  LUNO — Système d'authentification (vitrine)
 //  Partage de données avec l'app via localStorage
 // ══════════════════════════════════════════════════════
 
@@ -1266,8 +1281,8 @@ const PLANS = {
 
 function lsGet(k)    { try { return JSON.parse(localStorage.getItem(k)||'null'); } catch{ return null; } }
 function lsSet(k,v)  { localStorage.setItem(k, JSON.stringify(v)); }
-function getUsers()  { return lsGet('cpme_users') || []; }
-function saveUsers(u){ lsSet('cpme_users', u); }
+function getUsers()  { return lsGet('luno_users') || []; }
+function saveUsers(u){ lsSet('luno_users', u); }
 function findUser(email){ return getUsers().find(u=>u.email===email.toLowerCase().trim())||null; }
 
 function getStatus(user) {
@@ -1283,8 +1298,8 @@ function getStatus(user) {
 function initDemo() {
   const now = Date.now();
   let users = getUsers();
-  if (!users.find(u=>u.email==='demo@comptapme.fr')) {
-    users.push({ email:'demo@comptapme.fr', pwd:'demo1234', prenom:'Sophie', nom:'Dupuis',
+  if (!users.find(u=>u.email==='demo@luno.fr')) {
+    users.push({ email:'demo@luno.fr', pwd:'demo1234', prenom:'Sophie', nom:'Dupuis',
       societe:'Demo SAS', plan:'pro', paidUntil: now+25*86400000,
       trialEnd: now-1, trialUsed:true, createdAt: now-5*86400000, data:{} });
   }
@@ -1339,7 +1354,7 @@ function doLogin() {
   const status = getStatus(user);
 
   // Écrire la session dans localStorage
-  lsSet('cpme_session', { email: user.email, ts: Date.now() });
+  lsSet('luno_session', { email: user.email, ts: Date.now() });
 
   if (status.type === 'blocked') {
     // Essai expiré → afficher mur de paiement dans la modale
@@ -1664,7 +1679,7 @@ function doRegister() {
   };
 
   const users = getUsers(); users.push(newUser); saveUsers(users);
-  lsSet('cpme_session', { email: newUser.email, ts: now });
+  lsSet('luno_session', { email: newUser.email, ts: now });
   showOk(`🎉 Bienvenue ${prenom} ! Votre essai gratuit de 15 jours démarre maintenant.`);
   setTimeout(() => { window.location.href = '/app'; }, 1200);
 }
@@ -1723,7 +1738,7 @@ function simulatePay(email) {
   users[idx].paidUntil = now + 30 * 24 * 60 * 60 * 1000; // +30 jours
   users[idx].blocked   = false;
   saveUsers(users);
-  lsSet('cpme_session', { email, ts: now });
+  lsSet('luno_session', { email, ts: now });
 
   const box = document.getElementById('auth-modal').querySelector('.modal-box');
   box.innerHTML = `
@@ -1820,10 +1835,10 @@ const LEGAL = {
     title: 'Mentions légales',
     date: 'En vigueur au 1er janvier 2025',
     html: `
-      <div class="highlight-box"><p>Conformément à la loi n° 2004-575 du 21 juin 2004 pour la Confiance en l'économie numérique (LCEN), voici les informations légales relatives au site <strong>comptapme.fr</strong>.</p></div>
+      <div class="highlight-box"><p>Conformément à la loi n° 2004-575 du 21 juin 2004 pour la Confiance en l'économie numérique (LCEN), voici les informations légales relatives au site <strong>luno.fr</strong>.</p></div>
       <h2>1. Éditeur du site</h2>
       <ul>
-        <li><strong>Raison sociale :</strong> ComptaPME Pro SAS</li>
+        <li><strong>Raison sociale :</strong> LUNO SAS</li>
         <li><strong>Capital social :</strong> 10 000 €</li>
         <li><strong>Siège social :</strong> 12 rue de la Paix, 75001 Paris, France</li>
         <li><strong>SIREN :</strong> 123 456 789</li>
@@ -1831,7 +1846,7 @@ const LEGAL = {
         <li><strong>RCS :</strong> Paris B 123 456 789</li>
         <li><strong>N° TVA intracommunautaire :</strong> FR12 123456789</li>
         <li><strong>Directeur de la publication :</strong> Sophie Dupuis, Présidente</li>
-        <li><strong>Email :</strong> <a href="mailto:hello@comptapme.fr">hello@comptapme.fr</a></li>
+        <li><strong>Email :</strong> <a href="mailto:hello@luno.fr">hello@luno.fr</a></li>
         <li><strong>Téléphone :</strong> +33 (0)1 42 00 00 00</li>
       </ul>
       <h2>2. Hébergement</h2>
@@ -1842,9 +1857,9 @@ const LEGAL = {
         <li><strong>Site web :</strong> <a href="https://www.ovh.com" target="_blank">www.ovh.com</a></li>
       </ul>
       <h2>3. Propriété intellectuelle</h2>
-      <p>L'ensemble du contenu du site comptapme.fr (textes, images, logiciels, marques, logos) est protégé par le droit de la propriété intellectuelle. La marque <strong>ComptaPME Pro®</strong> est déposée à l'INPI sous le n° 4512387. Toute reproduction, même partielle, est strictement interdite sans autorisation écrite préalable de ComptaPME Pro SAS.</p>
+      <p>L'ensemble du contenu du site luno.fr (textes, images, logiciels, marques, logos) est protégé par le droit de la propriété intellectuelle. La marque <strong>LUNO®</strong> est déposée à l'INPI sous le n° 4512387. Toute reproduction, même partielle, est strictement interdite sans autorisation écrite préalable de LUNO SAS.</p>
       <h2>4. Limitation de responsabilité</h2>
-      <p>ComptaPME Pro SAS s'efforce d'assurer l'exactitude des informations publiées sur le site, sans pouvoir garantir leur exhaustivité. Les informations présentes sur ce site sont fournies à titre indicatif et ne constituent pas un conseil comptable, fiscal ou juridique. Pour toute décision comptable ou fiscale, nous vous recommandons de consulter un expert-comptable agréé.</p>
+      <p>LUNO SAS s'efforce d'assurer l'exactitude des informations publiées sur le site, sans pouvoir garantir leur exhaustivité. Les informations présentes sur ce site sont fournies à titre indicatif et ne constituent pas un conseil comptable, fiscal ou juridique. Pour toute décision comptable ou fiscale, nous vous recommandons de consulter un expert-comptable agréé.</p>
       <h2>5. Médiation de la consommation</h2>
       <p>En cas de litige, vous pouvez recourir gratuitement au Médiateur du Commerce Électronique (FEVAD), 60 rue La Boétie, 75008 Paris — <a href="https://www.mediateurfevad.fr" target="_blank">www.mediateurfevad.fr</a>. Vous pouvez également utiliser la plateforme européenne de règlement des litiges en ligne : <a href="https://ec.europa.eu/odr" target="_blank">ec.europa.eu/odr</a>.</p>
       <h2>6. Droit applicable</h2>
@@ -1854,14 +1869,14 @@ const LEGAL = {
     title: "Conditions Générales d'Utilisation (CGU)",
     date: 'Version 2.1 — En vigueur au 1er janvier 2025',
     html: `
-      <div class="highlight-box"><p>En créant un compte et en utilisant le service ComptaPME Pro, vous acceptez sans réserve les présentes Conditions Générales d'Utilisation. Veuillez les lire attentivement avant de vous inscrire.</p></div>
+      <div class="highlight-box"><p>En créant un compte et en utilisant le service LUNO, vous acceptez sans réserve les présentes Conditions Générales d'Utilisation. Veuillez les lire attentivement avant de vous inscrire.</p></div>
       <h2>1. Objet et champ d'application</h2>
-      <p>Les présentes CGU régissent l'accès et l'utilisation du service de gestion comptable en ligne <strong>ComptaPME Pro</strong>, édité par ComptaPME Pro SAS (ci-après « l'Éditeur »), accessible à l'adresse comptapme.fr. Elles s'appliquent à tout utilisateur (ci-après « l'Utilisateur ») qui accède au service, quel que soit le support utilisé.</p>
+      <p>Les présentes CGU régissent l'accès et l'utilisation du service de gestion comptable en ligne <strong>LUNO</strong>, édité par LUNO SAS (ci-après « l'Éditeur »), accessible à l'adresse luno.fr. Elles s'appliquent à tout utilisateur (ci-après « l'Utilisateur ») qui accède au service, quel que soit le support utilisé.</p>
       <h2>2. Création de compte et accès</h2>
       <h3>2.1 Conditions d'inscription</h3>
       <p>L'accès au service requiert la création d'un compte personnel. L'Utilisateur doit être une personne physique majeure ou une personne morale représentée par un représentant légal habilité, et fournir des informations exactes, complètes et à jour.</p>
       <h3>2.2 Sécurité du compte</h3>
-      <p>L'Utilisateur est seul responsable de la confidentialité de ses identifiants. Il s'engage à ne pas les communiquer à des tiers et à notifier immédiatement l'Éditeur de tout accès non autorisé à l'adresse <a href="mailto:security@comptapme.fr">security@comptapme.fr</a>.</p>
+      <p>L'Utilisateur est seul responsable de la confidentialité de ses identifiants. Il s'engage à ne pas les communiquer à des tiers et à notifier immédiatement l'Éditeur de tout accès non autorisé à l'adresse <a href="mailto:security@luno.fr">security@luno.fr</a>.</p>
       <h3>2.3 Essai gratuit</h3>
       <p>Chaque nouveau compte bénéficie d'un essai gratuit de <strong>15 jours</strong> sans engagement ni carte bancaire, donnant accès à l'ensemble des fonctionnalités du plan Pro. À l'issue de cet essai, aucun prélèvement automatique n'est effectué.</p>
       <h2>3. Obligations de l'Utilisateur</h2>
@@ -1879,13 +1894,13 @@ const LEGAL = {
       <h2>5. Propriété des données</h2>
       <p>L'Utilisateur demeure propriétaire de l'intégralité de ses données comptables et commerciales. L'Éditeur n'exploite pas ces données à des fins commerciales et ne les cède jamais à des tiers. L'Utilisateur peut exporter l'intégralité de ses données à tout moment au format JSON ou CSV.</p>
       <h2>6. Propriété intellectuelle du service</h2>
-      <p>Le logiciel ComptaPME Pro, son interface, ses algorithmes et son code source sont la propriété exclusive de ComptaPME Pro SAS, protégés par le droit d'auteur. L'abonnement confère un droit d'usage personnel, non exclusif et non transférable.</p>
+      <p>Le logiciel LUNO, son interface, ses algorithmes et son code source sont la propriété exclusive de LUNO SAS, protégés par le droit d'auteur. L'abonnement confère un droit d'usage personnel, non exclusif et non transférable.</p>
       <h2>7. Modifications du service et des CGU</h2>
       <p>L'Éditeur peut faire évoluer le service et les présentes CGU. Les Utilisateurs sont informés des modifications substantielles par email avec un préavis de <strong>30 jours</strong>. La poursuite de l'utilisation du service vaut acceptation des nouvelles conditions.</p>
       <h2>8. Résiliation</h2>
       <p>L'Utilisateur peut résilier son abonnement à tout moment depuis son espace client, sans frais. La résiliation prend effet à la fin de la période en cours. Les données sont conservées en lecture seule pendant <strong>90 jours</strong> après résiliation, puis supprimées définitivement.</p>
       <h2>9. Responsabilité</h2>
-      <p>ComptaPME Pro SAS est un outil d'aide à la gestion comptable et ne se substitue pas à un expert-comptable agréé. La responsabilité de l'Éditeur ne saurait être engagée pour des erreurs de saisie de l'Utilisateur ou pour des décisions prises sur la base des données du logiciel. La responsabilité totale de l'Éditeur est limitée au montant de l'abonnement mensuel en cours.</p>
+      <p>LUNO SAS est un outil d'aide à la gestion comptable et ne se substitue pas à un expert-comptable agréé. La responsabilité de l'Éditeur ne saurait être engagée pour des erreurs de saisie de l'Utilisateur ou pour des décisions prises sur la base des données du logiciel. La responsabilité totale de l'Éditeur est limitée au montant de l'abonnement mensuel en cours.</p>
       <h2>10. Droit applicable et juridiction</h2>
       <p>Les présentes CGU sont soumises au droit français. En cas de litige, et après tentative de résolution amiable, les tribunaux compétents sont ceux du ressort de la Cour d'appel de Paris.</p>`
   },
@@ -1893,7 +1908,7 @@ const LEGAL = {
     title: 'Conditions Générales de Vente (CGV)',
     date: 'Version 1.4 — En vigueur au 1er janvier 2025',
     html: `
-      <div class="highlight-box"><p>Les présentes CGV s'appliquent à toute souscription d'un abonnement au service ComptaPME Pro. Elles prévalent sur tout autre document, sauf accord écrit contraire.</p></div>
+      <div class="highlight-box"><p>Les présentes CGV s'appliquent à toute souscription d'un abonnement au service LUNO. Elles prévalent sur tout autre document, sauf accord écrit contraire.</p></div>
       <h2>1. Plans et tarifs</h2>
       <table>
         <thead><tr><th>Plan</th><th>Mensuel HT</th><th>Annuel HT</th><th>Utilisateurs</th></tr></thead>
@@ -1917,12 +1932,12 @@ const LEGAL = {
         <li>Prélèvement SEPA — abonnement annuel uniquement</li>
         <li>Virement bancaire — plan Entreprise uniquement, sous 30 jours</li>
       </ul>
-      <p>Les transactions sont sécurisées par Stripe (certifié PCI-DSS niveau 1). ComptaPME Pro SAS ne conserve jamais vos coordonnées bancaires.</p>
+      <p>Les transactions sont sécurisées par Stripe (certifié PCI-DSS niveau 1). LUNO SAS ne conserve jamais vos coordonnées bancaires.</p>
       <h3>3.4 Retard de paiement</h3>
       <p>En cas de retard de paiement, l'accès au service est suspendu après 7 jours et une pénalité de retard est applicable au taux légal en vigueur, conformément à la loi n° 92-1442 du 31 décembre 1992.</p>
       <h2>4. Droit de rétractation</h2>
       <p>Conformément à l'article L. 221-18 du Code de la consommation, vous disposez d'un délai de <strong>14 jours calendaires</strong> à compter de la souscription pour exercer votre droit de rétractation, sans avoir à justifier de motifs ni à payer de pénalités.</p>
-      <p>Pour exercer ce droit, adressez un email à <a href="mailto:hello@comptapme.fr">hello@comptapme.fr</a> avec l'objet « Rétractation — [votre email] ». Le remboursement est effectué dans les 14 jours suivant la réception de votre demande.</p>
+      <p>Pour exercer ce droit, adressez un email à <a href="mailto:hello@luno.fr">hello@luno.fr</a> avec l'objet « Rétractation — [votre email] ». Le remboursement est effectué dans les 14 jours suivant la réception de votre demande.</p>
       <h2>5. Renouvellement et résiliation</h2>
       <p>Les abonnements sont reconduits tacitement à chaque échéance. L'Utilisateur peut résilier à tout moment depuis son espace client. La résiliation prend effet à la fin de la période en cours, sans remboursement prorata temporis (sauf rétractation dans le délai légal de 14 jours).</p>
       <h2>6. Changement de plan</h2>
@@ -1932,10 +1947,10 @@ const LEGAL = {
     title: 'Politique de confidentialité',
     date: 'Conforme RGPD (UE) 2016/679 — Mise à jour le 1er janvier 2025',
     html: `
-      <div class="highlight-box"><p>La protection de vos données personnelles est une priorité absolue pour ComptaPME Pro SAS. Cette politique explique de façon transparente comment nous collectons, utilisons et protégeons vos informations, conformément au Règlement Général sur la Protection des Données (RGPD).</p></div>
+      <div class="highlight-box"><p>La protection de vos données personnelles est une priorité absolue pour LUNO SAS. Cette politique explique de façon transparente comment nous collectons, utilisons et protégeons vos informations, conformément au Règlement Général sur la Protection des Données (RGPD).</p></div>
       <h2>1. Responsable du traitement</h2>
-      <p><strong>ComptaPME Pro SAS</strong> — 12 rue de la Paix, 75001 Paris<br>
-      DPO (Délégué à la Protection des Données) : <a href="mailto:dpo@comptapme.fr">dpo@comptapme.fr</a></p>
+      <p><strong>LUNO SAS</strong> — 12 rue de la Paix, 75001 Paris<br>
+      DPO (Délégué à la Protection des Données) : <a href="mailto:dpo@luno.fr">dpo@luno.fr</a></p>
       <h2>2. Données collectées</h2>
       <h3>2.1 Données de compte</h3>
       <ul>
@@ -1945,7 +1960,7 @@ const LEGAL = {
         <li>Adresse IP et logs de connexion (sécurité)</li>
       </ul>
       <h3>2.2 Données métier (saisies dans le logiciel)</h3>
-      <p>Les informations comptables et commerciales que vous saisissez (clients, factures, salariés, écritures, etc.) restent votre propriété exclusive. Elles ne sont jamais analysées, vendues ou exploitées par ComptaPME Pro SAS à des fins commerciales.</p>
+      <p>Les informations comptables et commerciales que vous saisissez (clients, factures, salariés, écritures, etc.) restent votre propriété exclusive. Elles ne sont jamais analysées, vendues ou exploitées par LUNO SAS à des fins commerciales.</p>
       <h3>2.3 Données de navigation (anonymisées)</h3>
       <ul>
         <li>Pages consultées, durée de session, fonctionnalités utilisées</li>
@@ -1975,7 +1990,7 @@ const LEGAL = {
         <li><strong>Limitation</strong> — demander la suspension temporaire d'un traitement</li>
         <li><strong>Retrait du consentement</strong> — à tout moment pour les traitements fondés sur le consentement</li>
       </ul>
-      <p>Pour exercer ces droits : <a href="mailto:dpo@comptapme.fr">dpo@comptapme.fr</a>. Réponse sous 30 jours. En cas de désaccord, vous pouvez saisir la <strong>CNIL</strong> : <a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a> ou 3 place de Fontenoy, 75007 Paris.</p>
+      <p>Pour exercer ces droits : <a href="mailto:dpo@luno.fr">dpo@luno.fr</a>. Réponse sous 30 jours. En cas de désaccord, vous pouvez saisir la <strong>CNIL</strong> : <a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a> ou 3 place de Fontenoy, 75007 Paris.</p>
       <h2>5. Sécurité des données</h2>
       <ul>
         <li>Chiffrement en transit : TLS 1.3 (HTTPS obligatoire)</li>
@@ -2002,7 +2017,7 @@ const LEGAL = {
     title: 'Politique de gestion des cookies',
     date: 'Conforme à la directive ePrivacy — Mise à jour le 1er janvier 2025',
     html: `
-      <div class="highlight-box"><p>Conformément aux recommandations de la CNIL (délibération n° 2020-091 du 17 septembre 2020), nous vous informons de façon transparente sur les cookies utilisés sur <strong>comptapme.fr</strong> et vous donnons un contrôle effectif sur leur dépôt.</p></div>
+      <div class="highlight-box"><p>Conformément aux recommandations de la CNIL (délibération n° 2020-091 du 17 septembre 2020), nous vous informons de façon transparente sur les cookies utilisés sur <strong>luno.fr</strong> et vous donnons un contrôle effectif sur leur dépôt.</p></div>
       <h2>1. Qu'est-ce qu'un cookie ?</h2>
       <p>Un cookie est un petit fichier texte déposé sur votre terminal lors de la visite d'un site web. Il permet de mémoriser des informations relatives à votre navigation et de vous offrir une expérience personnalisée. Les cookies ne peuvent pas exécuter de programmes ni contenir de virus.</p>
       <h2>2. Cookies strictement nécessaires</h2>
@@ -2024,7 +2039,7 @@ const LEGAL = {
         <tbody>
           <tr><td><code>_ga</code></td><td>Google Analytics</td><td>Identifiant utilisateur anonyme</td><td>13 mois</td></tr>
           <tr><td><code>_gid</code></td><td>Google Analytics</td><td>Session anonyme</td><td>24 heures</td></tr>
-          <tr><td><code>_cpme_analytics</code></td><td>ComptaPME Pro</td><td>Mesure d'usage interne anonymisée</td><td>30 jours</td></tr>
+          <tr><td><code>_luno_analytics</code></td><td>LUNO</td><td>Mesure d'usage interne anonymisée</td><td>30 jours</td></tr>
         </tbody>
       </table>
       <h2>4. Cookies de personnalisation (soumis à consentement)</h2>
@@ -2049,7 +2064,7 @@ const LEGAL = {
   },
   support: {
     title: 'Support client',
-    date: 'ComptaPME Pro — Centre d\'aide',
+    date: 'LUNO — Centre d\'aide',
     html: `
       <h2>📩 Contactez notre équipe</h2>
       <p>Notre équipe est basée en France et disponible pour répondre à toutes vos questions techniques, de facturation ou d'utilisation du logiciel.</p>
@@ -2063,11 +2078,11 @@ const LEGAL = {
       </table>
       <h2>📧 Adresses de contact</h2>
       <ul>
-        <li><strong>Support technique :</strong> <a href="mailto:support@comptapme.fr">support@comptapme.fr</a></li>
-        <li><strong>Facturation & abonnement :</strong> <a href="mailto:billing@comptapme.fr">billing@comptapme.fr</a></li>
-        <li><strong>Données personnelles (DPO) :</strong> <a href="mailto:dpo@comptapme.fr">dpo@comptapme.fr</a></li>
-        <li><strong>Partenariats :</strong> <a href="mailto:partnerships@comptapme.fr">partnerships@comptapme.fr</a></li>
-        <li><strong>Presse :</strong> <a href="mailto:press@comptapme.fr">press@comptapme.fr</a></li>
+        <li><strong>Support technique :</strong> <a href="mailto:support@luno.fr">support@luno.fr</a></li>
+        <li><strong>Facturation & abonnement :</strong> <a href="mailto:billing@luno.fr">billing@luno.fr</a></li>
+        <li><strong>Données personnelles (DPO) :</strong> <a href="mailto:dpo@luno.fr">dpo@luno.fr</a></li>
+        <li><strong>Partenariats :</strong> <a href="mailto:partnerships@luno.fr">partnerships@luno.fr</a></li>
+        <li><strong>Presse :</strong> <a href="mailto:press@luno.fr">press@luno.fr</a></li>
       </ul>
       <h2>🕐 Horaires du support</h2>
       <ul>
@@ -2087,15 +2102,15 @@ const LEGAL = {
         <li>Changelog des mises à jour produit</li>
       </ul>
       <h2>🎓 Formation & onboarding</h2>
-      <p>Le plan Entreprise inclut une session d'onboarding personnalisée de 2h avec un expert ComptaPME Pro, réalisée par visioconférence. Des formations complémentaires sont disponibles pour tous les plans sur devis (250 € HT / session d'1h).</p>
+      <p>Le plan Entreprise inclut une session d'onboarding personnalisée de 2h avec un expert LUNO, réalisée par visioconférence. Des formations complémentaires sont disponibles pour tous les plans sur devis (250 € HT / session d'1h).</p>
       <h2>💬 Satisfaction client</h2>
       <p>Nous mesurons régulièrement la satisfaction de nos utilisateurs. Notre NPS (Net Promoter Score) actuel est de <strong>+72</strong>. 94% des tickets de support reçoivent une réponse dans le délai garanti.</p>`
   },
   documentation: {
     title: 'Documentation',
-    date: 'ComptaPME Pro — Guide utilisateur v4.0',
+    date: 'LUNO — Guide utilisateur v4.0',
     html: `
-      <div class="highlight-box"><p>Bienvenue dans la documentation de ComptaPME Pro. Ce guide couvre l'ensemble des fonctionnalités du logiciel, du démarrage rapide aux fonctionnalités avancées.</p></div>
+      <div class="highlight-box"><p>Bienvenue dans la documentation de LUNO. Ce guide couvre l'ensemble des fonctionnalités du logiciel, du démarrage rapide aux fonctionnalités avancées.</p></div>
       <h2>🚀 Démarrage rapide (5 minutes)</h2>
       <ul>
         <li><strong>Étape 1</strong> — Créer votre compte (30 secondes, sans carte bancaire)</li>
@@ -2160,7 +2175,7 @@ const LEGAL = {
         <li>Exporter chaque module séparément en CSV</li>
       </ul>
       <h2>🔗 Collaboration avec votre expert-comptable</h2>
-      <p>ComptaPME Pro facilite la collaboration avec votre expert-comptable. Exportez votre journal au format FEC (Fichier des Écritures Comptables), conforme à l'article A.47 A-1 du Livre des Procédures Fiscales. Ce fichier est importable directement dans les logiciels professionnels (Sage, Cegid, Quadratus, etc.), ce qui réduit significativement son temps de travail — et donc votre facture.</p>`
+      <p>LUNO facilite la collaboration avec votre expert-comptable. Exportez votre journal au format FEC (Fichier des Écritures Comptables), conforme à l'article A.47 A-1 du Livre des Procédures Fiscales. Ce fichier est importable directement dans les logiciels professionnels (Sage, Cegid, Quadratus, etc.), ce qui réduit significativement son temps de travail — et donc votre facture.</p>`
   }
 };
 
