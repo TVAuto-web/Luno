@@ -864,7 +864,7 @@ footer {
     <div class="pricing-grid reveal" style="margin-top:2.5rem;">
       <div class="pricing-card">
         <div class="pricing-tier">Gratuit</div>
-        <div class="pricing-price">0<span style="font-size:22px;">?</span></div>
+        <div class="pricing-price">0<span style="font-size:22px;">€</span></div>
         <div class="pricing-period">D?couverte ? pour commencer</div>
         <div class="pricing-desc">Pour auto-entrepreneurs, freelances et tr?s petites structures qui veulent entrer dans LUNO sans friction.</div>
         <div class="pricing-divider"></div>
@@ -877,7 +877,7 @@ footer {
       <div class="pricing-card featured">
         <div class="pricing-badge">Le plus populaire</div>
         <div class="pricing-tier">Essentiel</div>
-        <div class="pricing-price" id="price-essentiel">7.90<span style="font-size:22px;">?</span></div>
+        <div class="pricing-price" id="price-essentiel">7.90<span style="font-size:22px;">€</span></div>
         <div class="pricing-period" id="period-essentiel">HT/mois ? factur? annuellement</div>
         <div class="pricing-desc">Le plan principal pour ind?pendants et petites entreprises, concurrent direct des offres standard type Indy.</div>
         <div class="pricing-divider"></div>
@@ -890,7 +890,7 @@ footer {
       <div class="pricing-card premium-card">
         <div class="pricing-badge" style="background:var(--gold);">Automatisation</div>
         <div class="pricing-tier">Pro</div>
-        <div class="pricing-price" id="price-pro">15.90<span style="font-size:22px;">?</span></div>
+        <div class="pricing-price" id="price-pro">15.90<span style="font-size:22px;">€</span></div>
         <div class="pricing-period" id="period-pro">HT/mois ? factur? annuellement</div>
         <div class="pricing-desc">Pour PME, ?quipes et utilisateurs avanc?s qui veulent une automatisation r?elle et un cadre plus robuste.</div>
         <div class="pricing-divider"></div>
@@ -903,7 +903,7 @@ footer {
       <div class="pricing-card cabinet-card">
         <div class="pricing-badge" style="background:#fff8eb;color:#102d26;">Cabinets & groupes</div>
         <div class="pricing-tier">Business</div>
-        <div class="pricing-price" id="price-business">28.90<span style="font-size:22px;">?</span></div>
+        <div class="pricing-price" id="price-business">28.90<span style="font-size:22px;">€</span></div>
         <div class="pricing-period" id="period-business">HT/mois ? factur? annuellement</div>
         <div class="pricing-desc">Pour cabinets comptables, grosses structures et organisations multi-soci?t?s qui ont besoin d'un pilotage avanc?.</div>
         <div class="pricing-divider"></div>
@@ -1547,7 +1547,7 @@ async function lookupSiren() {
     document.getElementById('sc-taille').textContent = tailleLabel;
     document.getElementById('sc-adresse').textContent = adresse;
     document.getElementById('sc-date').textContent = dateCreation;
-    document.getElementById('sc-plan').textContent = {gratuit:'Gratuit (0?/mois)',essentiel:'Essentiel (10,90? HT/mois)',pro:'Pro (19,90? HT/mois)',business:'Business (34,90? HT/mois)'}[planReco];
+    document.getElementById('sc-plan').textContent = {gratuit:'Gratuit (0€/mois)',essentiel:'Essentiel (10,90€ HT/mois)',pro:'Pro (19,90€ HT/mois)',business:'Business (34,90€ HT/mois)'}[planReco];
 
     const badge = document.getElementById('sc-statut-badge');
     if (etat === 'active') {
@@ -1825,7 +1825,7 @@ function toggleBillingVitrine() {
       const val = isAnnualV ? pricesV[p].annual : pricesV[p].monthly;
       const note = isAnnualV ? pricesV[p].annualNote : pricesV[p].monthlyNote;
       // price includes span for € sign — rebuild
-      prEl.innerHTML = val + '<span style="font-size:22px;">?</span>';
+      prEl.innerHTML = val + '<span style="font-size:22px;">€</span>';
       ntEl.textContent = note;
       prEl.style.opacity = '1'; prEl.style.transform = 'translateY(0)';
       prEl.style.transition = 'opacity .15s, transform .15s';
@@ -1963,10 +1963,10 @@ const LEGAL = {
       <table>
         <thead><tr><th>Plan</th><th>Mensuel HT</th><th>Annuel HT</th><th>Utilisateurs</th></tr></thead>
         <tbody>
-          <tr><td><strong>Gratuit</strong></td><td>0 ?</td><td>0 ?</td><td>1</td></tr>
-          <tr><td><strong>Essentiel</strong></td><td>10,90 ? HT/mois</td><td>7,90 ? HT/mois annuel</td><td>Collaborateurs limit?s</td></tr>
-          <tr><td><strong>Pro</strong></td><td>19,90 ? HT/mois</td><td>15,90 ? HT/mois annuel</td><td>Multi-utilisateurs</td></tr>
-          <tr><td><strong>Business</strong></td><td>34,90 ? HT/mois</td><td>28,90 ? HT/mois annuel</td><td>Utilisateurs ?lev?s</td></tr>
+          <tr><td><strong>Gratuit</strong></td><td>0 €</td><td>0 €</td><td>1</td></tr>
+          <tr><td><strong>Essentiel</strong></td><td>10,90 € HT/mois</td><td>7,90 € HT/mois annuel</td><td>Collaborateurs limit?s</td></tr>
+          <tr><td><strong>Pro</strong></td><td>19,90 € HT/mois</td><td>15,90 € HT/mois annuel</td><td>Multi-utilisateurs</td></tr>
+          <tr><td><strong>Business</strong></td><td>34,90 € HT/mois</td><td>28,90 € HT/mois annuel</td><td>Utilisateurs ?lev?s</td></tr>
         </tbody>
       </table>
       <p>Tous les prix sont exprimés HT. La TVA applicable est de 20% (taux standard français). L'Éditeur se réserve le droit de modifier ses tarifs avec un préavis de 60 jours.</p>
@@ -2138,7 +2138,7 @@ const LEGAL = {
       <h2>🕐 Horaires du support</h2>
       <ul>
         <li>Lundi – Vendredi : 9h00 – 18h30 (heure de Paris)</li>
-        <li>Samedi : 9h00 ? 12h30 (plans Pro et Business uniquement)</li>
+        <li>Samedi : 9h00 – 12h30 (plans Pro et Business uniquement)</li>
         <li>Dimanches et jours fériés français : fermé</li>
       </ul>
       <h2>🚨 Urgences (plan Entreprise)</h2>
