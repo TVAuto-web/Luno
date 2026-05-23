@@ -6,7 +6,12 @@
     { "source": "/compta_app",      "destination": "/app", "permanent": true },
     { "source": "/compta-app",      "destination": "/app", "permanent": true },
     { "source": "/pricing",         "destination": "/#tarifs", "permanent": true },
-    { "source": "/pricing.html",    "destination": "/#tarifs", "permanent": true }
+    { "source": "/pricing.html",    "destination": "/#tarifs", "permanent": true },
+    { "source": "/auto-entrepreneur", "destination": "/#auto-entrepreneur", "permanent": true },
+    { "source": "/sasu-sas",        "destination": "/#sasu-sas", "permanent": true },
+    { "source": "/sarl-eurl",       "destination": "/#sasu-sas", "permanent": true },
+    { "source": "/sci-lmnp",        "destination": "/#sci-lmnp", "permanent": true },
+    { "source": "/cabinet-comptable", "destination": "/#cabinet-comptable", "permanent": true }
   ],
   "headers": [
     {
