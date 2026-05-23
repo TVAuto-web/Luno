@@ -21,6 +21,11 @@ alter table if exists public.companies add column if not exists fiscal_settings 
 alter table if exists public.companies add column if not exists app_settings jsonb default '{}'::jsonb;
 
 alter table if exists public.profiles add column if not exists onboarding_state jsonb default '{}'::jsonb;
+alter table if exists public.clients add column if not exists legacy_index integer;
+alter table if exists public.devis add column if not exists legacy_index integer;
+alter table if exists public.devis add column if not exists client_index integer;
+alter table if exists public.factures add column if not exists legacy_index integer;
+alter table if exists public.factures add column if not exists client_index integer;
 
 create or replace function public.is_company_member(p_company_id uuid)
 returns boolean
@@ -203,6 +208,9 @@ create trigger set_updated_at_integration_settings before update on public.integ
 
 create index if not exists idx_app_snapshots_user on public.app_snapshots(user_id);
 create index if not exists idx_app_snapshots_company on public.app_snapshots(company_id);
+create index if not exists idx_clients_company_legacy on public.clients(company_id, legacy_index);
+create index if not exists idx_devis_company_legacy on public.devis(company_id, legacy_index);
+create index if not exists idx_factures_company_legacy on public.factures(company_id, legacy_index);
 create index if not exists idx_bank_accounts_company on public.bank_accounts(company_id);
 create index if not exists idx_bank_transactions_company on public.bank_transactions(company_id);
 create index if not exists idx_bank_transactions_account on public.bank_transactions(bank_account_id);
