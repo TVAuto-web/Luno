@@ -1283,6 +1283,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
     <button class="btn btn-gr" onclick="openOv('ov-add-bank')">+ Connecter un compte</button>
   </div>
   <div class="sg sg3" id="bank-stats"></div>
+  <div id="luno-bank-alerts"></div>
   <div class="card">
     <div class="ch">Comptes bancaires connectés <span id="bank-count" class="bdg inf" style="font-size:10px;"></span></div>
     <div id="bank-accounts-list"></div>
@@ -10617,18 +10618,52 @@ function lunoNormalizeBankPayload(result) {
         transactions: [],
       });
     }
-    const catData = aiCategorize(tx.lib || '');
+    const catData = tx.catData || aiCategorize(tx.lib || '');
     if (tx.category) catData.cat = tx.category;
     accountMap.get(key).transactions.push({
       id: tx.id || ('TX_' + Date.now()),
+      providerId: tx.providerId || tx.id || '',
       date: tx.date ? new Date(tx.date).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR'),
       lib: tx.lib || 'Transaction bancaire',
       mnt: Number(tx.mnt || 0),
       catData,
+      category: tx.category || catData.cat,
+      tvaRate: Number(tx.tvaRate || 0),
+      tvaAmount: Number(tx.tvaAmount || 0),
+      status: tx.status || (catData.cat && catData.cat !== 'A classer' ? 'classified' : 'to_review'),
       manual: null,
     });
   });
   return Array.from(accountMap.values());
+}
+
+async function lunoPersistBankToSupabase() {
+  const token = await lunoSupabaseAccessToken?.();
+  if (!token) return false;
+  const response = await fetch('/api/supabase-bank', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify({ accounts: bankAccounts || [] }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || 'Sauvegarde bancaire Supabase impossible');
+  if (Array.isArray(data.accounts) && data.accounts.length) bankAccounts = data.accounts;
+  return true;
+}
+
+async function lunoLoadBankFromSupabase() {
+  const token = await lunoSupabaseAccessToken?.();
+  if (!token) return false;
+  const response = await fetch('/api/supabase-bank', {
+    headers: { Authorization: 'Bearer ' + token },
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || 'Chargement bancaire Supabase impossible');
+  if (Array.isArray(data.accounts) && data.accounts.length) {
+    bankAccounts = data.accounts;
+    renderBanque?.();
+  }
+  return true;
 }
 
 window.connectBank = async function() {
@@ -10659,6 +10694,7 @@ window.syncBankAccount = async function(id) {
     });
     const realAccounts = lunoNormalizeBankPayload(result);
     if (realAccounts.length) bankAccounts = realAccounts;
+    await lunoPersistBankToSupabase().catch(e => console.warn('[Supabase] bank save error', e));
     renderBanque();
     notif('Synchronisation bancaire terminee : ' + (result.transactions || []).length + ' transactions');
     addH('tresorerie', 'Synchronisation bancaire ' + (result.provider || ''), 'ok');
@@ -10867,8 +10903,103 @@ function renderReconciliationPanel() {
 const _lunoRenderBanque = window.renderBanque || renderBanque;
 window.renderBanque = function(){
   _lunoRenderBanque.apply(this, arguments);
+  renderBankAutomationPanel();
   renderReconciliationPanel();
 };
+
+function lunoBankFlatTxns() {
+  return (bankAccounts || []).flatMap(account => (account.transactions || []).map(tx => ({
+    ...tx,
+    accountId: account.id,
+    bankName: account.bank,
+    category: tx.manual || tx.category || tx.catData?.cat || 'A classer',
+    confidence: Number(tx.catData?.confidence || tx.confidence || 0),
+    status: tx.matchedWith ? 'matched' : (tx.status || ((tx.manual || tx.category || tx.catData?.cat) && (tx.manual || tx.category || tx.catData?.cat) !== 'A classer' ? 'classified' : 'to_review')),
+  })));
+}
+
+function renderBankAutomationPanel() {
+  const page = document.getElementById('p-banque');
+  if (!page) return;
+  const txns = lunoBankFlatTxns();
+  const toReview = txns.filter(t => t.status === 'to_review' || t.category === 'A classer' || t.confidence < 0.75);
+  const matched = txns.filter(t => t.matchedWith || t.status === 'matched');
+  const tvaDetected = txns.reduce((sum, t) => sum + Number(t.tvaAmount || 0), 0);
+  const alerts = document.getElementById('luno-bank-alerts');
+  if (alerts) {
+    alerts.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-bottom:1rem;">
+        <div class="card" style="padding:.85rem 1rem;"><div style="font-size:11px;color:var(--tx2);font-weight:700;">A classer</div><div style="font-size:24px;font-weight:800;color:${toReview.length ? 'var(--am)' : 'var(--gr)'};">${toReview.length}</div></div>
+        <div class="card" style="padding:.85rem 1rem;"><div style="font-size:11px;color:var(--tx2);font-weight:700;">Rapprochements</div><div style="font-size:24px;font-weight:800;color:var(--gr);">${matched.length}</div></div>
+        <div class="card" style="padding:.85rem 1rem;"><div style="font-size:11px;color:var(--tx2);font-weight:700;">TVA detectee</div><div style="font-size:24px;font-weight:800;color:var(--bl);">${fmt(tvaDetected)}</div></div>
+      </div>
+      ${toReview.length ? `<div style="margin-bottom:1rem;padding:.75rem 1rem;border:1px solid #f4c56a;background:#fff7df;border-radius:8px;font-size:12px;color:#7a4a00;font-weight:700;">${toReview.length} transaction(s) a verifier avant comptabilisation.</div>` : ''}
+    `;
+  }
+
+  let card = document.getElementById('luno-bank-automation-card');
+  if (!card) {
+    card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'luno-bank-automation-card';
+    card.style.marginTop = '1rem';
+    page.appendChild(card);
+  }
+  card.innerHTML = `
+    <div class="ch" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>Transactions a traiter</span>
+      <div style="display:flex;gap:.4rem;">
+        <button class="btn btn-sm" onclick="lunoLoadBankFromSupabase().then(()=>notif('Donnees bancaires chargees')).catch(e=>notif(e.message))">Cloud</button>
+        <button class="btn btn-sm btn-gr" onclick="lunoBookReviewedBankTransactions()">Comptabiliser OK</button>
+      </div>
+    </div>
+    <div class="tw">
+      <table><thead><tr><th>Date</th><th>Libelle</th><th>Banque</th><th>Categorie</th><th style="text-align:right;">TVA</th><th>Statut</th></tr></thead>
+      <tbody>${txns.slice(0, 20).map((t, i) => `
+        <tr>
+          <td>${t.date || ''}</td>
+          <td>${t.lib || ''}</td>
+          <td>${t.bankName || ''}</td>
+          <td><span class="bdg ${t.status === 'to_review' ? 'wa' : 'ok'}">${t.category}</span> <span style="font-size:10px;color:var(--tx2);">${Math.round(t.confidence * 100)}%</span></td>
+          <td style="text-align:right;">${t.tvaAmount ? fmt(t.tvaAmount) : '-'}</td>
+          <td><span class="bdg ${t.status === 'matched' ? 'ok' : t.status === 'classified' ? 'inf' : 'wa'}">${t.status === 'matched' ? 'Rapprochee' : t.status === 'classified' ? 'Classee' : 'A revoir'}</span></td>
+        </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--tx2);padding:1rem;">Aucune transaction bancaire importee.</td></tr>'}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+window.lunoBookReviewedBankTransactions = function() {
+  let count = 0;
+  (bankAccounts || []).forEach(account => (account.transactions || []).forEach(t => {
+    const category = t.manual || t.category || t.catData?.cat || 'A classer';
+    const status = t.matchedWith ? 'matched' : (t.status || (category !== 'A classer' ? 'classified' : 'to_review'));
+    if (status !== 'classified' || t.booked) return;
+    const isIn = Number(t.mnt || 0) > 0;
+    ecritures.push({
+      date: t.date || today(),
+      jnl: 'BQ',
+      cpd: isIn ? '512000' : (category === 'Achats fournisseurs' ? '607000' : category === 'Loyer' ? '613000' : category === 'Marketing' ? '623000' : '658000'),
+      cpc: isIn ? '706000' : '512000',
+      lib: `${category} - ${t.lib}`,
+      mnt: Math.abs(Number(t.mnt || 0)),
+      pj: t.id || '',
+      reconciledWith: `bank:${t.id}`,
+    });
+    t.booked = true;
+    t.status = 'matched';
+    count++;
+  }));
+  lunoNormalizeEntries();
+  persistUserData?.();
+  lunoPersistBankToSupabase().catch(e => console.warn('[Supabase] bank save error', e));
+  renderBanque?.();
+  notif(count + ' transaction(s) comptabilisee(s)');
+};
+
+setTimeout(() => {
+  lunoLoadBankFromSupabase().catch(() => {});
+}, 2500);
 
 window.exportFEC = async function() {
   lunoNormalizeEntries();
