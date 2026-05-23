@@ -10503,6 +10503,115 @@ window.sendForSignature = async function() {
   }
 };
 
+function lunoDownloadText(filename, text, mimeType) {
+  const blob = new Blob([text], { type: mimeType || 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1200);
+}
+
+function lunoSellerPayload() {
+  const address = String(me?.adresse || '').trim();
+  const cpMatch = address.match(/\b(\d{5})\b/);
+  return {
+    nom: me?.societe || me?.nom || 'Votre entreprise',
+    siren: me?.siren || '',
+    siret: me?.siret || '',
+    tva_num: me?.tva_num || me?.vat || '',
+    adresse: address,
+    cp: cpMatch ? cpMatch[1] : '',
+    ville: cpMatch ? address.slice(address.indexOf(cpMatch[1]) + 5).replace(/^[,\s]+/, '') : '',
+    email: me?.email || '',
+    country: 'FR',
+  };
+}
+
+window.exportFacturX = async function(i) {
+  const f = factures[i];
+  if (!f) { notif('Aucune facture selectionnee'); return; }
+  try {
+    const result = await lunoPostJsonApi('/api/facturx', {
+      invoice: f,
+      seller: lunoSellerPayload(),
+      buyer: clients[f.ci] || {},
+    });
+    lunoDownloadText(result.filename || `${f.num}_factur-x.xml`, result.xml, result.mimeType || 'application/xml;charset=utf-8');
+    const issues = result.compliance?.issues?.length || 0;
+    const warnings = result.compliance?.warnings?.length || 0;
+    if (issues) notif('Factur-X exporte avec champs a completer : ' + result.compliance.issues.join(', '));
+    else if (warnings) notif('Factur-X exporte - avertissements : ' + warnings);
+    else notif('Factur-X XML conforme genere');
+    addH('export', 'Factur-X XML : ' + f.num, issues ? 'wa' : 'ok');
+  } catch (err) {
+    notif('Export Factur-X indisponible : ' + lunoIntegrationError(err, 'erreur serveur'));
+  }
+};
+
+window.checkFacturXCompliance = async function(i) {
+  const f = factures[i];
+  if (!f) { notif('Aucune facture selectionnee'); return; }
+  try {
+    const result = await lunoPostJsonApi('/api/facturx', {
+      invoice: f,
+      seller: lunoSellerPayload(),
+      buyer: clients[f.ci] || {},
+    });
+    const c = result.compliance || {};
+    const lines = []
+      .concat((c.issues || []).map(x => 'A corriger : ' + x))
+      .concat((c.warnings || []).map(x => 'A verifier : ' + x));
+    notif(lines.length ? lines.join(' | ') : 'Controle Factur-X OK');
+  } catch (err) {
+    notif('Controle Factur-X indisponible : ' + lunoIntegrationError(err, 'erreur serveur'));
+  }
+};
+
+function lunoNormalizeBankPayload(result) {
+  const accountMap = new Map((result.accounts || []).map(account => [String(account.id), {
+    id: 'BA_' + String(account.id || Date.now()).replace(/[^a-z0-9_-]/gi, '_'),
+    providerId: String(account.id || ''),
+    bank: account.bank || 'Compte bancaire',
+    iban: account.iban || 'IBAN masque',
+    solde: Number(account.solde || 0),
+    lastSync: account.lastSync || new Date().toISOString(),
+    color: '#1D9E75',
+    emoji: 'BK',
+    transactions: [],
+  }]));
+  (result.transactions || []).forEach(tx => {
+    const key = String(tx.accountId || '');
+    if (!accountMap.has(key)) {
+      accountMap.set(key, {
+        id: 'BA_' + (key || Date.now()),
+        providerId: key,
+        bank: tx.bankName || 'Compte bancaire',
+        iban: 'IBAN masque',
+        solde: 0,
+        lastSync: new Date().toISOString(),
+        color: '#1D9E75',
+        emoji: 'BK',
+        transactions: [],
+      });
+    }
+    const catData = aiCategorize(tx.lib || '');
+    if (tx.category) catData.cat = tx.category;
+    accountMap.get(key).transactions.push({
+      id: tx.id || ('TX_' + Date.now()),
+      date: tx.date ? new Date(tx.date).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR'),
+      lib: tx.lib || 'Transaction bancaire',
+      mnt: Number(tx.mnt || 0),
+      catData,
+      manual: null,
+    });
+  });
+  return Array.from(accountMap.values());
+}
+
 window.connectBank = async function() {
   closeOv('ov-add-bank');
   try {
@@ -10519,6 +10628,54 @@ window.connectBank = async function() {
     notif('Synchro bancaire non disponible : ' + lunoIntegrationError(err, 'configuration Bridge/Powens requise'));
   }
 };
+
+window.syncBankAccount = async function(id) {
+  const acc = bankAccounts.find(a => a.id === id);
+  try {
+    notif('Synchronisation bancaire en cours...');
+    const result = await lunoPostJsonApi('/api/bank-sync', {
+      provider: window.LUNO_BANK_PROVIDER || undefined,
+      accountId: acc?.providerId || undefined,
+      limit: 50,
+    });
+    const realAccounts = lunoNormalizeBankPayload(result);
+    if (realAccounts.length) bankAccounts = realAccounts;
+    renderBanque();
+    notif('Synchronisation bancaire terminee : ' + (result.transactions || []).length + ' transactions');
+    addH('tresorerie', 'Synchronisation bancaire ' + (result.provider || ''), 'ok');
+  } catch (err) {
+    notif('Synchro bancaire non disponible : ' + lunoIntegrationError(err, 'configuration Bridge/Powens requise'));
+  }
+};
+
+(function injectFacturXControls(){
+  function enhanceFactureRows(){
+    document.querySelectorAll('#fac-tbl tr').forEach((row, i) => {
+      const actions = row.querySelector('td:last-child > div');
+      if (!actions || actions.querySelector('.luno-facturx-btn')) return;
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-sm btn-bl luno-facturx-btn';
+      btn.title = 'Exporter Factur-X XML';
+      btn.textContent = 'FX';
+      btn.onclick = () => window.exportFacturX(i);
+      actions.appendChild(btn);
+    });
+  }
+  function enhanceExportsPage(){
+    const grid = document.querySelector('#p-exports .three-col');
+    if (!grid || document.getElementById('luno-facturx-export-card')) return;
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'luno-facturx-export-card';
+    card.innerHTML = '<div class="ch">Factur-X / e-facture</div><div style="padding:.85rem 1rem;"><p style="font-size:12px;color:var(--tx2);margin-bottom:.75rem;">XML structure pour facture electronique, avec controle des champs obligatoires.</p><select id="e-fx" style="margin-bottom:.65rem;font-size:12px;width:100%;"></select><div style="display:flex;gap:.4rem;"><button class="btn btn-bl" style="flex:1;" id="fx-download">XML</button><button class="btn" style="flex:1;" id="fx-check">Controle</button></div></div>';
+    grid.appendChild(card);
+    const sel = document.getElementById('e-fx');
+    if (sel) sel.innerHTML = factures.map((f,i)=>`<option value="${i}">${f.num} - ${clients[f.ci]?.nom||'?'}</option>`).join('');
+    document.getElementById('fx-download').onclick = () => exportFacturX(parseInt(document.getElementById('e-fx').value) || 0);
+    document.getElementById('fx-check').onclick = () => checkFacturXCompliance(parseInt(document.getElementById('e-fx').value) || 0);
+  }
+  setInterval(() => { enhanceFactureRows(); enhanceExportsPage(); }, 1500);
+})();
 
 </script>
 </body>
