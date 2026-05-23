@@ -126,6 +126,18 @@ export default async function handler(req, res) {
       body: JSON.stringify(payload),
     });
 
+    await supabaseFetch('/rest/v1/app_snapshot_backups', {
+      method: 'POST',
+      body: JSON.stringify([{
+        user_id: user.id,
+        company_id: companyId,
+        source: 'web-app',
+        version: req.body?.version || '1',
+        data,
+        reason: req.body?.reason || 'auto-sync',
+      }]),
+    }).catch(() => null);
+
     await supabaseFetch('/rest/v1/audit_logs', {
       method: 'POST',
       body: JSON.stringify([{
