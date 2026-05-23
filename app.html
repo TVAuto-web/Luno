@@ -11180,6 +11180,121 @@ setTimeout(() => {
   lunoLoadBankFromSupabase().catch(() => {});
 }, 2500);
 
+function lunoClosureState() {
+  const tvaC = factures.reduce((s, f) => s + Number(f.tvaA || 0), 0);
+  const tvaD = achats.reduce((s, a) => s + Number(a.tvaA || 0), 0);
+  const products = comptes.filter(c => String(c.num).startsWith('7')).reduce((s, c) => s + Number(c.c || 0), 0) || factures.reduce((s, f) => s + Number(f.ht || 0), 0);
+  const charges = comptes.filter(c => String(c.num).startsWith('6')).reduce((s, c) => s + Number(c.d || 0), 0) || achats.reduce((s, a) => s + Number(a.ht || 0), 0);
+  const result = products - charges;
+  const isRate = 0.25;
+  const estimatedTax = Math.max(0, Math.round(result * isRate * 100) / 100);
+  const entries = (ecritures || []).map((e, i) => ({ ...e, index: i }));
+  const missingPieces = entries.filter(e => !lunoEntryPiece(e) || /^ECR-\d+/.test(lunoEntryPiece(e)));
+  const unbalanced = entries.filter(e => !lunoEntryDebit(e) || !lunoEntryCredit(e) || !Number(e.mnt || 0));
+  const unpaidInvoices = factures.filter(f => f.st !== 'payee' && f.st !== 'payée');
+  const unpaidPurchases = achats.filter(a => a.st !== 'payee' && a.st !== 'payée');
+  const bankToReview = (typeof lunoBankFlatTxns === 'function' ? lunoBankFlatTxns() : []).filter(t => t.status === 'to_review' || t.category === 'A classer');
+  const tvaWarnings = []
+    .concat(factures.filter(f => Number(f.tva || 0) > 0 && !Number(f.tvaA || 0)).map(f => ({ type:'TVA vente', label:f.num, detail:'TVA collectee manquante' })))
+    .concat(achats.filter(a => Number(a.tva || 0) > 0 && !Number(a.tvaA || 0)).map(a => ({ type:'TVA achat', label:a.num, detail:'TVA deductible manquante' })));
+  const anomalies = [
+    ...missingPieces.map(e => ({ level:'wa', group:'Pieces manquantes', label:e.lib, detail:'Ecriture sans reference exploitable' })),
+    ...unbalanced.map(e => ({ level:'er', group:'Journal', label:e.lib, detail:'Compte debit/credit ou montant manquant' })),
+    ...bankToReview.map(t => ({ level:'wa', group:'Banque', label:t.lib, detail:'Transaction bancaire a classer' })),
+    ...tvaWarnings.map(w => ({ level:'wa', group:w.type, label:w.label, detail:w.detail })),
+    ...unpaidInvoices.map(f => ({ level:'inf', group:'Clients', label:f.num, detail:'Facture non payee a justifier/lettrer' })),
+    ...unpaidPurchases.map(a => ({ level:'inf', group:'Fournisseurs', label:a.num, detail:'Achat non regle a justifier/lettrer' })),
+  ];
+  const blocking = anomalies.filter(a => a.level === 'er').length;
+  const warning = anomalies.filter(a => a.level === 'wa').length;
+  const checks = [
+    { id:'bank', label:'Banque rapprochee', ok: bankToReview.length === 0, detail: bankToReview.length + ' operation(s) a classer' },
+    { id:'pieces', label:'Pieces justificatives', ok: missingPieces.length === 0, detail: missingPieces.length + ' piece(s) manquante(s)' },
+    { id:'tva', label:'TVA controlee', ok: tvaWarnings.length === 0, detail: 'TVA nette estimee ' + fmt(tvaC - tvaD) },
+    { id:'journal', label:'Journal comptable', ok: unbalanced.length === 0, detail: unbalanced.length + ' anomalie(s) bloquante(s)' },
+    { id:'fec', label:'Export FEC pret', ok: entries.length > 0 && unbalanced.length === 0, detail: entries.length + ' ecriture(s)' },
+    { id:'fiscal', label:'Resultat fiscal estime', ok: Number.isFinite(result), detail: fmt(result) + ' avant IS estime' },
+  ];
+  const score = Math.max(0, Math.round((checks.filter(c => c.ok).length / checks.length) * 100 - blocking * 15 - warning * 4));
+  return { tvaC, tvaD, result, estimatedTax, afterTax: result - estimatedTax, anomalies, checks, score, blocking, warning };
+}
+
+function renderClosureAssistant() {
+  const host = document.getElementById('luno-closure-assistant');
+  if (!host) return;
+  const state = lunoClosureState();
+  host.innerHTML = `
+    <div class="ch" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>Assistant de cloture</span>
+      <div style="display:flex;gap:.4rem;">
+        <button class="btn btn-sm" onclick="renderClosureAssistant()">Actualiser</button>
+        <button class="btn btn-sm btn-bl" onclick="exportClosurePackage()">Pack cabinet</button>
+      </div>
+    </div>
+    <div style="padding:1rem;">
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:1rem;align-items:center;margin-bottom:1rem;">
+        <div style="text-align:center;border:1px solid var(--bd);border-radius:8px;padding:1rem;">
+          <div style="font-size:34px;font-weight:800;color:${state.score >= 80 ? 'var(--gr)' : state.score >= 55 ? 'var(--am)' : 'var(--rd)'};">${state.score}%</div>
+          <div style="font-size:11px;color:var(--tx2);font-weight:700;">pret pour cloture</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem;">
+          <div class="sc"><div class="sc-l">Resultat estime</div><div class="sc-v" style="color:${state.result >= 0 ? 'var(--gr)' : 'var(--rd)'};">${fmt(state.result)}</div></div>
+          <div class="sc"><div class="sc-l">IS estime</div><div class="sc-v">${fmt(state.estimatedTax)}</div></div>
+          <div class="sc"><div class="sc-l">TVA nette</div><div class="sc-v">${fmt(state.tvaC - state.tvaD)}</div></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.65rem;margin-bottom:1rem;">
+        ${state.checks.map(c => `<div style="border:1px solid var(--bd);border-radius:8px;padding:.75rem;background:${c.ok ? 'var(--gr3)' : 'var(--bg0)'};">
+          <div style="font-size:12px;font-weight:800;color:${c.ok ? 'var(--gr2)' : 'var(--tx0)'};">${c.ok ? 'OK' : 'A faire'} - ${c.label}</div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:4px;">${c.detail}</div>
+        </div>`).join('')}
+      </div>
+      <div class="tw">
+        <table><thead><tr><th>Controle</th><th>Element</th><th>Detail</th><th style="width:80px;">Niveau</th></tr></thead>
+        <tbody>${state.anomalies.slice(0, 20).map(a => `<tr><td>${a.group}</td><td>${a.label || '-'}</td><td>${a.detail}</td><td><span class="bdg ${a.level}">${a.level === 'er' ? 'Bloquant' : a.level === 'wa' ? 'A verifier' : 'Info'}</span></td></tr>`).join('') || '<tr><td colspan="4" style="padding:1rem;text-align:center;color:var(--tx2);">Aucune anomalie detectee.</td></tr>'}</tbody></table>
+      </div>
+    </div>`;
+}
+
+window.exportClosurePackage = async function() {
+  try {
+    lunoNormalizeEntries();
+    const state = lunoClosureState();
+    const fiscal = await lunoFiscalReport('full', 'json');
+    const pack = {
+      generatedAt: new Date().toISOString(),
+      company: { name: me?.societe || '', siren: me?.siren || '' },
+      exercice: yr,
+      closure: state,
+      fiscal: fiscal.report,
+      exports: {
+        fec: 'Utiliser le bouton FEC .txt pour le fichier reglementaire',
+        journalRows: ecritures.length,
+        invoices: factures.length,
+        purchases: achats.length,
+      }
+    };
+    lunoDownloadText(`luno_cloture_${yr}.json`, JSON.stringify(pack, null, 2), 'application/json;charset=utf-8');
+    notif('Pack de cloture genere');
+    addH('export', 'Pack cloture ' + yr, state.blocking ? 'wa' : 'ok');
+  } catch (err) {
+    notif('Pack cloture indisponible : ' + lunoIntegrationError(err, 'erreur serveur'));
+  }
+};
+
+function injectClosureAssistant() {
+  const panel = document.getElementById('tp-bilan');
+  if (panel && !document.getElementById('luno-closure-assistant')) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'luno-closure-assistant';
+    card.style.marginBottom = '1rem';
+    panel.insertBefore(card, panel.firstChild);
+  }
+  renderClosureAssistant();
+}
+setInterval(injectClosureAssistant, 1800);
+
 window.exportFEC = async function() {
   lunoNormalizeEntries();
   try {
@@ -11226,6 +11341,20 @@ window.checkFEC = async function() {
     grid.appendChild(card);
   }
   setInterval(addFecCard, 1500);
+})();
+
+(function injectClosureExportCard(){
+  function addClosureCard(){
+    const grid = document.querySelector('#p-exports .three-col');
+    if (!grid || document.getElementById('luno-closure-export-card')) return;
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'luno-closure-export-card';
+    card.innerHTML = `<div class="ch">Cloture comptable</div><div style="padding:.85rem 1rem;"><p style="font-size:12px;color:var(--tx2);margin-bottom:.75rem;">Checklist, anomalies, resultat fiscal estime et pack cabinet.</p><div style="display:flex;gap:.4rem;"><button class="btn btn-bl" style="flex:1;" onclick="exportClosurePackage()">Pack JSON</button><button class="btn" style="flex:1;" id="luno-closure-open-btn">Voir</button></div></div>`;
+    grid.appendChild(card);
+    document.getElementById('luno-closure-open-btn').onclick = () => nav('bilan', document.querySelector('[onclick*="bilan"]'));
+  }
+  setInterval(addClosureCard, 1500);
 })();
 
 (function injectFiscalDeclarationControls(){
