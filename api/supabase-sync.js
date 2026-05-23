@@ -1,6 +1,7 @@
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://hysznhfowtzfsbdntsyd.supabase.co';
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const ANON_KEY = process.env.SUPABASE_ANON_KEY;
+// Server-side persistence bridge for the legacy single-page app.
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
