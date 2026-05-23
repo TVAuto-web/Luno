@@ -10385,6 +10385,141 @@ window.showRegisterForm = function(){
   }
 };
 
+// Real provider integrations override the demo implementations above.
+function lunoReadFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error || new Error('Lecture du fichier impossible'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function lunoPostJsonApi(url, body) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body || {}),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || data.message || ('Erreur API ' + response.status));
+  return data;
+}
+
+function lunoIntegrationError(err, fallback) {
+  return (err && err.message) || fallback || 'Erreur intégration';
+}
+
+window.processOcrFile = async function(file) {
+  if (!file) return;
+  if (!canAccess('ocr')) { showUpsell('ocr','plus'); return; }
+  if (ocrQuota.used >= ocrQuota.max && ocrQuota.max !== Infinity) {
+    notif('Quota OCR épuisé pour ce mois.');
+    showUpsell('ocr','premium');
+    return;
+  }
+
+  E('ocr-processing').style.display = 'block';
+  E('ocr-result').innerHTML = '';
+
+  try {
+    const result = await lunoPostJsonApi('/api/ocr', {
+      fileName: file.name,
+      mimeType: file.type || 'application/octet-stream',
+      dataUrl: await lunoReadFileAsDataUrl(file),
+    });
+    const extracted = result.extracted || {};
+    const clean = {
+      type: extracted.type || 'Document comptable',
+      fournisseur: extracted.fournisseur || 'Fournisseur non identifié',
+      date: extracted.date || new Date().toLocaleDateString('fr-FR'),
+      montantHT: Number(extracted.montantHT || 0),
+      tva: Number(extracted.tva || 20),
+      tvaAmt: Number(extracted.tvaAmt || 0),
+      montantTTC: Number(extracted.montantTTC || 0),
+    };
+    if (!clean.montantTTC && clean.montantHT) clean.montantTTC = clean.montantHT + clean.tvaAmt;
+
+    E('ocr-result').innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:.85rem;padding:.6rem .75rem;background:var(--gr3);border-radius:var(--r);">
+        <span style="color:var(--gr);font-size:16px;">✓</span>
+        <span style="font-size:12px;font-weight:700;color:var(--gr2);">Extraction OpenAI réussie</span>
+      </div>
+      <div style="display:grid;gap:.5rem;">
+        ${[['Type', clean.type],['Fournisseur', clean.fournisseur],['Date', clean.date],['Montant HT', fmt(clean.montantHT)],['TVA', fmt(clean.tvaAmt)],['Montant TTC', fmt(clean.montantTTC)]].map(([l,v])=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-bottom:1px solid var(--bd);font-size:12px;">
+            <span style="color:var(--tx2);">${l}</span><strong style="color:var(--tx0);">${v}</strong>
+          </div>`).join('')}
+      </div>
+      <div style="margin-top:1rem;display:flex;gap:.5rem;">
+        <button class="btn btn-gr" style="flex:1;" onclick="importOcrAsAchat(${JSON.stringify(clean).replace(/"/g,"'")})">→ Créer facture achat</button>
+        <button class="btn btn-bl" style="flex:1;" onclick="importOcrAsEcriture(${JSON.stringify(clean).replace(/"/g,"'")})">→ Saisir en journal</button>
+      </div>`;
+
+    ocrHistory.unshift({ file: file.name, date: new Date().toLocaleDateString('fr-FR'), type: clean.type, montant: clean.montantTTC, fournisseur: clean.fournisseur, status:'ok' });
+    ocrQuota.used++;
+    E('ocr-history-count').textContent = ocrHistory.length;
+    renderOcrHistory();
+    addH('client', 'OCR OpenAI : ' + file.name + ' → ' + clean.fournisseur, 'ok');
+  } catch (err) {
+    E('ocr-result').innerHTML = `<div style="padding:1rem;border:1px solid var(--rd);border-radius:var(--r);color:var(--rd);font-size:12px;">${lunoIntegrationError(err, 'OCR indisponible')}</div>`;
+    notif('OCR non disponible : ' + lunoIntegrationError(err, 'configuration requise'));
+  } finally {
+    E('ocr-processing').style.display = 'none';
+  }
+};
+
+window.sendForSignature = async function() {
+  const idx = parseInt(E('sign-devis-sel').value) || 0;
+  const email = E('sign-email').value.trim();
+  if (!email) { notif('Email requis'); return; }
+  const d = devis[idx];
+  if (!d) { notif('Aucun devis sélectionné'); return; }
+
+  try {
+    notif('Création de la demande YouSign…');
+    const result = await lunoPostJsonApi('/api/signature', {
+      signer: { email, name: clients[d.ci]?.contact || clients[d.ci]?.nom || 'Client' },
+      devis: { num: d.num, client: clients[d.ci]?.nom || 'Client', total: fmt(d.ttc) },
+      message: E('sign-message')?.value || '',
+    });
+    signatureRequests.unshift({
+      id: result.signatureRequestId || ('SR' + Date.now()),
+      provider: 'yousign',
+      devisId: idx,
+      client: clients[d.ci]?.nom || 'Client',
+      email,
+      status: 'pending',
+      sentAt: new Date().toLocaleDateString('fr-FR'),
+      signedAt: null,
+    });
+    E('sign-email').value = '';
+    E('sign-devis-preview').style.display = 'none';
+    addH('devis', 'Devis ' + d.num + ' envoyé via YouSign à ' + email, 'ok');
+    renderSignature();
+    notif('Demande YouSign envoyée à ' + email);
+  } catch (err) {
+    notif('Signature non disponible : ' + lunoIntegrationError(err, 'configuration YouSign requise'));
+  }
+};
+
+window.connectBank = async function() {
+  closeOv('ov-add-bank');
+  try {
+    notif('Ouverture de la connexion bancaire sécurisée…');
+    const result = await lunoPostJsonApi('/api/bank-connect', {
+      email: me?.email || '',
+      provider: window.LUNO_BANK_PROVIDER || undefined,
+      context: 'luno' + Date.now(),
+      redirectUrl: location.origin + location.pathname + '?bank=connected',
+    });
+    if (!result.redirectUrl) throw new Error('URL de connexion bancaire absente');
+    window.location.href = result.redirectUrl;
+  } catch (err) {
+    notif('Synchro bancaire non disponible : ' + lunoIntegrationError(err, 'configuration Bridge/Powens requise'));
+  }
+};
+
 </script>
 </body>
 </html>
