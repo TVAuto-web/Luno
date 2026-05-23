@@ -792,10 +792,9 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
     <!-- LOGIN -->
     <div id="al-login">
       <div class="aerr" id="lerr"></div>
-      <div class="afield"><label>Email</label><input id="l-email" type="email" value="demo@luno.fr"></div>
-      <div class="afield"><label>Mot de passe</label><input id="l-pwd" type="password" value="demo1234"></div>
+      <div class="afield"><label>Email</label><input id="l-email" type="email" placeholder="votre@email.fr"></div>
+      <div class="afield"><label>Mot de passe</label><input id="l-pwd" type="password" placeholder="Mot de passe"></div>
       <button class="abtn" onclick="doLogin()">Se connecter →</button>
-      <div class="ahint">Compte démo : demo@luno.fr / demo1234</div>
     </div>
     <!-- REGISTER -->
     <div id="al-reg" style="display:none;">
@@ -2144,11 +2143,6 @@ function getStatus(user){
 }
 function initDemoAccounts(){
   const now=Date.now();let users=getUsers();
-  if(!users.find(u=>u.email==='demo@luno.fr'))
-    users.push({email:'demo@luno.fr',pwd:'demo1234',prenom:'Sophie',nom:'Dupuis',
-      societe:'Demo SAS',plan:'pro',paidUntil:now+25*86400000,
-      trialEnd:now-1,trialUsed:true,createdAt:now-5*86400000,
-      profile:'entreprise',uiMode:'avance',data:{}});
   if(!users.find(u=>u.email==='expire@test.fr'))
     users.push({email:'expire@test.fr',pwd:'test1234',prenom:'Marc',nom:'Dupont',
       societe:'Dupont SARL',plan:'trial',paidUntil:null,
@@ -2857,12 +2851,67 @@ function saveRelanceRule() {
   renderRelances();
   notif('Règle de relance créée ✓');
 }
-function sendManualRelance(i) {
-  const f = factures.filter(x=>x.st==='en retard')[i];
-  if (!f) return;
-  addH('facture','Relance manuelle envoyée : facture '+f.num,'inf');
-  notif('📧 Relance envoyée pour ' + f.num);
+function buildRelanceHtml(f, cl) {
+  const societe = (me && me.societe) || 'ComptaPME Pro';
+  const montant = typeof fmt === 'function' ? fmt(f.ttc || f.ht * 1.2) : (f.ttc || f.ht * 1.2).toFixed(2) + ' €';
+  return `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;color:#1a1a2e;margin:0;padding:0;">
+  <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
+    <div style="border-bottom:2px solid #4361ee;padding-bottom:16px;margin-bottom:24px;">
+      <strong style="font-size:18px;color:#4361ee;">${societe}</strong>
+    </div>
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">Rappel de paiement</h2>
+    <p>Bonjour ${cl.prenom ? cl.prenom + ' ' : ''}${cl.nom || 'Madame/Monsieur'},</p>
+    <p>Sauf erreur ou omission de notre part, la facture ci-dessous reste impayée à ce jour :</p>
+    <div style="background:#f5f7ff;border-left:4px solid #4361ee;border-radius:6px;padding:16px 20px;margin:20px 0;">
+      <div style="margin-bottom:6px;"><span style="color:#666;font-size:13px;">Référence</span><br><strong style="font-size:15px;">${f.num}</strong></div>
+      <div style="margin-bottom:6px;"><span style="color:#666;font-size:13px;">Description</span><br>${f.desc || '—'}</div>
+      <div style="display:flex;gap:24px;margin-top:10px;">
+        <div><span style="color:#666;font-size:13px;">Date</span><br><strong>${f.date || '—'}</strong></div>
+        <div><span style="color:#666;font-size:13px;">Échéance</span><br><strong style="color:#e63946;">${f.due || '—'}</strong></div>
+        <div><span style="color:#666;font-size:13px;">Montant TTC</span><br><strong style="font-size:16px;">${montant}</strong></div>
+      </div>
+    </div>
+    <p>Nous vous serions reconnaissants de bien vouloir procéder au règlement dans les meilleurs délais.</p>
+    <p>Si ce règlement a déjà été effectué, veuillez ignorer ce message.</p>
+    <p>Pour toute question, n’hésitez pas à nous contacter.</p>
+    <p>Cordialement,<br><strong>${societe}</strong></p>
+    <div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#999;">
+      Cet email a été envoyé automatiquement par ComptaPME Pro.
+    </div>
+  </div>
+</body></html>`;
 }
+
+async function sendManualRelance(i) {
+  const f = factures.filter(x => x.st === 'en retard')[i];
+  if (!f) return;
+  const cl = clients[f.ci];
+  if (!cl || !cl.email) {
+    notif('❌ Ce client n\'a pas d\'email renseigné dans sa fiche');
+    return;
+  }
+  const subject = 'Rappel de paiement — Facture ' + f.num;
+  const html = buildRelanceHtml(f, cl);
+  notif('📧 Envoi en cours…');
+  try {
+    const resp = await fetch('/api/send-relance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to: cl.email, subject, html }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Erreur serveur');
+    f.relances = (f.relances || 0) + 1;
+    f.lastRelance = new Date().toLocaleDateString('fr-FR');
+    addH('facture', 'Relance envoyée : ' + f.num + ' → ' + cl.email, 'ok');
+    renderRelances();
+    notif('✅ Relance envoyée à ' + cl.email);
+  } catch (e) {
+    notif('❌ Échec envoi : ' + e.message);
+    addH('facture', 'Erreur relance ' + f.num + ' : ' + e.message, 'er');
+  }
+}
+
 function markPaid(i) {
   const f = factures.filter(x=>x.st==='en retard')[i];
   if (!f) return;
@@ -4638,7 +4687,7 @@ document.head.appendChild(cabStyle);
 
   window.lunoOnboardingInit = function(user){
     user = user || currentUser();
-    if(user && user.email === 'demo@luno.fr'){
+    if(user && user.isDemo){
       const s = get();
       s.dismissed = true;
       set(s);
@@ -5603,7 +5652,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
   function tourShouldRun(){
     const user = curUser();
     if(!user) return false;
-    if(user.email === 'demo@luno.fr') return false;
+    if(user.isDemo) return false;
     if(localStorage.getItem(tourKey())) return false;
     // Ne pas afficher si le user est encore sur l'écran auth
     const wrap = document.getElementById('app-wrap');
@@ -7855,7 +7904,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         if(!email || !pwd){ if(errEl){ errEl.textContent='Email et mot de passe requis.'; errEl.style.display='block'; } return; }
 
         // Comptes démo → fallback localStorage (pour ne pas casser les comptes de test existants)
-        if(email === 'demo@luno.fr' || email === 'test@test.fr' || email.includes('demo')){
+        if(email === 'test@test.fr' || email.includes('demo')){
           return origLogin.apply(this, arguments);
         }
 
