@@ -10899,6 +10899,134 @@ window.checkFEC = async function() {
   setInterval(addFecCard, 1500);
 })();
 
+function lunoFiscalSettings() {
+  const saved = lsGet?.('luno_fiscal_settings') || {};
+  return {
+    tvaRegime: saved.tvaRegime || me?.tvaRegime || me?.tva?.period || 'monthly',
+    isRegime: saved.isRegime || 'is',
+    closingMonth: Number(saved.closingMonth || 12),
+    closingDay: Number(saved.closingDay || 31),
+  };
+}
+
+function lunoSaveFiscalSettings() {
+  const settings = {
+    tvaRegime: document.getElementById('luno-tva-regime')?.value || 'monthly',
+    isRegime: document.getElementById('luno-is-regime')?.value || 'is',
+    closingMonth: Number(document.getElementById('luno-closing-month')?.value || 12),
+    closingDay: Number(document.getElementById('luno-closing-day')?.value || 31),
+  };
+  lsSet?.('luno_fiscal_settings', settings);
+  renderFiscalCalendar();
+  notif('Parametres fiscaux enregistres');
+}
+
+function lunoAddMonths(date, months) {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + months);
+  return d;
+}
+
+function lunoFmtDate(date) {
+  return date.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+function lunoFiscalEvents() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const settings = lunoFiscalSettings();
+  const events = [];
+
+  if (settings.tvaRegime !== 'franchise') {
+    if (settings.tvaRegime === 'quarterly') {
+      [0, 3, 6, 9].forEach((month, idx) => {
+        events.push({ type:'TVA', label:`Declaration TVA T${idx + 1}`, date:new Date(year, month + 3, 15), action:'Exporter CA3 et verifier TVA collectee/deductible' });
+      });
+    } else if (settings.tvaRegime === 'annual') {
+      events.push({ type:'TVA', label:'Declaration annuelle TVA CA12', date:new Date(year + 1, 4, 3), action:'Preparer le solde annuel et acomptes TVA' });
+    } else {
+      for (let month = 0; month < 12; month++) {
+        events.push({ type:'TVA', label:`Declaration TVA ${String(month + 1).padStart(2, '0')}/${year}`, date:new Date(year, month + 1, 15), action:'Controler CA3, exporter CSV et payer si necessaire' });
+      }
+    }
+  }
+
+  events.push({ type:'IS', label:'Acompte IS', date:new Date(year, 2, 15), action:'Verifier resultat previsionnel et acompte' });
+  events.push({ type:'IS', label:'Acompte IS', date:new Date(year, 5, 15), action:'Verifier resultat previsionnel et acompte' });
+  events.push({ type:'IS', label:'Acompte IS', date:new Date(year, 8, 15), action:'Verifier resultat previsionnel et acompte' });
+  events.push({ type:'IS', label:'Acompte IS', date:new Date(year, 11, 15), action:'Verifier resultat previsionnel et acompte' });
+  events.push({ type:'CFE', label:'CFE', date:new Date(year, 11, 15), action:'Verifier avis CFE et paiement' });
+
+  const closing = new Date(year, settings.closingMonth - 1, settings.closingDay);
+  events.push({ type:'Cloture', label:'Preparation cloture', date:lunoAddMonths(closing, -1), action:'Controle FEC, lettrage, justificatifs et rapprochements' });
+  events.push({ type:'FEC', label:'Export FEC de controle', date:closing, action:'Generer FEC .txt et transmettre au cabinet' });
+
+  return events
+    .filter(e => e.date >= new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1))
+    .sort((a, b) => a.date - b.date)
+    .slice(0, 8);
+}
+
+function renderFiscalCalendar() {
+  const host = document.getElementById('luno-fiscal-list');
+  if (!host) return;
+  const events = lunoFiscalEvents();
+  host.innerHTML = events.length ? events.map(e => {
+    const days = Math.ceil((e.date - new Date()) / 86400000);
+    const cls = days <= 7 ? 'er' : days <= 30 ? 'wa' : 'inf';
+    return `<div style="display:grid;grid-template-columns:95px 1fr 80px;gap:10px;align-items:center;padding:10px;border-bottom:1px solid var(--bd);font-size:12px;">
+      <div><span class="bdg ${cls}" style="font-size:10px;">${e.type}</span><br><strong>${lunoFmtDate(e.date)}</strong></div>
+      <div><strong>${e.label}</strong><br><span style="color:var(--tx2);">${e.action}</span></div>
+      <button class="btn btn-sm" onclick="${e.type === 'FEC' ? 'exportFEC()' : "nav('tva',document.querySelector('[onclick*=\\'tva\\']'))"}">${e.type === 'FEC' ? 'FEC' : 'TVA'}</button>
+    </div>`;
+  }).join('') : '<div style="padding:1rem;color:var(--tx2);font-size:12px;text-align:center;">Aucune echeance fiscale prochaine.</div>';
+}
+
+function injectFiscalCalendar() {
+  const tvaPage = document.getElementById('p-tva');
+  if (tvaPage && !document.getElementById('luno-fiscal-card')) {
+    const settings = lunoFiscalSettings();
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'luno-fiscal-card';
+    card.style.marginTop = '1rem';
+    card.innerHTML = `<div class="ch" style="display:flex;justify-content:space-between;align-items:center;"><span>Rappels fiscaux & echeances</span><button class="btn btn-sm btn-gr" onclick="lunoSaveFiscalSettings()">Enregistrer</button></div>
+      <div style="padding:1rem;border-bottom:1px solid var(--bd);display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;">
+        <label style="font-size:11px;color:var(--tx2);">Regime TVA<select id="luno-tva-regime" style="margin-top:4px;"><option value="monthly">Mensuel CA3</option><option value="quarterly">Trimestriel</option><option value="annual">Annuel CA12</option><option value="franchise">Franchise en base</option></select></label>
+        <label style="font-size:11px;color:var(--tx2);">Fiscalite<select id="luno-is-regime" style="margin-top:4px;"><option value="is">IS</option><option value="ir">IR</option></select></label>
+        <label style="font-size:11px;color:var(--tx2);">Mois cloture<input id="luno-closing-month" type="number" min="1" max="12" value="${settings.closingMonth}" style="margin-top:4px;"></label>
+        <label style="font-size:11px;color:var(--tx2);">Jour cloture<input id="luno-closing-day" type="number" min="1" max="31" value="${settings.closingDay}" style="margin-top:4px;"></label>
+      </div>
+      <div id="luno-fiscal-list"></div>`;
+    tvaPage.appendChild(card);
+    document.getElementById('luno-tva-regime').value = settings.tvaRegime;
+    document.getElementById('luno-is-regime').value = settings.isRegime;
+  }
+  renderFiscalCalendar();
+}
+
+function injectJournalFecButtons() {
+  const header = document.querySelector('#p-journal .ph > div:last-child');
+  if (!header || document.getElementById('luno-journal-fec')) return;
+  const check = document.createElement('button');
+  check.id = 'luno-journal-fec-check';
+  check.className = 'btn';
+  check.textContent = 'Controle FEC';
+  check.onclick = checkFEC;
+  const exportBtn = document.createElement('button');
+  exportBtn.id = 'luno-journal-fec';
+  exportBtn.className = 'btn btn-bl';
+  exportBtn.textContent = 'FEC .txt';
+  exportBtn.onclick = exportFEC;
+  header.insertBefore(check, header.lastElementChild);
+  header.insertBefore(exportBtn, header.lastElementChild);
+}
+
+setInterval(() => {
+  injectFiscalCalendar();
+  injectJournalFecButtons();
+}, 1500);
+
 </script>
 </body>
 </html>
