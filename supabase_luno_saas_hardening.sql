@@ -26,6 +26,9 @@ alter table if exists public.devis add column if not exists legacy_index integer
 alter table if exists public.devis add column if not exists client_index integer;
 alter table if exists public.factures add column if not exists legacy_index integer;
 alter table if exists public.factures add column if not exists client_index integer;
+alter table if exists public.bank_transactions add column if not exists tva_rate numeric(5,2) default 0;
+alter table if exists public.bank_transactions add column if not exists tva_amount numeric(14,2) default 0;
+alter table if exists public.bank_transactions add column if not exists status text default 'to_review';
 
 create or replace function public.is_company_member(p_company_id uuid)
 returns boolean
