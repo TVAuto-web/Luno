@@ -11049,6 +11049,45 @@ window.checkFEC = async function() {
   setInterval(addFecCard, 1500);
 })();
 
+(function injectFiscalDeclarationControls(){
+  function addFiscalCards(){
+    const tvaPage = document.getElementById('p-tva');
+    if (tvaPage && !document.getElementById('luno-tax-pack-card')) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.id = 'luno-tax-pack-card';
+      card.style.marginTop = '1rem';
+      card.innerHTML = `
+        <div class="ch" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Declarations fiscales</span>
+          <button class="btn btn-sm btn-gr" onclick="exportFiscalReport('full','json')">Pack complet</button>
+        </div>
+        <div style="padding:.85rem 1rem;">
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;">
+            <button class="btn btn-bl" onclick="exportFiscalReport('tva','csv')">TVA CA3 CSV</button>
+            <button class="btn" onclick="previewFiscalReport('2035')">2035 BNC</button>
+            <button class="btn" onclick="previewFiscalReport('2033')">2033 Societe</button>
+            <button class="btn" onclick="previewFiscalReport('2065')">2065 IS</button>
+            <button class="btn" onclick="previewFiscalReport('das2')">DAS2</button>
+            <button class="btn" onclick="previewFiscalReport('2042cpro')">2042-C-PRO</button>
+          </div>
+          <div id="luno-fiscal-preview" style="margin-top:.85rem;"></div>
+        </div>`;
+      tvaPage.appendChild(card);
+    }
+
+    const grid = document.querySelector('#p-exports .three-col');
+    if (grid && !document.getElementById('luno-fiscal-export-card')) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.id = 'luno-fiscal-export-card';
+      card.innerHTML = `<div class="ch">Pack fiscal</div><div style="padding:.85rem 1rem;"><p style="font-size:12px;color:var(--tx2);margin-bottom:.75rem;">Preparation TVA, 2035, 2033/2065, DAS2, 2042-C-PRO et echeancier. Non transmis automatiquement.</p><div style="display:flex;gap:.4rem;"><button class="btn btn-bl" style="flex:1;" onclick="exportFiscalReport('full','json')">JSON</button><button class="btn" style="flex:1;" onclick="exportFiscalReport('tva','csv')">TVA CSV</button></div></div>`;
+      grid.appendChild(card);
+    }
+  }
+  setInterval(addFiscalCards, 1500);
+})();
+
 function lunoFiscalSettings() {
   const saved = lsGet?.('luno_fiscal_settings') || {};
   return {
@@ -11058,6 +11097,55 @@ function lunoFiscalSettings() {
     closingDay: Number(saved.closingDay || 31),
   };
 }
+
+function lunoFiscalPayload() {
+  return {
+    clients: typeof clients !== 'undefined' ? clients : [],
+    fournisseurs: typeof fournisseurs !== 'undefined' ? fournisseurs : [],
+    factures: typeof factures !== 'undefined' ? factures : [],
+    achats: typeof achats !== 'undefined' ? achats : [],
+    comptes: typeof comptes !== 'undefined' ? comptes : [],
+    ecritures: typeof ecritures !== 'undefined' ? ecritures : [],
+    treso: typeof treso !== 'undefined' ? treso : [],
+    settings: { ...lunoFiscalSettings(), year: yr, isRate: 25 },
+    company: { name: me?.societe || '', siren: me?.siren || '', email: me?.email || '' },
+  };
+}
+
+async function lunoFiscalReport(type, format) {
+  const result = await lunoPostJsonApi('/api/fiscal', {
+    type,
+    format: format || 'json',
+    year: yr,
+    data: lunoFiscalPayload(),
+  });
+  return result;
+}
+
+window.exportFiscalReport = async function(type, format) {
+  try {
+    const result = await lunoFiscalReport(type, format || 'json');
+    lunoDownloadText(result.filename || `luno_${type}_${yr}.${format === 'csv' ? 'csv' : 'json'}`, result.content, result.mimeType || 'application/json;charset=utf-8');
+    notif('Preparation fiscale exportee : ' + type);
+    addH('export', 'Export fiscal ' + type, 'ok');
+  } catch (err) {
+    notif('Preparation fiscale indisponible : ' + lunoIntegrationError(err, 'erreur serveur'));
+  }
+};
+
+window.previewFiscalReport = async function(type) {
+  try {
+    const result = await lunoFiscalReport(type, 'json');
+    const report = result.report || {};
+    const fields = report.fields || report.balance || {};
+    const rows = Object.entries(fields).slice(0, 8).map(([k, v]) => `<div class="brow"><span>${k.replace(/_/g, ' ')}</span><span>${typeof v === 'number' ? fmt(v) : v}</span></div>`).join('');
+    let host = document.getElementById('luno-fiscal-preview');
+    if (!host) return;
+    host.innerHTML = `<div class="ch">Apercu ${report.form || type}</div><div style="padding:.8rem 1rem;">${rows || '<div style="font-size:12px;color:var(--tx2);">Aucune donnee.</div>'}</div>`;
+  } catch (err) {
+    notif('Apercu fiscal indisponible : ' + lunoIntegrationError(err, 'erreur serveur'));
+  }
+};
 
 function lunoSaveFiscalSettings() {
   const settings = {
@@ -11117,6 +11205,10 @@ function lunoFiscalEvents() {
     .slice(0, 8);
 }
 
+window.exportFiscalCalendar = async function() {
+  await exportFiscalReport('calendar', 'json');
+};
+
 function renderFiscalCalendar() {
   const host = document.getElementById('luno-fiscal-list');
   if (!host) return;
@@ -11140,7 +11232,7 @@ function injectFiscalCalendar() {
     card.className = 'card';
     card.id = 'luno-fiscal-card';
     card.style.marginTop = '1rem';
-    card.innerHTML = `<div class="ch" style="display:flex;justify-content:space-between;align-items:center;"><span>Rappels fiscaux & echeances</span><button class="btn btn-sm btn-gr" onclick="lunoSaveFiscalSettings()">Enregistrer</button></div>
+    card.innerHTML = `<div class="ch" style="display:flex;justify-content:space-between;align-items:center;"><span>Rappels fiscaux & echeances</span><div style="display:flex;gap:.4rem;"><button class="btn btn-sm" onclick="exportFiscalCalendar()">Exporter</button><button class="btn btn-sm btn-gr" onclick="lunoSaveFiscalSettings()">Enregistrer</button></div></div>
       <div style="padding:1rem;border-bottom:1px solid var(--bd);display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;">
         <label style="font-size:11px;color:var(--tx2);">Regime TVA<select id="luno-tva-regime" style="margin-top:4px;"><option value="monthly">Mensuel CA3</option><option value="quarterly">Trimestriel</option><option value="annual">Annuel CA12</option><option value="franchise">Franchise en base</option></select></label>
         <label style="font-size:11px;color:var(--tx2);">Fiscalite<select id="luno-is-regime" style="margin-top:4px;"><option value="is">IS</option><option value="ir">IR</option></select></label>
