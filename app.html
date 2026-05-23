@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>LUNO</title>
+<meta name="theme-color" content="#1D9E75">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon-192.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;1,14..32,400&display=swap" rel="stylesheet">
 <style>
@@ -11026,6 +11029,90 @@ setInterval(() => {
   injectFiscalCalendar();
   injectJournalFecButtons();
 }, 1500);
+
+async function lunoIntegrationStatus() {
+  try {
+    return await lunoPostJsonApi('/api/integration-status', null, 'GET');
+  } catch (err) {
+    return null;
+  }
+}
+
+async function lunoPostJsonApiFlexible(url, body, method) {
+  const response = await fetch(url, {
+    method: method || 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: method === 'GET' ? undefined : JSON.stringify(body || {}),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || data.message || ('Erreur API ' + response.status));
+  return data;
+}
+
+const _lunoPostJsonApiBase = window.lunoPostJsonApi || lunoPostJsonApi;
+window.lunoPostJsonApi = function(url, body, method) {
+  return method === 'GET' ? lunoPostJsonApiFlexible(url, body, method) : _lunoPostJsonApiBase(url, body);
+};
+
+async function renderIntegrationStatusCards() {
+  const status = await lunoIntegrationStatus();
+  if (!status) return;
+
+  const signPage = document.getElementById('p-signature');
+  if (signPage && !document.getElementById('luno-signature-status')) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'luno-signature-status';
+    card.style.marginTop = '1rem';
+    signPage.appendChild(card);
+  }
+  const signCard = document.getElementById('luno-signature-status');
+  if (signCard) {
+    const ok = status.signature?.configured;
+    signCard.innerHTML = `<div class="ch">Etat YouSign</div><div style="padding:1rem;font-size:12px;line-height:1.6;"><span class="bdg ${ok ? 'ok' : 'wa'}">${ok ? 'Actif' : 'A configurer'}</span><p style="margin-top:.6rem;color:var(--tx2);">${status.signature?.label || ''}</p>${ok ? '' : '<p style="color:var(--tx2);">Ajoutez YOUSIGN_API_KEY dans Vercel pour envoyer les demandes de signature reelles.</p>'}</div>`;
+  }
+
+  const bankPage = document.getElementById('p-banque');
+  if (bankPage && !document.getElementById('luno-account-pro-card')) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'luno-account-pro-card';
+    card.style.marginTop = '1rem';
+    card.innerHTML = '<div class="ch">Compte pro partenaire</div><div id="luno-account-pro-body" style="padding:1rem;"></div>';
+    bankPage.appendChild(card);
+  }
+  const body = document.getElementById('luno-account-pro-body');
+  if (body) {
+    const ok = status.accountPro?.configured;
+    body.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;font-size:12px;"><div><span class="bdg ${ok ? 'ok' : 'inf'}">${ok ? 'Partenaire pret' : 'Pre-inscription'}</span><p style="margin-top:.6rem;color:var(--tx2);line-height:1.6;">${status.accountPro?.label || 'Partenaire compte pro a choisir'}. LUNO peut deja collecter les demandes et rediriger quand le partenaire est configure.</p></div><button class="btn btn-gr" onclick="requestAccountPro()">Demander</button></div>`;
+  }
+}
+
+window.requestAccountPro = async function() {
+  try {
+    const result = await lunoPostJsonApi('/api/account-pro-lead', {
+      email: me?.email || '',
+      company: me?.societe || '',
+      siren: me?.siren || '',
+    });
+    if (result.redirectUrl) {
+      location.href = result.redirectUrl;
+      return;
+    }
+    notif(result.message || 'Demande compte pro enregistree');
+  } catch (err) {
+    notif('Compte pro indisponible : ' + lunoIntegrationError(err, 'email requis'));
+  }
+};
+
+function registerLunoPwa() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+}
+
+registerLunoPwa();
+setInterval(renderIntegrationStatusCards, 2500);
 
 </script>
 </body>
