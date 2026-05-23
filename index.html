@@ -238,6 +238,26 @@ section { padding: 100px 2rem; background: var(--paper); }
 .section-title em { font-style: italic; color: var(--sage); }
 .section-sub { font-size: 17px; color: var(--muted); max-width: 520px; line-height: 1.65; }
 
+/* Statuts */
+.status-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-top: 3rem; }
+.status-card {
+  background: rgba(255,252,245,.82);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  padding: 1.25rem;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+  box-shadow: 0 18px 48px rgba(8,26,22,.08);
+}
+.status-card h3 { color: var(--ink); font-size: 18px; line-height: 1.25; }
+.status-card p { color: var(--muted); font-size: 14px; line-height: 1.55; }
+.status-card ul { list-style: none; display: grid; gap: .45rem; margin-top: auto; }
+.status-card li { color: var(--text); font-size: 13px; display: flex; gap: .45rem; }
+.status-card li::before { content: "✓"; color: var(--sage); font-weight: 800; }
+.status-pill { width: max-content; padding: 4px 10px; border-radius: 999px; background: var(--sage-light); color: var(--sage-dark); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .35px; }
+
 /* ── FEATURES ── */
 #features { background: #102d26; color: rgba(255,255,255,.86); }
 #features .section-title { color: #fff8eb; }
@@ -602,7 +622,7 @@ footer {
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .nav-links { display: none; }
-  .features-grid, .pricing-grid { grid-template-columns: 1fr; }
+  .features-grid, .pricing-grid, .status-grid { grid-template-columns: 1fr; }
   .feature-highlight, .why-grid, .footer-grid { grid-template-columns: 1fr; }
   .preview-body { grid-template-columns: 1fr; }
   .preview-sidebar { display: none; }
@@ -621,6 +641,7 @@ footer {
   <ul class="nav-links">
     <li><a href="#features">Fonctionnalités</a></li>
     <li><a href="#pourquoi">Pourquoi nous</a></li>
+    <li><a href="#statuts">Statuts</a></li>
     <li><a href="#tarifs">Tarifs</a></li>
     <li><a href="#faq">FAQ</a></li>
   </ul>
@@ -845,6 +866,42 @@ footer {
 </section>
 
 <!-- ══ TARIFS ══ -->
+<section id="statuts">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-tag">&#10022; Par statut</div>
+      <h2 class="section-title">Un suivi adapte a <em>chaque structure</em></h2>
+      <p class="section-sub" style="margin:0 auto;">LUNO adapte le discours, les alertes et les exports aux besoins courants des independants, societes et activites immobilieres.</p>
+    </div>
+    <div class="status-grid reveal">
+      <article class="status-card" id="auto-entrepreneur">
+        <span class="status-pill">Independants</span>
+        <h3>Auto-entrepreneur & freelance</h3>
+        <p>Facturation simple, suivi clients, plafonds de documents et pilotage rapide sans complexite comptable inutile.</p>
+        <ul><li>Devis et factures rapides</li><li>TVA simple ou franchise en base</li><li>Relances clients et exports PDF</li></ul>
+      </article>
+      <article class="status-card" id="sasu-sas">
+        <span class="status-pill">Societes</span>
+        <h3>SAS, SASU, SARL, EURL</h3>
+        <p>Pour les dirigeants qui veulent suivre ventes, achats, tresorerie, TVA et exports comptables avant transmission au cabinet.</p>
+        <ul><li>Journal, TVA et FEC</li><li>Rapprochement bancaire</li><li>Roles, permissions et workflows</li></ul>
+      </article>
+      <article class="status-card" id="sci-lmnp">
+        <span class="status-pill">Immobilier</span>
+        <h3>SCI, LMNP et gestion locative</h3>
+        <p>Un cadre pour centraliser charges, justificatifs, paiements et documents utiles a la preparation comptable.</p>
+        <ul><li>OCR justificatifs</li><li>Classement des charges</li><li>Exports pour l'expert-comptable</li></ul>
+      </article>
+      <article class="status-card" id="cabinet-comptable">
+        <span class="status-pill">Cabinets</span>
+        <h3>Cabinets comptables</h3>
+        <p>Une vue multi-dossiers pour suivre les clients, collecter les pieces, controler la TVA et fluidifier la production.</p>
+        <ul><li>Portefeuille clients</li><li>Portail client et workflows</li><li>Pre-revision et anomalies</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
 <section id="tarifs">
   <div class="container">
     <div class="reveal" style="text-align:center;">
