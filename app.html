@@ -8070,6 +8070,17 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
   }
 
   // ─── Hydratation : si une session Supabase existe, charger le profile et lancer launchApp ───
+  async function fetchSupabaseBusinessData(){
+    const { data: { session } } = await window.sb.auth.getSession();
+    if(!session || !session.access_token) return null;
+    const response = await fetch('/api/supabase-data', {
+      headers: { Authorization: 'Bearer ' + session.access_token }
+    });
+    const payload = await response.json().catch(() => ({}));
+    if(!response.ok) throw new Error(payload.error || 'Chargement Supabase impossible');
+    return payload.data || null;
+  }
+
   async function hydrateSupabaseSession(){
     if(!window.sb) return;
     try {
@@ -8089,6 +8100,11 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         return;
       }
       // Convertit en format compatible avec le système legacy `me`
+      const businessData = await fetchSupabaseBusinessData().catch(e => {
+        console.warn('[Supabase] Donnees metier indisponibles', e);
+        setCloudState('error');
+        return null;
+      });
       const legacyUser = {
         email:    profile.email,
         prenom:   profile.prenom || '',
@@ -8111,7 +8127,7 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         plan:     (sub && sub.plan) || 'trial',
         status:   (sub && sub.status) || 'active',
         trialEnds: sub && sub.trial_ends_at,
-        data: {} // sera rempli en V8 (sync clients/factures)
+        data: businessData || {}
       };
       // Cache dans luno_users pour que le système legacy ait accès
       const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
@@ -11146,18 +11162,40 @@ let lunoSupabaseSyncTimer = null;
 async function lunoSyncToSupabaseNow() {
   const token = await lunoSupabaseAccessToken();
   if (!token) return false;
+  const snapshot = lunoCurrentSnapshot();
   const response = await fetch('/api/supabase-sync', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-    body: JSON.stringify({ version: 'web-snapshot-v1', data: lunoCurrentSnapshot() }),
+    body: JSON.stringify({ version: 'web-snapshot-v1', data: snapshot }),
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.error || 'Sync Supabase impossible');
+  await lunoSyncBusinessDataNow(token, snapshot);
   setCloudState?.('connected');
   return true;
 }
 
 window.lunoSyncToSupabaseNow = lunoSyncToSupabaseNow;
+async function lunoSyncBusinessDataNow(token, snapshot) {
+  const accessToken = token || await lunoSupabaseAccessToken();
+  if (!accessToken) return false;
+  const state = snapshot || lunoCurrentSnapshot();
+  const response = await fetch('/api/supabase-data', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + accessToken },
+    body: JSON.stringify({
+      data: {
+        clients: state.clients || [],
+        devis: state.devis || [],
+        factures: state.factures || [],
+      }
+    }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || 'Sync donnees Supabase impossible');
+  return true;
+}
+window.lunoSyncBusinessDataNow = lunoSyncBusinessDataNow;
 function lunoScheduleSupabaseSync() {
   clearTimeout(lunoSupabaseSyncTimer);
   lunoSupabaseSyncTimer = setTimeout(() => {
@@ -11181,6 +11219,21 @@ function lunoScheduleSupabaseSync() {
   setInterval(() => {
     if (me) lunoScheduleSupabaseSync();
   }, 60000);
+})();
+
+(function hookBusinessMutations(){
+  if (window._lunoBusinessMutationHooked) return;
+  window._lunoBusinessMutationHooked = true;
+  ['saveClient','delClient','saveDevis','delDevis','convertDevis','saveFac','payerFac','delFac'].forEach(name => {
+    const original = window[name];
+    if (typeof original !== 'function') return;
+    window[name] = function(){
+      const result = original.apply(this, arguments);
+      try { if (typeof persistUserData === 'function') persistUserData(); } catch(e) {}
+      lunoScheduleSupabaseSync();
+      return result;
+    };
+  });
 })();
 
 </script>
