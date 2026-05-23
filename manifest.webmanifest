@@ -1,0 +1,36 @@
+{
+  "name": "LUNO",
+  "short_name": "LUNO",
+  "description": "Gestion comptable, facturation, TVA et pre-comptabilite pour PME francaises.",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#061f1a",
+  "theme_color": "#1f8a68",
+  "orientation": "portrait-primary",
+  "lang": "fr-FR",
+  "icons": [
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouvelle facture",
+      "url": "/app#factures"
+    },
+    {
+      "name": "TVA",
+      "url": "/app#tva"
+    }
+  ]
+}
