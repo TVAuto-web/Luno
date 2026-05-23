@@ -11113,7 +11113,8 @@ function lunoFiscalPayload() {
 }
 
 async function lunoFiscalReport(type, format) {
-  const result = await lunoPostJsonApi('/api/fiscal', {
+  const result = await lunoPostJsonApi('/api/fec', {
+    mode: 'fiscal',
     type,
     format: format || 'json',
     year: yr,
