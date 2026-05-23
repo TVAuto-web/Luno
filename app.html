@@ -2493,6 +2493,8 @@ let activeCompanyId = 'C1';
 let webhooks = [];
 let backupFreq = 'daily';
 
+const LUNO_EINVOICE_STATUSES = ['emise','preparee','transmise','recue','rejetee','payee'];
+
 
 // ════════════════════════════════════════
 // 1. SYNCHRONISATION BANCAIRE
@@ -10591,6 +10593,95 @@ window.checkFacturXCompliance = async function(i) {
   }
 };
 
+window.lookupEInvoiceDirectory = async function(kind, index) {
+  const list = kind === 'fournisseur' ? fournisseurs : clients;
+  const item = list[index];
+  if (!item) { notif('Entreprise introuvable'); return; }
+  try {
+    const result = await lunoPostJsonApi('/api/facturx', { mode: 'directory', query: item.siret || item.siren || item.nom });
+    const found = result.results?.[0];
+    if (!found) { notif('Aucune entreprise trouvee dans l annuaire'); return; }
+    Object.assign(item, {
+      nom: item.nom || found.nom,
+      siret: item.siret || found.siret,
+      siren: item.siren || found.siren,
+      adr: item.adr || found.adresse,
+      cp: item.cp || found.cp,
+      ville: item.ville || found.ville,
+      eInvoiceReady: found.eInvoiceReady,
+      eInvoiceDirectoryCheckedAt: new Date().toISOString(),
+    });
+    persistUserData?.();
+    renderClients?.();
+    renderFourn?.();
+    notif('Annuaire verifie : ' + (found.nom || found.siren));
+  } catch (err) {
+    notif('Annuaire indisponible : ' + lunoIntegrationError(err, 'verification impossible'));
+  }
+};
+
+window.updateEInvoiceStatus = function(kind, index, status) {
+  const list = kind === 'achat' ? achats : factures;
+  const item = list[index];
+  if (!item) return;
+  item.eStatus = status;
+  if (status === 'payee' || status === 'payee') item.st = 'payee';
+  if (status === 'payee') item.st = 'payee';
+  if (status === 'rejetee') item.eRejectedAt = new Date().toISOString();
+  item.eStatusUpdatedAt = new Date().toISOString();
+  persistUserData?.();
+  renderFactures?.();
+  renderAchats?.();
+  renderEInvoiceCockpit?.();
+  notif('Statut e-facture : ' + status);
+};
+
+window.importReceivedEInvoiceXml = async function() {
+  const input = document.getElementById('luno-einvoice-file');
+  const file = input?.files?.[0];
+  if (!file) { notif('Fichier XML requis'); return; }
+  try {
+    const xml = await file.text();
+    const result = await lunoPostJsonApi('/api/facturx', { mode: 'receive', xml });
+    const inv = result.invoice || {};
+    let fi = fournisseurs.findIndex(f => lunoNormText(f.nom) === lunoNormText(inv.fournisseur));
+    if (fi < 0) {
+      fournisseurs.push({ nom: inv.fournisseur || 'Fournisseur electronique', contact:'', email:'', tel:'', siret:'', delai:30 });
+      fi = fournisseurs.length - 1;
+    }
+    achats.unshift({
+      num: inv.num || ('RX-' + Date.now()),
+      fi,
+      date: inv.date || today(),
+      due: due30(),
+      ht: Number(inv.ht || 0),
+      tva: Number(inv.tva || 20),
+      tvaA: Number(inv.tvaA || 0),
+      ttc: Number(inv.ttc || 0),
+      st: 'en attente',
+      desc: inv.desc || 'Facture electronique recue',
+      eStatus: 'recue',
+      source: 'factur-x',
+    });
+    persistUserData?.();
+    renderAchats?.();
+    renderEInvoiceCockpit?.();
+    notif('Facture fournisseur recue importee');
+  } catch (err) {
+    notif('Import e-facture impossible : ' + lunoIntegrationError(err, 'XML invalide'));
+  }
+};
+
+window.openEInvoicePartner = async function() {
+  try {
+    const result = await lunoPostJsonApi('/api/facturx', { mode: 'partner-status' });
+    if (result.redirectUrl) location.href = result.redirectUrl;
+    else notif(result.note || 'Partenaire PA/PDP a choisir');
+  } catch (err) {
+    notif('Partenaire e-facture indisponible');
+  }
+};
+
 function lunoNormalizeBankPayload(result) {
   const accountMap = new Map((result.accounts || []).map(account => [String(account.id), {
     id: 'BA_' + String(account.id || Date.now()).replace(/[^a-z0-9_-]/gi, '_'),
@@ -10704,18 +10795,106 @@ window.syncBankAccount = async function(id) {
 };
 
 (function injectFacturXControls(){
+  const statusBadge = status => {
+    const cls = status === 'rejetee' ? 'er' : status === 'transmise' || status === 'recue' || status === 'payee' ? 'ok' : status === 'preparee' ? 'inf' : 'wa';
+    return `<span class="bdg ${cls}" style="font-size:10px;">${status || 'emise'}</span>`;
+  };
+
   function enhanceFactureRows(){
     document.querySelectorAll('#fac-tbl tr').forEach((row, i) => {
       const actions = row.querySelector('td:last-child > div');
       if (!actions || actions.querySelector('.luno-facturx-btn')) return;
+      const statusCell = row.querySelector('td:nth-child(6)');
+      if (statusCell && !statusCell.querySelector('.luno-estatus')) {
+        statusCell.insertAdjacentHTML('beforeend', `<br><span class="luno-estatus">${statusBadge(factures[i]?.eStatus || 'emise')}</span>`);
+      }
       const btn = document.createElement('button');
       btn.className = 'btn btn-sm btn-bl luno-facturx-btn';
       btn.title = 'Exporter Factur-X XML';
       btn.textContent = 'FX';
       btn.onclick = () => window.exportFacturX(i);
       actions.appendChild(btn);
+      const sel = document.createElement('select');
+      sel.className = 'luno-estatus-select';
+      sel.style.cssText = 'font-size:10px;width:92px;padding:2px 4px;';
+      sel.innerHTML = LUNO_EINVOICE_STATUSES.map(s => `<option value="${s}"${s === (factures[i]?.eStatus || 'emise') ? ' selected' : ''}>${s}</option>`).join('');
+      sel.onchange = () => updateEInvoiceStatus('facture', i, sel.value);
+      actions.appendChild(sel);
     });
   }
+
+  function enhanceAchatRows(){
+    document.querySelectorAll('#ac-tbl tr').forEach((row, i) => {
+      const actions = row.querySelector('td:last-child > div');
+      if (!actions || actions.querySelector('.luno-achat-estatus')) return;
+      const statusCell = row.querySelector('td:nth-child(6)');
+      if (statusCell) statusCell.insertAdjacentHTML('beforeend', `<br><span class="luno-achat-estatus">${statusBadge(achats[i]?.eStatus || 'recue')}</span>`);
+      const sel = document.createElement('select');
+      sel.style.cssText = 'font-size:10px;width:92px;padding:2px 4px;';
+      sel.innerHTML = LUNO_EINVOICE_STATUSES.map(s => `<option value="${s}"${s === (achats[i]?.eStatus || 'recue') ? ' selected' : ''}>${s}</option>`).join('');
+      sel.onchange = () => updateEInvoiceStatus('achat', i, sel.value);
+      actions.appendChild(sel);
+    });
+  }
+
+  function enhanceDirectoryButtons(){
+    document.querySelectorAll('#cl-tbl tr').forEach((row, i) => {
+      const actions = row.querySelector('td:last-child > div');
+      if (!actions || actions.querySelector('.luno-dir-btn')) return;
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-sm luno-dir-btn';
+      btn.title = 'Verifier annuaire e-facture';
+      btn.textContent = 'SIRET';
+      btn.onclick = () => lookupEInvoiceDirectory('client', i);
+      actions.appendChild(btn);
+    });
+    document.querySelectorAll('#fo-tbl tr').forEach((row, i) => {
+      const actions = row.querySelector('td:last-child');
+      if (!actions || actions.querySelector('.luno-dir-btn')) return;
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-sm luno-dir-btn';
+      btn.title = 'Verifier annuaire e-facture';
+      btn.textContent = 'SIRET';
+      btn.onclick = () => lookupEInvoiceDirectory('fournisseur', i);
+      actions.appendChild(btn);
+    });
+  }
+
+  window.renderEInvoiceCockpit = function(){
+    const page = document.getElementById('p-factures');
+    if (!page) return;
+    let card = document.getElementById('luno-einvoice-cockpit');
+    if (!card) {
+      card = document.createElement('div');
+      card.className = 'card';
+      card.id = 'luno-einvoice-cockpit';
+      card.style.marginBottom = '1rem';
+      page.insertBefore(card, page.children[1] || null);
+    }
+    const outgoing = factures || [];
+    const incoming = achats || [];
+    const rejected = outgoing.concat(incoming).filter(x => x.eStatus === 'rejetee').length;
+    const toTransmit = outgoing.filter(x => !x.eStatus || x.eStatus === 'emise' || x.eStatus === 'preparee').length;
+    const received = incoming.filter(x => x.eStatus === 'recue').length;
+    card.innerHTML = `
+      <div class="ch" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Facturation electronique 2026</span>
+        <button class="btn btn-sm btn-gr" onclick="openEInvoicePartner()">Partenaire PA/PDP</button>
+      </div>
+      <div style="padding:.85rem 1rem;">
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem;margin-bottom:.85rem;">
+          <div class="sc"><div class="sc-l">A transmettre</div><div class="sc-v">${toTransmit}</div></div>
+          <div class="sc"><div class="sc-l">Recues</div><div class="sc-v" style="color:var(--gr);">${received}</div></div>
+          <div class="sc"><div class="sc-l">Rejetees</div><div class="sc-v" style="color:${rejected ? 'var(--rd)' : 'var(--gr)'};">${rejected}</div></div>
+          <div class="sc"><div class="sc-l">Format</div><div class="sc-v" style="font-size:18px;">Factur-X</div></div>
+        </div>
+        <div style="display:flex;gap:.5rem;align-items:center;">
+          <input id="luno-einvoice-file" type="file" accept=".xml,application/xml,text/xml" style="font-size:12px;flex:1;">
+          <button class="btn btn-bl" onclick="importReceivedEInvoiceXml()">Importer recue</button>
+        </div>
+      </div>`;
+  };
+
   function enhanceExportsPage(){
     const grid = document.querySelector('#p-exports .three-col');
     if (!grid || document.getElementById('luno-facturx-export-card')) return;
@@ -10729,7 +10908,7 @@ window.syncBankAccount = async function(id) {
     document.getElementById('fx-download').onclick = () => exportFacturX(parseInt(document.getElementById('e-fx').value) || 0);
     document.getElementById('fx-check').onclick = () => checkFacturXCompliance(parseInt(document.getElementById('e-fx').value) || 0);
   }
-  setInterval(() => { enhanceFactureRows(); enhanceExportsPage(); }, 1500);
+  setInterval(() => { enhanceFactureRows(); enhanceAchatRows(); enhanceDirectoryButtons(); enhanceExportsPage(); renderEInvoiceCockpit(); }, 1500);
 })();
 
 function lunoEntryDebit(e) { return e.cpd || e.deb || e.compteDebit || ''; }
