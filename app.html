@@ -5940,7 +5940,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
   display: block; font-size: 11px; font-weight: 600; color: var(--tx1,#62604b);
   margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px;
 }
-.ux-settings-section input[type="text"], .ux-settings-section select, .ux-settings-section textarea{
+.ux-settings-section input[type="text"], .ux-settings-section input[type="number"], .ux-settings-section input[type="email"], .ux-settings-section select, .ux-settings-section textarea{
   width: 100%; padding: 9px 12px; border: 1px solid var(--bd,#dddad0); border-radius: 8px;
   background: var(--bg0,#fff); color: var(--tx0,#1a1a18); font-size: 13px; box-sizing: border-box;
   font-family: inherit;
@@ -5956,6 +5956,16 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
   margin-top: 1rem; padding: 1rem; background: var(--bg2,#f6f6f4); border-radius: 10px; font-size: 12px;
 }
 .ux-settings-preview h5{ font-size: 11px; color: var(--tx2,#999582); text-transform: uppercase; margin-bottom: .5rem; }
+.ux-settings-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.85rem 1rem; }
+.ux-settings-grid .fld{ margin-bottom:0; }
+.ux-settings-grid .wide{ grid-column:1 / -1; }
+.ux-check-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem .75rem; }
+.ux-check-grid label{
+  display:flex; align-items:center; gap:8px; margin:0; padding:8px 10px; border:1px solid var(--bd,#dddad0);
+  border-radius:8px; background:var(--bg0,#fff); font-size:12px; text-transform:none; letter-spacing:0; color:var(--tx0,#1a1a18);
+}
+.ux-check-grid input{ margin:0; }
+@media(max-width:720px){ .ux-settings-grid, .ux-check-grid{ grid-template-columns:1fr; } }
 .ux-foot{ padding: .85rem 1.25rem; border-top: 1px solid var(--bd,#dddad0); display: flex; justify-content: flex-end; gap: 8px; }
 .ux-foot .btn-cancel{
   padding: 8px 16px; font-size: 12px; font-weight: 600; border-radius: 8px;
@@ -6013,6 +6023,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
     </div>
     <div class="ux-settings-tabs">
       <button class="ux-tab on" data-tab="apparence" onclick="uxSettingsTab('apparence')">🎨 Apparence</button>
+      <button class="ux-tab"    data-tab="profil"    onclick="uxSettingsTab('profil')">Entreprise & fiscal</button>
       <button class="ux-tab"    data-tab="documents" onclick="uxSettingsTab('documents')">📄 Documents</button>
       <button class="ux-tab"    data-tab="devise"    onclick="uxSettingsTab('devise')">💱 Devise & format</button>
     </div>
@@ -6036,6 +6047,106 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
           <h5>Aperçu</h5>
           <button id="ux-prev-btn" style="padding:8px 16px;border-radius:8px;border:none;color:#fff;font-weight:700;font-family:inherit;cursor:default;font-size:12px;background:#1D9E75;">Bouton primaire</button>
           <span id="ux-prev-bdg" style="display:inline-block;margin-left:8px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(29,158,117,.15);color:#1D9E75;">Badge marque</span>
+        </div>
+      </div>
+      <div class="ux-settings-section" id="ux-sec-profil">
+        <div class="ux-settings-grid">
+          <div class="fld">
+            <label>Nom commercial / raison sociale</label>
+            <input type="text" id="ux-company-name" placeholder="LUNO SAS">
+          </div>
+          <div class="fld">
+            <label>Forme juridique</label>
+            <select id="ux-legal-form">
+              <option value="">A preciser</option>
+              <option value="EI">Entreprise individuelle</option>
+              <option value="Micro-entreprise">Micro-entreprise</option>
+              <option value="EURL">EURL</option>
+              <option value="SARL">SARL</option>
+              <option value="SASU">SASU</option>
+              <option value="SAS">SAS</option>
+              <option value="SA">SA</option>
+              <option value="Association">Association</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>SIREN</label>
+            <input type="text" id="ux-siren" inputmode="numeric" placeholder="123456789">
+          </div>
+          <div class="fld">
+            <label>SIRET</label>
+            <input type="text" id="ux-siret" inputmode="numeric" placeholder="12345678900012">
+          </div>
+          <div class="fld">
+            <label>Numero TVA intracommunautaire</label>
+            <input type="text" id="ux-vat-number" placeholder="FR00123456789">
+          </div>
+          <div class="fld">
+            <label>Code APE / NAF</label>
+            <input type="text" id="ux-ape-code" placeholder="6201Z">
+          </div>
+          <div class="fld">
+            <label>Capital social</label>
+            <input type="text" id="ux-share-capital" placeholder="10 000 EUR">
+          </div>
+          <div class="fld">
+            <label>Pays</label>
+            <input type="text" id="ux-country" placeholder="FR">
+          </div>
+          <div class="fld wide">
+            <label>Adresse du siege / etablissement</label>
+            <input type="text" id="ux-address" placeholder="123 rue de la Republique">
+          </div>
+          <div class="fld">
+            <label>Code postal</label>
+            <input type="text" id="ux-postcode" inputmode="numeric" placeholder="75001">
+          </div>
+          <div class="fld">
+            <label>Ville</label>
+            <input type="text" id="ux-city" placeholder="Paris">
+          </div>
+          <div class="fld">
+            <label>Regime fiscal</label>
+            <select id="ux-fiscal-regime">
+              <option value="is">IS</option>
+              <option value="ir">IR</option>
+              <option value="bnc">BNC</option>
+              <option value="bic">BIC</option>
+              <option value="micro">Micro</option>
+              <option value="reel_simplifie">Reel simplifie</option>
+              <option value="reel_normal">Reel normal</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Regime TVA</label>
+            <select id="ux-tva-regime-company">
+              <option value="monthly">Mensuel CA3</option>
+              <option value="quarterly">Trimestriel</option>
+              <option value="annual">Annuel CA12</option>
+              <option value="franchise">Franchise en base</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Mois de cloture</label>
+            <input type="number" id="ux-closing-month-company" min="1" max="12" placeholder="12">
+          </div>
+          <div class="fld">
+            <label>Jour de cloture</label>
+            <input type="number" id="ux-closing-day-company" min="1" max="31" placeholder="31">
+          </div>
+          <div class="fld wide">
+            <label>Options comptables</label>
+            <div class="ux-check-grid">
+              <label><input type="checkbox" id="ux-accrual-accounting"> Comptabilite d'engagement</label>
+              <label><input type="checkbox" id="ux-auto-numbering"> Numerotation automatique</label>
+              <label><input type="checkbox" id="ux-fec-ready"> Exports FEC actifs</label>
+              <label><input type="checkbox" id="ux-einvoice-ready"> Preparation e-facturation 2026</label>
+            </div>
+          </div>
+        </div>
+        <div class="ux-settings-preview">
+          <h5>Informations legales facture</h5>
+          <div id="ux-company-preview" style="background:#fff;border:1px solid var(--bd,#dddad0);padding:.75rem;border-radius:8px;font-size:11px;color:#333;white-space:pre-wrap;line-height:1.5;">Completez le profil entreprise pour securiser les factures.</div>
         </div>
       </div>
       <div class="ux-settings-section" id="ux-sec-documents">
@@ -6139,6 +6250,136 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
     const i = us.findIndex(x => x.email === u.email);
     if(i >= 0){ us[i][field] = value; localStorage.setItem('luno_users', JSON.stringify(us)); }
   }
+  function uxVal(id){ return (document.getElementById(id)?.value || '').trim(); }
+  function uxChecked(id){ return !!document.getElementById(id)?.checked; }
+  function compactDigits(v){ return String(v || '').replace(/\D/g, ''); }
+  function lunoDefaultCompanySettings(u){
+    const savedFiscal = JSON.parse(localStorage.getItem('luno_fiscal_settings') || 'null') || {};
+    const rawAddress = String(u?.adresse || '').trim();
+    const cpMatch = rawAddress.match(/\b(\d{5})\b/);
+    return {
+      companyName: u?.companySettings?.companyName || u?.societe || u?.nom || '',
+      legalForm: u?.companySettings?.legalForm || u?.formeJuridique || '',
+      siren: compactDigits(u?.companySettings?.siren || u?.siren || ''),
+      siret: compactDigits(u?.companySettings?.siret || u?.siret || ''),
+      vatNumber: u?.companySettings?.vatNumber || u?.tva_num || u?.vat || '',
+      apeCode: u?.companySettings?.apeCode || u?.codeApe || '',
+      shareCapital: u?.companySettings?.shareCapital || '',
+      address: u?.companySettings?.address || rawAddress.replace(/\s*\b\d{5}\b.*$/, ''),
+      postcode: u?.companySettings?.postcode || (cpMatch ? cpMatch[1] : ''),
+      city: u?.companySettings?.city || (cpMatch ? rawAddress.slice(rawAddress.indexOf(cpMatch[1]) + 5).replace(/^[,\s]+/, '') : ''),
+      country: u?.companySettings?.country || 'FR',
+      fiscalRegime: u?.companySettings?.fiscalRegime || savedFiscal.isRegime || 'is',
+      tvaRegime: u?.companySettings?.tvaRegime || savedFiscal.tvaRegime || u?.tvaRegime || u?.tva?.period || 'monthly',
+      closingMonth: Number(u?.companySettings?.closingMonth || savedFiscal.closingMonth || 12),
+      closingDay: Number(u?.companySettings?.closingDay || savedFiscal.closingDay || 31),
+      options: {
+        accrualAccounting: u?.companySettings?.options?.accrualAccounting ?? true,
+        autoNumbering: u?.companySettings?.options?.autoNumbering ?? true,
+        fecReady: u?.companySettings?.options?.fecReady ?? true,
+        einvoiceReady: u?.companySettings?.options?.einvoiceReady ?? true
+      }
+    };
+  }
+  window.lunoCompanySettings = function(){
+    return lunoDefaultCompanySettings(curUser() || (typeof me !== 'undefined' ? me : null));
+  };
+  window.lunoLegalHeaderFromCompany = function(company){
+    const c = company || window.lunoCompanySettings();
+    const lines = [];
+    const nameLine = [c.companyName, c.legalForm].filter(Boolean).join(' - ');
+    if(nameLine) lines.push(nameLine);
+    if(c.shareCapital) lines.push('Capital social : ' + c.shareCapital);
+    const addressLine = [c.address, [c.postcode, c.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+    if(addressLine) lines.push(addressLine);
+    if(c.siret) lines.push('SIRET : ' + c.siret);
+    else if(c.siren) lines.push('SIREN : ' + c.siren);
+    if(c.apeCode) lines.push('Code APE/NAF : ' + c.apeCode);
+    if(c.vatNumber) lines.push('TVA intracommunautaire : ' + c.vatNumber);
+    if(c.tvaRegime === 'franchise') lines.push('TVA non applicable, art. 293 B du CGI');
+    return lines.join('\n');
+  };
+  function uxCompanyPreview(){
+    const company = readCompanySettingsFromForm();
+    const preview = document.getElementById('ux-company-preview');
+    if(preview) preview.textContent = window.lunoLegalHeaderFromCompany(company) || 'Completez le profil entreprise pour securiser les factures.';
+  }
+  function readCompanySettingsFromForm(){
+    return {
+      companyName: uxVal('ux-company-name'),
+      legalForm: uxVal('ux-legal-form'),
+      siren: compactDigits(uxVal('ux-siren')),
+      siret: compactDigits(uxVal('ux-siret')),
+      vatNumber: uxVal('ux-vat-number'),
+      apeCode: uxVal('ux-ape-code').toUpperCase(),
+      shareCapital: uxVal('ux-share-capital'),
+      address: uxVal('ux-address'),
+      postcode: uxVal('ux-postcode'),
+      city: uxVal('ux-city'),
+      country: uxVal('ux-country') || 'FR',
+      fiscalRegime: uxVal('ux-fiscal-regime') || 'is',
+      tvaRegime: uxVal('ux-tva-regime-company') || 'monthly',
+      closingMonth: Math.min(12, Math.max(1, Number(uxVal('ux-closing-month-company') || 12))),
+      closingDay: Math.min(31, Math.max(1, Number(uxVal('ux-closing-day-company') || 31))),
+      options: {
+        accrualAccounting: uxChecked('ux-accrual-accounting'),
+        autoNumbering: uxChecked('ux-auto-numbering'),
+        fecReady: uxChecked('ux-fec-ready'),
+        einvoiceReady: uxChecked('ux-einvoice-ready')
+      }
+    };
+  }
+  function fillCompanySettingsForm(company){
+    const c = company || window.lunoCompanySettings();
+    const set = (id, v) => { const el = document.getElementById(id); if(el) el.value = v ?? ''; };
+    const check = (id, v) => { const el = document.getElementById(id); if(el) el.checked = !!v; };
+    set('ux-company-name', c.companyName);
+    set('ux-legal-form', c.legalForm);
+    set('ux-siren', c.siren);
+    set('ux-siret', c.siret);
+    set('ux-vat-number', c.vatNumber);
+    set('ux-ape-code', c.apeCode);
+    set('ux-share-capital', c.shareCapital);
+    set('ux-address', c.address);
+    set('ux-postcode', c.postcode);
+    set('ux-city', c.city);
+    set('ux-country', c.country || 'FR');
+    set('ux-fiscal-regime', c.fiscalRegime || 'is');
+    set('ux-tva-regime-company', c.tvaRegime || 'monthly');
+    set('ux-closing-month-company', c.closingMonth || 12);
+    set('ux-closing-day-company', c.closingDay || 31);
+    check('ux-accrual-accounting', c.options?.accrualAccounting);
+    check('ux-auto-numbering', c.options?.autoNumbering);
+    check('ux-fec-ready', c.options?.fecReady);
+    check('ux-einvoice-ready', c.options?.einvoiceReady);
+    uxCompanyPreview();
+  }
+  function saveCompanySettings(company){
+    const u = curUser(); if(!u) return;
+    const us = JSON.parse(localStorage.getItem('luno_users')||'[]');
+    const i = us.findIndex(x => x.email === u.email);
+    if(i < 0) return;
+    const legalAddress = [company.address, [company.postcode, company.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+    Object.assign(us[i], {
+      companySettings: company,
+      societe: company.companyName || us[i].societe,
+      formeJuridique: company.legalForm,
+      siren: company.siren,
+      siret: company.siret,
+      tva_num: company.vatNumber,
+      codeApe: company.apeCode,
+      adresse: legalAddress,
+      tvaRegime: company.tvaRegime
+    });
+    localStorage.setItem('luno_users', JSON.stringify(us));
+    localStorage.setItem('luno_fiscal_settings', JSON.stringify({
+      tvaRegime: company.tvaRegime,
+      isRegime: company.fiscalRegime,
+      closingMonth: company.closingMonth,
+      closingDay: company.closingDay
+    }));
+    try { if(typeof me !== 'undefined') me = us[i]; } catch(e){}
+  }
 
   // ════════ 1. SWITCHER ENTREPRISE (toolbar) ════════
   function injectCompanySwitcher(){
@@ -6194,6 +6435,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
     document.getElementById('ux-doc-footer').value = s.docFooter || '';
     document.getElementById('ux-currency').value = s.currency || 'EUR';
     document.getElementById('ux-decimal').value = s.decimal || 'comma';
+    fillCompanySettingsForm(window.lunoCompanySettings());
     uxBrandPreview();
     uxDocPreview();
     uxCurrPreview();
@@ -6233,6 +6475,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
   document.addEventListener('input', function(e){
     if(e.target && (e.target.id === 'ux-doc-header' || e.target.id === 'ux-doc-footer')) uxDocPreview();
     if(e.target && (e.target.id === 'ux-currency' || e.target.id === 'ux-decimal')) uxCurrPreview();
+    if(e.target && e.target.id && e.target.id.indexOf('ux-') === 0) uxCompanyPreview();
   });
   window.uxCurrPreview = function(){
     const c = document.getElementById('ux-currency').value;
@@ -6245,14 +6488,22 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
     if(el) el.textContent = c === 'EUR' || c === 'GBP' ? (v + ' ' + sym) : (sym + v);
   };
   window.uxSettingsSave = function(){
+    const company = readCompanySettingsFromForm();
+    let docHeader = document.getElementById('ux-doc-header').value.trim();
+    if(!docHeader){
+      docHeader = window.lunoLegalHeaderFromCompany(company);
+      document.getElementById('ux-doc-header').value = docHeader;
+      uxDocPreview();
+    }
     const s = {
       brandColor: document.getElementById('ux-brand-color').value,
-      docHeader:  document.getElementById('ux-doc-header').value.trim(),
+      docHeader:  docHeader,
       docFooter:  document.getElementById('ux-doc-footer').value.trim(),
       currency:   document.getElementById('ux-currency').value,
       decimal:    document.getElementById('ux-decimal').value
     };
     saveUserField('settings', s);
+    saveCompanySettings(company);
     applyBrandColor(s.brandColor);
     uxSettingsClose();
     if(typeof notif === 'function') notif('Réglages enregistrés ✓');
@@ -6950,7 +7201,8 @@ body.has-brand .sc-v[style*="color:var(--gr)"], body.has-brand .sc-v[style*="col
     const brand = brandHex();
     const sym = currencySymbol();
     const logoHtml = u && u.logo ? '<img src="' + u.logo + '" style="max-height:60px;max-width:180px;object-fit:contain;margin-bottom:.75rem;">' : '';
-    const headerHtml = s.docHeader ? '<div style="font-size:11px;color:#666;white-space:pre-wrap;line-height:1.5;margin-top:8px;">' + escHtml(s.docHeader) + '</div>' : '';
+    const legalHeader = s.docHeader || (typeof window.lunoLegalHeaderFromCompany === 'function' ? window.lunoLegalHeaderFromCompany() : '');
+    const headerHtml = legalHeader ? '<div style="font-size:11px;color:#666;white-space:pre-wrap;line-height:1.5;margin-top:8px;">' + escHtml(legalHeader) + '</div>' : '';
     const footerHtml = s.docFooter ? '<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid #eee;font-size:11px;color:#666;text-align:center;font-style:italic;">' + escHtml(s.docFooter) + '</div>' : '';
     return '<!DOCTYPE html><html><head><title>Facture ' + escHtml(f.num) + '</title>' +
       '<style>' +
@@ -7284,7 +7536,8 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
     const brand = brandHex();
     const sym = currencySymbol();
     const logoHtml = u && u.logo ? '<img src="' + u.logo + '" style="max-height:60px;max-width:180px;object-fit:contain;margin-bottom:.75rem;">' : '';
-    const headerHtml = s.docHeader ? '<div style="font-size:11px;color:#666;white-space:pre-wrap;line-height:1.5;margin-top:8px;">' + escHtml(s.docHeader) + '</div>' : '';
+    const legalHeader = s.docHeader || (typeof window.lunoLegalHeaderFromCompany === 'function' ? window.lunoLegalHeaderFromCompany() : '');
+    const headerHtml = legalHeader ? '<div style="font-size:11px;color:#666;white-space:pre-wrap;line-height:1.5;margin-top:8px;">' + escHtml(legalHeader) + '</div>' : '';
     const footerHtml = s.docFooter ? '<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid #eee;font-size:11px;color:#666;text-align:center;font-style:italic;">' + escHtml(s.docFooter) + '</div>' : '';
     const tvaA = d.ht * d.tva / 100;
     return '<!DOCTYPE html><html><head><title>Devis ' + escHtml(d.num) + '</title><style>' +
@@ -10538,18 +10791,24 @@ function lunoDownloadText(filename, text, mimeType) {
 }
 
 function lunoSellerPayload() {
-  const address = String(me?.adresse || '').trim();
+  const company = typeof window.lunoCompanySettings === 'function' ? window.lunoCompanySettings() : {};
+  const address = String(company.address || me?.adresse || '').trim();
   const cpMatch = address.match(/\b(\d{5})\b/);
   return {
-    nom: me?.societe || me?.nom || 'Votre entreprise',
-    siren: me?.siren || '',
-    siret: me?.siret || '',
-    tva_num: me?.tva_num || me?.vat || '',
+    nom: company.companyName || me?.societe || me?.nom || 'Votre entreprise',
+    legal_form: company.legalForm || me?.formeJuridique || '',
+    siren: company.siren || me?.siren || '',
+    siret: company.siret || me?.siret || '',
+    tva_num: company.vatNumber || me?.tva_num || me?.vat || '',
+    ape_code: company.apeCode || me?.codeApe || '',
+    share_capital: company.shareCapital || '',
     adresse: address,
-    cp: cpMatch ? cpMatch[1] : '',
-    ville: cpMatch ? address.slice(address.indexOf(cpMatch[1]) + 5).replace(/^[,\s]+/, '') : '',
+    cp: company.postcode || (cpMatch ? cpMatch[1] : ''),
+    ville: company.city || (cpMatch ? address.slice(address.indexOf(cpMatch[1]) + 5).replace(/^[,\s]+/, '') : ''),
     email: me?.email || '',
-    country: 'FR',
+    country: company.country || 'FR',
+    fiscal_regime: company.fiscalRegime || '',
+    tva_regime: company.tvaRegime || '',
   };
 }
 
@@ -11398,11 +11657,12 @@ window.checkFEC = async function() {
 
 function lunoFiscalSettings() {
   const saved = lsGet?.('luno_fiscal_settings') || {};
+  const company = typeof window.lunoCompanySettings === 'function' ? window.lunoCompanySettings() : {};
   return {
-    tvaRegime: saved.tvaRegime || me?.tvaRegime || me?.tva?.period || 'monthly',
-    isRegime: saved.isRegime || 'is',
-    closingMonth: Number(saved.closingMonth || 12),
-    closingDay: Number(saved.closingDay || 31),
+    tvaRegime: company.tvaRegime || saved.tvaRegime || me?.tvaRegime || me?.tva?.period || 'monthly',
+    isRegime: company.fiscalRegime || saved.isRegime || 'is',
+    closingMonth: Number(company.closingMonth || saved.closingMonth || 12),
+    closingDay: Number(company.closingDay || saved.closingDay || 31),
   };
 }
 
@@ -11416,7 +11676,7 @@ function lunoFiscalPayload() {
     ecritures: typeof ecritures !== 'undefined' ? ecritures : [],
     treso: typeof treso !== 'undefined' ? treso : [],
     settings: { ...lunoFiscalSettings(), year: yr, isRate: 25 },
-    company: { name: me?.societe || '', siren: me?.siren || '', email: me?.email || '' },
+    company: { ...lunoSellerPayload(), email: me?.email || '' },
   };
 }
 
@@ -11464,6 +11724,23 @@ function lunoSaveFiscalSettings() {
     closingDay: Number(document.getElementById('luno-closing-day')?.value || 31),
   };
   lsSet?.('luno_fiscal_settings', settings);
+  try {
+    const session = lsGet?.('luno_session');
+    const users = lsGet?.('luno_users') || [];
+    const idx = users.findIndex(u => u.email === session?.email);
+    if (idx >= 0) {
+      users[idx].companySettings = {
+        ...(users[idx].companySettings || {}),
+        fiscalRegime: settings.isRegime,
+        tvaRegime: settings.tvaRegime,
+        closingMonth: settings.closingMonth,
+        closingDay: settings.closingDay
+      };
+      users[idx].tvaRegime = settings.tvaRegime;
+      lsSet?.('luno_users', users);
+      if (typeof me !== 'undefined') me = users[idx];
+    }
+  } catch (e) {}
   renderFiscalCalendar();
   notif('Parametres fiscaux enregistres');
 }
@@ -11686,6 +11963,7 @@ function lunoCurrentSnapshot() {
     ocrHistory: typeof ocrHistory !== 'undefined' ? ocrHistory : [],
     signatureRequests: typeof signatureRequests !== 'undefined' ? signatureRequests : [],
     fiscalSettings: lsGet?.('luno_fiscal_settings') || {},
+    companySettings: typeof window.lunoCompanySettings === 'function' ? window.lunoCompanySettings() : {},
     exportedAt: new Date().toISOString(),
   };
 }
