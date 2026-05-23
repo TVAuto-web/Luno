@@ -2233,12 +2233,17 @@ function loadUserData(email){
   if(d.ecritures)    ecritures=d.ecritures;
   if(d.treso)        treso=d.treso;
   if(d.salaries)     salaries=d.salaries;
+  if(d.tvaHist)      tvaHist=d.tvaHist;
+  if(d.ocrHistory)   ocrHistory=d.ocrHistory;
+  if(d.signatureRequests) signatureRequests=d.signatureRequests;
+  if(d.relanceRules) relanceRules=d.relanceRules;
+  if(d.bankAccounts) bankAccounts=d.bankAccounts;
 }
 function persistUserData(){
   if(!me) return;
   const users=getUsers();const idx=users.findIndex(u=>u.email===me.email);
   if(idx===-1) return;
-  users[idx].data={clients,fournisseurs,devis,factures,achats,ecritures,treso,salaries};
+  users[idx].data={clients,fournisseurs,devis,factures,achats,ecritures,treso,salaries,tvaHist,ocrHistory,signatureRequests,relanceRules,bankAccounts};
   saveUsers(users);
 }
 
@@ -11962,6 +11967,7 @@ function lunoCurrentSnapshot() {
     bankAccounts: typeof bankAccounts !== 'undefined' ? bankAccounts : [],
     ocrHistory: typeof ocrHistory !== 'undefined' ? ocrHistory : [],
     signatureRequests: typeof signatureRequests !== 'undefined' ? signatureRequests : [],
+    relanceRules: typeof relanceRules !== 'undefined' ? relanceRules : [],
     fiscalSettings: lsGet?.('luno_fiscal_settings') || {},
     companySettings: typeof window.lunoCompanySettings === 'function' ? window.lunoCompanySettings() : {},
     exportedAt: new Date().toISOString(),
@@ -11996,13 +12002,23 @@ async function lunoSyncBusinessDataNow(token, snapshot) {
     body: JSON.stringify({
       data: {
         clients: state.clients || [],
+        fournisseurs: state.fournisseurs || [],
         devis: state.devis || [],
         factures: state.factures || [],
+        achats: state.achats || [],
+        ecritures: state.ecritures || [],
+        tvaHist: state.tvaHist || [],
+        ocrHistory: state.ocrHistory || [],
+        signatureRequests: state.signatureRequests || [],
+        relanceRules: state.relanceRules || [],
       }
     }),
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(data.error || 'Sync donnees Supabase impossible');
+  if (typeof lunoPersistBankToSupabase === 'function') {
+    await lunoPersistBankToSupabase().catch(err => console.warn('[Supabase] bank sync error', err));
+  }
   return true;
 }
 window.lunoSyncBusinessDataNow = lunoSyncBusinessDataNow;
