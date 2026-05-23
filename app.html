@@ -11032,7 +11032,9 @@ setInterval(() => {
 
 async function lunoIntegrationStatus() {
   try {
-    return await lunoPostJsonApi('/api/integration-status', null, 'GET');
+    const response = await fetch('/api/integration-status');
+    if (!response.ok) throw new Error('Statut integrations indisponible');
+    return await response.json();
   } catch (err) {
     return null;
   }
@@ -11113,6 +11115,73 @@ function registerLunoPwa() {
 
 registerLunoPwa();
 setInterval(renderIntegrationStatusCards, 2500);
+
+async function lunoSupabaseAccessToken() {
+  if (!window.sb) return null;
+  const { data: { session } } = await window.sb.auth.getSession();
+  return session?.access_token || null;
+}
+
+function lunoCurrentSnapshot() {
+  return {
+    clients: typeof clients !== 'undefined' ? clients : [],
+    fournisseurs: typeof fournisseurs !== 'undefined' ? fournisseurs : [],
+    devis: typeof devis !== 'undefined' ? devis : [],
+    factures: typeof factures !== 'undefined' ? factures : [],
+    achats: typeof achats !== 'undefined' ? achats : [],
+    comptes: typeof comptes !== 'undefined' ? comptes : [],
+    ecritures: typeof ecritures !== 'undefined' ? ecritures : [],
+    treso: typeof treso !== 'undefined' ? treso : [],
+    salaries: typeof salaries !== 'undefined' ? salaries : [],
+    tvaHist: typeof tvaHist !== 'undefined' ? tvaHist : [],
+    bankAccounts: typeof bankAccounts !== 'undefined' ? bankAccounts : [],
+    ocrHistory: typeof ocrHistory !== 'undefined' ? ocrHistory : [],
+    signatureRequests: typeof signatureRequests !== 'undefined' ? signatureRequests : [],
+    fiscalSettings: lsGet?.('luno_fiscal_settings') || {},
+    exportedAt: new Date().toISOString(),
+  };
+}
+
+let lunoSupabaseSyncTimer = null;
+async function lunoSyncToSupabaseNow() {
+  const token = await lunoSupabaseAccessToken();
+  if (!token) return false;
+  const response = await fetch('/api/supabase-sync', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify({ version: 'web-snapshot-v1', data: lunoCurrentSnapshot() }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || 'Sync Supabase impossible');
+  setCloudState?.('connected');
+  return true;
+}
+
+window.lunoSyncToSupabaseNow = lunoSyncToSupabaseNow;
+function lunoScheduleSupabaseSync() {
+  clearTimeout(lunoSupabaseSyncTimer);
+  lunoSupabaseSyncTimer = setTimeout(() => {
+    lunoSyncToSupabaseNow().catch(err => {
+      console.warn('[Supabase] snapshot sync error', err);
+      setCloudState?.('error');
+    });
+  }, 1200);
+}
+
+(function hookSupabaseSnapshotSync(){
+  const origPersist = window.persistUserData;
+  if (typeof origPersist === 'function' && !window._lunoSnapshotSyncHooked) {
+    window._lunoSnapshotSyncHooked = true;
+    window.persistUserData = function(){
+      const result = origPersist.apply(this, arguments);
+      lunoScheduleSupabaseSync();
+      return result;
+    };
+  }
+  setInterval(() => {
+    if (me) lunoScheduleSupabaseSync();
+  }, 60000);
+})();
 
 </script>
 </body>
