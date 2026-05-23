@@ -10677,6 +10677,228 @@ window.syncBankAccount = async function(id) {
   setInterval(() => { enhanceFactureRows(); enhanceExportsPage(); }, 1500);
 })();
 
+function lunoEntryDebit(e) { return e.cpd || e.deb || e.compteDebit || ''; }
+function lunoEntryCredit(e) { return e.cpc || e.cre || e.compteCredit || ''; }
+function lunoEntryPiece(e) { return e.pj || e.piece || e.ref || ''; }
+function lunoNormText(value) {
+  return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+}
+function lunoDateTime(value) {
+  const raw = String(value || '').slice(0, 10);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return new Date(raw + 'T00:00:00').getTime();
+  const m = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (m) return new Date(`${m[3]}-${m[2]}-${m[1]}T00:00:00`).getTime();
+  return Date.now();
+}
+function lunoAmountClose(a, b, tolerance) {
+  return Math.abs(Number(a || 0) - Number(b || 0)) <= (tolerance || 1);
+}
+function lunoDateClose(a, b, days) {
+  return Math.abs(lunoDateTime(a) - lunoDateTime(b)) <= (days || 10) * 86400000;
+}
+function lunoNormalizeEntries() {
+  ecritures = ecritures.map((e, i) => ({
+    date: e.date || today(),
+    jnl: e.jnl || e.journal || 'OD',
+    cpd: lunoEntryDebit(e),
+    cpc: lunoEntryCredit(e),
+    lib: e.lib || e.label || 'Ecriture comptable',
+    mnt: Number(e.mnt || e.amount || 0),
+    pj: lunoEntryPiece(e) || e.num || `ECR-${i + 1}`,
+    reconciledWith: e.reconciledWith || null,
+  }));
+}
+
+function lunoAllBankTransactions() {
+  const fromBank = (bankAccounts || []).flatMap(account => (account.transactions || []).map(tx => ({
+    id: tx.id || `${account.id}-${tx.date}-${tx.mnt}`,
+    date: tx.date,
+    lib: tx.lib,
+    mnt: Number(tx.mnt || 0),
+    source: 'bank',
+    accountId: account.id,
+    bank: account.bank,
+    matchedWith: tx.matchedWith || null,
+  })));
+  const fromTreso = (treso || []).map((t, i) => ({
+    id: `TR-${i}`,
+    date: t.date,
+    lib: t.lib,
+    mnt: t.type === 'enc' ? Number(t.mnt || 0) : -Number(t.mnt || 0),
+    source: 'treso',
+    index: i,
+    bank: 'Tresorerie',
+    matchedWith: t.matchedWith || null,
+  }));
+  return fromBank.concat(fromTreso);
+}
+
+function lunoReconciliationCandidates() {
+  const bankTxns = lunoAllBankTransactions().filter(tx => !tx.matchedWith);
+  const candidates = [];
+
+  factures.forEach((f, i) => {
+    if (f.st === 'payee' || f.st === 'payée') return;
+    const cl = clients[f.ci] || {};
+    const wanted = lunoNormText(`${f.num} ${cl.nom || ''}`);
+    bankTxns.filter(tx => tx.mnt > 0).forEach(tx => {
+      let score = 0;
+      if (lunoAmountClose(tx.mnt, f.ttc, 1)) score += 55;
+      if (lunoDateClose(tx.date, f.due || f.date, 15)) score += 20;
+      const text = lunoNormText(tx.lib);
+      if (text.includes(lunoNormText(f.num))) score += 20;
+      if (cl.nom && text.includes(lunoNormText(cl.nom).split(' ')[0])) score += 15;
+      if (score >= 55) candidates.push({ kind:'facture', index:i, ref:f.num, label:cl.nom || 'Client', amount:f.ttc, tx, score:Math.min(score, 100) });
+    });
+  });
+
+  achats.forEach((a, i) => {
+    if (a.st === 'payee' || a.st === 'payée') return;
+    const fr = fournisseurs[a.fi] || { nom: a.fourn || a.fournisseur };
+    bankTxns.filter(tx => tx.mnt < 0).forEach(tx => {
+      let score = 0;
+      if (lunoAmountClose(Math.abs(tx.mnt), a.ttc, 1)) score += 55;
+      if (lunoDateClose(tx.date, a.due || a.date, 15)) score += 20;
+      const text = lunoNormText(tx.lib);
+      if (a.num && text.includes(lunoNormText(a.num))) score += 15;
+      if (fr.nom && text.includes(lunoNormText(fr.nom).split(' ')[0])) score += 15;
+      if (score >= 55) candidates.push({ kind:'achat', index:i, ref:a.num || a.ref || `ACH-${i + 1}`, label:fr.nom || 'Fournisseur', amount:a.ttc, tx, score:Math.min(score, 100) });
+    });
+  });
+
+  ocrHistory.forEach((h, i) => {
+    if (h.matchedWith) return;
+    bankTxns.filter(tx => tx.mnt < 0).forEach(tx => {
+      let score = 0;
+      if (lunoAmountClose(Math.abs(tx.mnt), h.montant, 1)) score += 60;
+      if (lunoDateClose(tx.date, h.date, 20)) score += 15;
+      if (h.fournisseur && lunoNormText(tx.lib).includes(lunoNormText(h.fournisseur).split(' ')[0])) score += 20;
+      if (score >= 60) candidates.push({ kind:'ocr', index:i, ref:h.file || `OCR-${i + 1}`, label:h.fournisseur || 'Justificatif', amount:h.montant, tx, score:Math.min(score, 100) });
+    });
+  });
+
+  return candidates.sort((a, b) => b.score - a.score).slice(0, 20);
+}
+
+window.applyReconciliation = function(kind, index, txId) {
+  const tx = lunoAllBankTransactions().find(t => t.id === txId);
+  if (!tx) { notif('Transaction introuvable'); return; }
+  const ref = `${kind}:${index}:${txId}`;
+  if (kind === 'facture' && factures[index]) {
+    factures[index].st = 'payee';
+    factures[index].matchedWith = txId;
+    if (!treso.find(t => t.matchedWith === ref)) {
+      treso.push({ date: tx.date, lib: `Rapprochement ${factures[index].num} - ${tx.lib}`, type:'enc', cat:'Ventes', mnt: Math.abs(tx.mnt), matchedWith: ref });
+    }
+    ecritures.push({ date: tx.date, jnl:'BQ', cpd:'512000', cpc:'411000', lib:`Reglement ${factures[index].num}`, mnt:Math.abs(tx.mnt), pj:factures[index].num, reconciledWith:ref });
+  }
+  if (kind === 'achat' && achats[index]) {
+    achats[index].st = 'payee';
+    achats[index].matchedWith = txId;
+    if (!treso.find(t => t.matchedWith === ref)) {
+      treso.push({ date: tx.date, lib: `Rapprochement ${achats[index].num || 'achat'} - ${tx.lib}`, type:'dec', cat:'Achats', mnt: Math.abs(tx.mnt), matchedWith: ref });
+    }
+    ecritures.push({ date: tx.date, jnl:'BQ', cpd:'401000', cpc:'512000', lib:`Reglement ${achats[index].num || 'achat fournisseur'}`, mnt:Math.abs(tx.mnt), pj:achats[index].num || '', reconciledWith:ref });
+  }
+  if (kind === 'ocr' && ocrHistory[index]) {
+    ocrHistory[index].matchedWith = txId;
+    if (!treso.find(t => t.matchedWith === ref)) {
+      treso.push({ date: tx.date, lib: `Justificatif OCR rapproche - ${tx.lib}`, type:'dec', cat:'Achats', mnt: Math.abs(tx.mnt), matchedWith: ref });
+    }
+  }
+  lunoNormalizeEntries();
+  persistUserData?.();
+  renderBanque?.();
+  renderTreso?.();
+  renderFactures?.();
+  renderAchats?.();
+  renderOcrHistory?.();
+  notif('Rapprochement applique');
+};
+
+window.autoReconcileAll = function() {
+  const best = lunoReconciliationCandidates().filter(c => c.score >= 80);
+  best.forEach(c => applyReconciliation(c.kind, c.index, c.tx.id));
+  notif(best.length + ' rapprochement(s) automatique(s) applique(s)');
+};
+
+function renderReconciliationPanel() {
+  const page = document.getElementById('p-banque');
+  if (!page) return;
+  let card = document.getElementById('luno-reco-card');
+  if (!card) {
+    card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'luno-reco-card';
+    card.style.marginTop = '1rem';
+    card.innerHTML = '<div class="ch" style="display:flex;justify-content:space-between;align-items:center;"><span>Rapprochement automatique</span><button class="btn btn-sm btn-gr" onclick="autoReconcileAll()">Tout valider</button></div><div id="luno-reco-list"></div>';
+    page.appendChild(card);
+  }
+  const list = document.getElementById('luno-reco-list');
+  const candidates = lunoReconciliationCandidates();
+  list.innerHTML = candidates.length ? candidates.map(c => `
+    <div style="display:grid;grid-template-columns:1.2fr 1fr 80px 90px;gap:10px;align-items:center;padding:10px;border-bottom:1px solid var(--bd);font-size:12px;">
+      <div><strong>${c.ref}</strong><br><span style="color:var(--tx2);">${c.label} - ${fmt(c.amount)}</span></div>
+      <div><strong>${c.tx.bank}</strong><br><span style="color:var(--tx2);">${c.tx.date} - ${c.tx.lib}</span></div>
+      <span class="bdg ${c.score >= 80 ? 'ok' : 'wa'}">${Math.round(c.score)}%</span>
+      <button class="btn btn-sm btn-gr" onclick="applyReconciliation('${c.kind}',${c.index},'${String(c.tx.id).replace(/'/g, "\\'")}')">Valider</button>
+    </div>`).join('') : '<div style="padding:1rem;text-align:center;color:var(--tx2);font-size:12px;">Aucun rapprochement probable pour le moment.</div>';
+}
+
+const _lunoRenderBanque = window.renderBanque || renderBanque;
+window.renderBanque = function(){
+  _lunoRenderBanque.apply(this, arguments);
+  renderReconciliationPanel();
+};
+
+window.exportFEC = async function() {
+  lunoNormalizeEntries();
+  try {
+    const result = await lunoPostJsonApi('/api/fec', {
+      entries: ecritures,
+      siren: me?.siren || '',
+      company: { siren: me?.siren || '' },
+      closingDate: `${yr}1231`,
+    });
+    lunoDownloadText(result.filename || `FEC_${yr}.txt`, result.fec, result.mimeType || 'text/plain;charset=utf-8');
+    const issues = result.compliance?.issues?.length || 0;
+    const warnings = result.compliance?.warnings?.length || 0;
+    if (issues) notif('FEC exporte avec erreurs a corriger : ' + issues);
+    else if (warnings) notif('FEC exporte avec avertissements : ' + warnings);
+    else notif('FEC controle et exporte');
+    addH('export', 'Export FEC controle', issues ? 'wa' : 'ok');
+  } catch (err) {
+    notif('Export FEC indisponible : ' + lunoIntegrationError(err, 'erreur serveur'));
+  }
+};
+
+window.checkFEC = async function() {
+  lunoNormalizeEntries();
+  try {
+    const result = await lunoPostJsonApi('/api/fec', { entries: ecritures, siren: me?.siren || '', closingDate: `${yr}1231` });
+    const c = result.compliance || {};
+    const lines = []
+      .concat((c.issues || []).map(x => 'Erreur : ' + x))
+      .concat((c.warnings || []).map(x => 'A verifier : ' + x));
+    notif(lines.length ? lines.slice(0, 3).join(' | ') : 'Controle FEC OK');
+  } catch (err) {
+    notif('Controle FEC indisponible : ' + lunoIntegrationError(err, 'erreur serveur'));
+  }
+};
+
+(function injectFecControls(){
+  function addFecCard(){
+    const grid = document.querySelector('#p-exports .three-col');
+    if (!grid || document.getElementById('luno-fec-card')) return;
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.id = 'luno-fec-card';
+    card.innerHTML = '<div class="ch">FEC comptable</div><div style="padding:.85rem 1rem;"><p style="font-size:12px;color:var(--tx2);margin-bottom:.75rem;">Fichier des ecritures comptables au format texte tabule, avec controle avant export.</p><div style="display:flex;gap:.4rem;"><button class="btn btn-bl" style="flex:1;" onclick="exportFEC()">FEC .txt</button><button class="btn" style="flex:1;" onclick="checkFEC()">Controle</button></div></div>';
+    grid.appendChild(card);
+  }
+  setInterval(addFecCard, 1500);
+})();
+
 </script>
 </body>
 </html>
