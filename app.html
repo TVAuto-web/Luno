@@ -2861,7 +2861,7 @@ function buildRelanceHtml(f, cl) {
     </div>
     <h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">Rappel de paiement</h2>
     <p>Bonjour ${cl.prenom ? cl.prenom + ' ' : ''}${cl.nom || 'Madame/Monsieur'},</p>
-    <p>Sauf erreur ou omission de notre part, la facture ci-dessous reste impayée à ce jour :</p>
+    <p>Sauf erreur ou omission de notre part, la facture ci-dessous reste impayée à ce jour :</p>
     <div style="background:#f5f7ff;border-left:4px solid #4361ee;border-radius:6px;padding:16px 20px;margin:20px 0;">
       <div style="margin-bottom:6px;"><span style="color:#666;font-size:13px;">Référence</span><br><strong style="font-size:15px;">${f.num}</strong></div>
       <div style="margin-bottom:6px;"><span style="color:#666;font-size:13px;">Description</span><br>${f.desc || '—'}</div>
@@ -2873,7 +2873,7 @@ function buildRelanceHtml(f, cl) {
     </div>
     <p>Nous vous serions reconnaissants de bien vouloir procéder au règlement dans les meilleurs délais.</p>
     <p>Si ce règlement a déjà été effectué, veuillez ignorer ce message.</p>
-    <p>Pour toute question, n’hésitez pas à nous contacter.</p>
+    <p>Pour toute question, n'hésitez pas à nous contacter.</p>
     <p>Cordialement,<br><strong>${societe}</strong></p>
     <div style="margin-top:32px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#999;">
       Cet email a été envoyé automatiquement par ComptaPME Pro.
@@ -2890,8 +2890,10 @@ async function sendManualRelance(i) {
     notif('❌ Ce client n\'a pas d\'email renseigné dans sa fiche');
     return;
   }
-  const subject = 'Rappel de paiement — Facture ' + f.num;
+
+  const subject = `Rappel de paiement — Facture ${f.num}`;
   const html = buildRelanceHtml(f, cl);
+
   notif('📧 Envoi en cours…');
   try {
     const resp = await fetch('/api/send-relance', {
@@ -2901,17 +2903,17 @@ async function sendManualRelance(i) {
     });
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || 'Erreur serveur');
+
     f.relances = (f.relances || 0) + 1;
     f.lastRelance = new Date().toLocaleDateString('fr-FR');
-    addH('facture', 'Relance envoyée : ' + f.num + ' → ' + cl.email, 'ok');
+    addH('facture', 'Relance envoyée : ' + f.num + ' → ' + cl.email, 'ok');
     renderRelances();
     notif('✅ Relance envoyée à ' + cl.email);
   } catch (e) {
-    notif('❌ Échec envoi : ' + e.message);
-    addH('facture', 'Erreur relance ' + f.num + ' : ' + e.message, 'er');
+    notif('❌ Échec envoi : ' + e.message);
+    addH('facture', 'Erreur relance ' + f.num + ' : ' + e.message, 'er');
   }
 }
-
 function markPaid(i) {
   const f = factures.filter(x=>x.st==='en retard')[i];
   if (!f) return;
@@ -3433,22 +3435,32 @@ function renderDash(){
   E('d-res').textContent=fmt(res);E('d-res').style.color=res>=0?'var(--gr)':'var(--rd)';
   E('d-tva').textContent=fmt(tvaC-tvaD);
   E('d-tres').textContent=fmt(enc-dec);E('d-tres').style.color=(enc-dec)>=0?'var(--gr)':'var(--rd)';
+  const isEmpty=factures.length===0&&clients.length===0&&ecritures.length===0;
   const caM=[7100,8200,6800,9200,7700,9800,8100,7400,10200,8800,9500,11000];
   const mL=['J','F','M','A','M','J','J','A','S','O','N','D'];
   const mx=Math.max(...caM);
-  E('dchart').innerHTML=caM.map((v,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><span style="font-size:9px;font-weight:700;color:var(--tx1);">${Math.round(v/1000)}k</span><div style="width:100%;background:${i<=new Date().getMonth()?'var(--gr)':'var(--bg3)'};border-radius:3px 3px 0 0;height:${Math.round(v/mx*88)}px;min-height:4px;"></div></div>`).join('');
-  E('dchart-l').innerHTML=mL.map(m=>`<span>${m}</span>`).join('');
+  if(isEmpty){
+    E('dchart').innerHTML='<div style="width:100%;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--tx2);"><span style="font-size:28px;">📊</span><span style="font-size:12px;">Vos données apparaîtront ici</span></div>';
+    E('dchart-l').innerHTML='';
+  } else {
+    E('dchart').innerHTML=caM.map((v,i)=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><span style="font-size:9px;font-weight:700;color:var(--tx1);">${Math.round(v/1000)}k</span><div style="width:100%;background:${i<=new Date().getMonth()?'var(--gr)':'var(--bg3)'};border-radius:3px 3px 0 0;height:${Math.round(v/mx*88)}px;min-height:4px;"></div></div>`).join('');
+    E('dchart-l').innerHTML=mL.map(m=>`<span>${m}</span>`).join('');
+  }
   const ret=factures.filter(f=>f.st==='en retard');
   E('dalerts').innerHTML=`${ret.length?`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--bd);font-size:12px;"><span style="color:var(--rd);">⚠</span><div><div style="font-weight:700;">${ret.length} facture(s) en retard</div><div style="font-size:11px;color:var(--tx2);">${ret.map(f=>clients[f.ci]?.nom||'?').join(', ')}</div></div></div>`:''}
   <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--bd);font-size:12px;"><span style="color:var(--gr);">✓</span><span>Journal équilibré</span></div>
   ${me?.siren?`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--bd);font-size:12px;"><span style="color:var(--bl);">🏢</span><div><div style="font-weight:700;">${me.societe}</div><div style="font-size:11px;color:var(--tx2);">SIREN ${me.siren} · ${me.formeJuridique||'—'} · ${me.taille||'—'}</div></div></div>`:''}
   <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--bd);font-size:12px;"><span style="color:var(--bl);">👥</span><span>${clients.length} clients · ${fournisseurs.length} fournisseurs</span></div>
   <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;font-size:12px;"><span style="color:var(--am);">📋</span><span>${devis.filter(d=>d.st==='en attente').length} devis en attente de réponse</span></div>`;
-  E('d-ecr').innerHTML=[...ecritures].slice(-5).reverse().map(e=>`<tr><td>${e.date.slice(5)}</td><td><span class="bdg inf" style="font-size:10px;">${e.jnl}</span></td><td>${e.lib}</td><td style="text-align:right;font-weight:700;">${fmt(e.mnt)}</td></tr>`).join('');
+  E('d-ecr').innerHTML=ecritures.length?[...ecritures].slice(-5).reverse().map(e=>`<tr><td>${e.date.slice(5)}</td><td><span class="bdg inf" style="font-size:10px;">${e.jnl}</span></td><td>${e.lib}</td><td style="text-align:right;font-weight:700;">${fmt(e.mnt)}</td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--tx2);padding:1.5rem;font-size:12px;">Aucune écriture — les opérations apparaîtront ici</td></tr>';
   const chD=[{l:'Salaires',v:50400},{l:'Achats',v:30000},{l:'Locations',v:7200},{l:'Honoraires',v:4200},{l:'Autre',v:5600}];
   const totC=chD.reduce((s,c)=>s+c.v,0);
   const cols=['var(--gr)','var(--bl)','var(--pu)','var(--am)','var(--tx2)'];
-  E('d-ch').innerHTML=chD.map((c,i)=>`<div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;font-size:11px;"><span>${c.l}</span><span style="font-weight:700;">${Math.round(c.v/totC*100)}%</span></div><div class="pb"><div class="pbb" style="width:${Math.round(c.v/totC*100)}%;background:${cols[i]};"></div></div></div>`).join('');
+  if(isEmpty){
+    E('d-ch').innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem 1rem;text-align:center;gap:14px;"><div style="font-size:30px;">🚀</div><div style="font-size:13px;font-weight:700;color:var(--tx0);">Commençons !</div><div style="font-size:12px;color:var(--tx2);line-height:1.6;">Ajoutez un client et créez votre première facture pour démarrer.</div><button class="btn btn-gr btn-sm" onclick="openClientModal(-1)">+ Ajouter un client</button></div>';
+  } else {
+    E('d-ch').innerHTML=chD.map((c,i)=>`<div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;font-size:11px;"><span>${c.l}</span><span style="font-weight:700;">${Math.round(c.v/totC*100)}%</span></div><div class="pb"><div class="pbb" style="width:${Math.round(c.v/totC*100)}%;background:${cols[i]};"></div></div></div>`).join('');
+  }
 }
 
 // ══ CLIENTS ══
@@ -3472,7 +3484,7 @@ function renderClients(){
   const caOf=i=>factures.filter(f=>f.ci===i).reduce((s,f)=>s+f.ht,0);
   const encOf=i=>factures.filter(f=>f.ci===i&&f.st!=='payée').reduce((s,f)=>s+f.ttc,0);
   E('cl-stats').innerHTML=`<div class="sc"><div class="sc-l">Total clients</div><div class="sc-v">${clients.length}</div></div><div class="sc"><div class="sc-l">CA HT facturé</div><div class="sc-v" style="color:var(--gr);">${fmt(factures.reduce((s,f)=>s+f.ht,0))}</div></div><div class="sc"><div class="sc-l">Encours total</div><div class="sc-v" style="color:var(--am);">${fmt(factures.filter(f=>f.st!=='payée').reduce((s,f)=>s+f.ttc,0))}</div></div>`;
-  E('cl-tbl').innerHTML=clients.length?clients.map((c,i)=>`<tr><td style="font-weight:700;">${c.nom}<br><small style="color:var(--tx2);font-size:10px;">${[c.cp,c.ville].filter(Boolean).join(' ')||'—'}</small></td><td>${c.email}</td><td>${c.tel}</td><td style="text-align:right;">${fmt(caOf(i))}</td><td style="text-align:right;${encOf(i)?'color:var(--am);font-weight:700;':''}">${encOf(i)?fmt(encOf(i)):'—'}</td><td><div style="display:flex;gap:3px;"><button class="btn btn-sm" onclick="openClientModal(${i})" title="Modifier">✏</button><button class="btn btn-sm btn-rd" onclick="delClient(${i})">✕</button></div></td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--tx2);padding:1.5rem;">Aucun client — <a href="#" onclick="openClientModal(-1)" style="color:var(--gr);">Ajouter le premier</a></td></tr>';
+  E('cl-tbl').innerHTML=clients.length?clients.map((c,i)=>`<tr><td style="font-weight:700;">${c.nom}<br><small style="color:var(--tx2);font-size:10px;">${[c.cp,c.ville].filter(Boolean).join(' ')||'—'}</small></td><td>${c.email}</td><td>${c.tel}</td><td style="text-align:right;">${fmt(caOf(i))}</td><td style="text-align:right;${encOf(i)?'color:var(--am);font-weight:700;':''}">${encOf(i)?fmt(encOf(i)):'—'}</td><td><div style="display:flex;gap:3px;"><button class="btn btn-sm" onclick="openClientModal(${i})" title="Modifier">✏</button><button class="btn btn-sm btn-rd" onclick="delClient(${i})">✕</button></div></td></tr>`).join(''):`<tr><td colspan="6"><div style="text-align:center;padding:3rem 1rem;"><div style="font-size:38px;margin-bottom:14px;">👥</div><div style="font-weight:700;font-size:15px;color:var(--tx0);margin-bottom:6px;">Aucun client pour l'instant</div><div style="font-size:12px;color:var(--tx2);margin-bottom:18px;line-height:1.6;">Ajoutez votre premier client pour commencer à lui envoyer des factures.</div><button class="btn btn-gr" onclick="openClientModal(-1)">+ Ajouter mon premier client</button></div></td></tr>`;
 }
 
 // ══ FOURNISSEURS ══
@@ -3484,7 +3496,7 @@ function saveFourn(){
 function delFourn(i){if(confirm('Supprimer ?')){fournisseurs.splice(i,1);renderFourn();}}
 function renderFourn(){
   const enc=i=>achats.filter(a=>a.fi===i&&a.st!=='payée').reduce((s,a)=>s+a.ttc,0);
-  E('fo-tbl').innerHTML=fournisseurs.length?fournisseurs.map((f,i)=>`<tr><td style="font-weight:700;">${f.nom}</td><td>${f.contact}</td><td>${f.tel}</td><td style="text-align:center;">${f.delai}j</td><td style="text-align:right;${enc(i)?'color:var(--rd);font-weight:700;':''}">${enc(i)?fmt(enc(i)):'—'}</td><td><button class="btn btn-sm btn-rd" onclick="delFourn(${i})">✕</button></td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--tx2);padding:1.5rem;">Aucun fournisseur</td></tr>';
+  E('fo-tbl').innerHTML=fournisseurs.length?fournisseurs.map((f,i)=>`<tr><td style="font-weight:700;">${f.nom}</td><td>${f.contact}</td><td>${f.tel}</td><td style="text-align:center;">${f.delai}j</td><td style="text-align:right;${enc(i)?'color:var(--rd);font-weight:700;':''}">${enc(i)?fmt(enc(i)):'—'}</td><td><button class="btn btn-sm btn-rd" onclick="delFourn(${i})">✕</button></td></tr>`).join(''):`<tr><td colspan="6"><div style="text-align:center;padding:3rem 1rem;"><div style="font-size:38px;margin-bottom:14px;">🏭</div><div style="font-weight:700;font-size:15px;color:var(--tx0);margin-bottom:6px;">Aucun fournisseur enregistré</div><div style="font-size:12px;color:var(--tx2);margin-bottom:18px;line-height:1.6;">Ajoutez vos fournisseurs pour suivre vos achats et vos encours.</div><button class="btn btn-gr" onclick="openOv('ov-fourn')">+ Ajouter un fournisseur</button></div></td></tr>`;
 }
 
 // ══ DEVIS ══
@@ -3525,7 +3537,7 @@ function imprimerDevis(i){
 function renderDevis(){
   const ST={'accepté':'ok','en attente':'wa','refusé':'er'};
   E('dv-stats').innerHTML=`<div class="sc"><div class="sc-l">Total devis</div><div class="sc-v">${devis.length}</div></div><div class="sc"><div class="sc-l">Acceptés</div><div class="sc-v" style="color:var(--gr);">${devis.filter(d=>d.st==='accepté').length}</div></div><div class="sc"><div class="sc-l">En attente</div><div class="sc-v" style="color:var(--am);">${devis.filter(d=>d.st==='en attente').length}</div></div><div class="sc"><div class="sc-l">Valeur totale HT</div><div class="sc-v">${fmt(devis.reduce((s,d)=>s+d.ht,0))}</div></div>`;
-  E('dv-tbl').innerHTML=devis.length?devis.map((d,i)=>`<tr><td style="font-weight:700;">${d.num}</td><td>${clients[d.ci]?.nom||'?'}</td><td>${d.date}</td><td>${d.val}</td><td style="text-align:right;font-weight:700;">${fmt(d.ttc)}</td><td><span class="bdg ${ST[d.st]||'inf'}">${d.st}</span></td><td><div style="display:flex;gap:2px;">${d.st==='en attente'?`<button class="btn btn-sm" onclick="convertDevis(${i})" title="Convertir en facture" style="font-size:11px;">→🧾</button>`:''}<button class="btn btn-sm" onclick="imprimerDevis(${i})" title="Imprimer">🖨</button><button class="btn btn-sm btn-rd" onclick="delDevis(${i})">✕</button></div></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--tx2);padding:1.5rem;">Aucun devis</td></tr>';
+  E('dv-tbl').innerHTML=devis.length?devis.map((d,i)=>`<tr><td style="font-weight:700;">${d.num}</td><td>${clients[d.ci]?.nom||'?'}</td><td>${d.date}</td><td>${d.val}</td><td style="text-align:right;font-weight:700;">${fmt(d.ttc)}</td><td><span class="bdg ${ST[d.st]||'inf'}">${d.st}</span></td><td><div style="display:flex;gap:2px;">${d.st==='en attente'?`<button class="btn btn-sm" onclick="convertDevis(${i})" title="Convertir en facture" style="font-size:11px;">→🧾</button>`:''}<button class="btn btn-sm" onclick="imprimerDevis(${i})" title="Imprimer">🖨</button><button class="btn btn-sm btn-rd" onclick="delDevis(${i})">✕</button></div></td></tr>`).join(''):`<tr><td colspan="7"><div style="text-align:center;padding:3rem 1rem;"><div style="font-size:38px;margin-bottom:14px;">📋</div><div style="font-weight:700;font-size:15px;color:var(--tx0);margin-bottom:6px;">Aucun devis pour l'instant</div><div style="font-size:12px;color:var(--tx2);margin-bottom:18px;line-height:1.6;">Créez un devis, envoyez-le à votre client, et convertissez-le en facture en un clic.</div><button class="btn btn-gr" onclick="openDevisModal()">+ Créer un devis</button></div></td></tr>`;
 }
 
 // ══ FACTURES ══
@@ -3569,7 +3581,7 @@ function renderFactures(){
   const ST={'payée':'ok','en attente':'wa','en retard':'er'};
   const p=factures.filter(f=>f.st==='payée');const a=factures.filter(f=>f.st==='en attente');const r=factures.filter(f=>f.st==='en retard');
   E('fac-stats').innerHTML=`<div class="sc"><div class="sc-l">Total émises</div><div class="sc-v">${factures.length}</div></div><div class="sc"><div class="sc-l">Payées</div><div class="sc-v" style="color:var(--gr);">${fmt(p.reduce((s,f)=>s+f.ttc,0))}</div></div><div class="sc"><div class="sc-l">En attente</div><div class="sc-v" style="color:var(--am);">${fmt(a.reduce((s,f)=>s+f.ttc,0))}</div></div><div class="sc"><div class="sc-l">En retard</div><div class="sc-v" style="color:var(--rd);">${fmt(r.reduce((s,f)=>s+f.ttc,0))}</div></div>`;
-  E('fac-tbl').innerHTML=factures.length?factures.map((f,i)=>`<tr><td style="font-weight:700;">${f.num}</td><td>${clients[f.ci]?.nom||'?'}</td><td>${f.date}</td><td>${f.due}</td><td style="text-align:right;font-weight:700;">${fmt(f.ttc)}</td><td><span class="bdg ${ST[f.st]||'inf'}">${f.st}</span></td><td><div style="display:flex;gap:2px;">${f.st!=='payée'?`<button class="btn btn-sm" onclick="payerFac(${i})" title="Marquer payée">✓</button>`:''}<button class="btn btn-sm" onclick="openFactureModal(${i})" title="Modifier">✏</button><button class="btn btn-sm" onclick="printFacIdx(${i})" title="PDF">🖨</button><button class="btn btn-sm btn-rd" onclick="delFac(${i})">✕</button></div></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--tx2);padding:1.5rem;">Aucune facture</td></tr>';
+  E('fac-tbl').innerHTML=factures.length?factures.map((f,i)=>`<tr><td style="font-weight:700;">${f.num}</td><td>${clients[f.ci]?.nom||'?'}</td><td>${f.date}</td><td>${f.due}</td><td style="text-align:right;font-weight:700;">${fmt(f.ttc)}</td><td><span class="bdg ${ST[f.st]||'inf'}">${f.st}</span></td><td><div style="display:flex;gap:2px;">${f.st!=='payée'?`<button class="btn btn-sm" onclick="payerFac(${i})" title="Marquer payée">✓</button>`:''}<button class="btn btn-sm" onclick="openFactureModal(${i})" title="Modifier">✏</button><button class="btn btn-sm" onclick="printFacIdx(${i})" title="PDF">🖨</button><button class="btn btn-sm btn-rd" onclick="delFac(${i})">✕</button></div></td></tr>`).join(''):`<tr><td colspan="7"><div style="text-align:center;padding:3rem 1rem;"><div style="font-size:38px;margin-bottom:14px;">📄</div><div style="font-weight:700;font-size:15px;color:var(--tx0);margin-bottom:6px;">Aucune facture pour l'instant</div><div style="font-size:12px;color:var(--tx2);margin-bottom:18px;line-height:1.6;">Créez votre première facture et envoyez-la à votre client en quelques secondes.</div><button class="btn btn-gr" onclick="openFactureModal(-1)">+ Créer ma première facture</button></div></td></tr>`;
 }
 
 // ══ ACHATS ══
@@ -3591,7 +3603,7 @@ function payerAchat(i){achats[i].st='payée';addH('paiement','Facture achat '+ac
 function delAchat(i){if(confirm('Supprimer ?')){achats.splice(i,1);renderAchats();}}
 function renderAchats(){
   const ST={'payée':'ok','en attente':'wa','en retard':'er'};
-  E('ac-tbl').innerHTML=achats.length?achats.map((a,i)=>`<tr><td>${a.num}</td><td>${fournisseurs[a.fi]?.nom||'?'}</td><td>${a.date}</td><td>${a.due}</td><td style="text-align:right;font-weight:700;">${fmt(a.ttc)}</td><td><span class="bdg ${ST[a.st]||'inf'}">${a.st}</span></td><td><div style="display:flex;gap:2px;">${a.st!=='payée'?`<button class="btn btn-sm" onclick="payerAchat(${i})">✓</button>`:''}<button class="btn btn-sm btn-rd" onclick="delAchat(${i})">✕</button></div></td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--tx2);padding:1.5rem;">Aucune facture achat</td></tr>';
+  E('ac-tbl').innerHTML=achats.length?achats.map((a,i)=>`<tr><td>${a.num}</td><td>${fournisseurs[a.fi]?.nom||'?'}</td><td>${a.date}</td><td>${a.due}</td><td style="text-align:right;font-weight:700;">${fmt(a.ttc)}</td><td><span class="bdg ${ST[a.st]||'inf'}">${a.st}</span></td><td><div style="display:flex;gap:2px;">${a.st!=='payée'?`<button class="btn btn-sm" onclick="payerAchat(${i})">✓</button>`:''}<button class="btn btn-sm btn-rd" onclick="delAchat(${i})">✕</button></div></td></tr>`).join(''):`<tr><td colspan="7"><div style="text-align:center;padding:3rem 1rem;"><div style="font-size:38px;margin-bottom:14px;">🧾</div><div style="font-weight:700;font-size:15px;color:var(--tx0);margin-bottom:6px;">Aucune facture fournisseur</div><div style="font-size:12px;color:var(--tx2);margin-bottom:18px;line-height:1.6;">Enregistrez vos factures d'achat pour suivre vos charges et récupérer la TVA.</div><button class="btn btn-gr" onclick="openAchatModal()">+ Enregistrer une facture</button></div></td></tr>`;
 }
 
 // ══ JOURNAL ══
@@ -4510,6 +4522,18 @@ document.head.appendChild(cabStyle);
   </div>
 </div>
 
+<!-- ══ WELCOME MODAL — première connexion post-inscription ══ -->
+<div id="luno-welcome-ov" style="display:none;position:fixed;inset:0;z-index:10100;background:rgba(16,16,14,.62);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--bg0,#fff);border-radius:22px;padding:44px 36px 32px;max-width:440px;width:100%;box-shadow:0 36px 80px rgba(0,0,0,.3);text-align:center;animation:wlcIn .38s cubic-bezier(.22,1,.36,1);">
+    <div style="font-size:54px;margin-bottom:18px;line-height:1;">🎉</div>
+    <div style="font-size:22px;font-weight:800;color:var(--tx0,#1a1a18);margin-bottom:8px;line-height:1.25;" id="wlc-title">Bienvenue !</div>
+    <div style="font-size:13px;color:var(--tx2,#999582);line-height:1.75;margin-bottom:32px;" id="wlc-sub">Votre espace LUNO est prêt.<br>La première étape : créez votre première facture.</div>
+    <button onclick="wlcPrimary()" style="display:block;width:100%;background:var(--gr,#1D9E75);color:#fff;border:none;border-radius:12px;padding:15px 20px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;letter-spacing:.1px;transition:opacity .15s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">📄 Créer ma première facture →</button>
+    <button onclick="wlcClose()" style="display:block;width:100%;background:transparent;color:var(--tx2,#999582);border:none;padding:10px;font-size:12px;cursor:pointer;">Explorer d'abord</button>
+  </div>
+</div>
+<style>@keyframes wlcIn{from{opacity:0;transform:scale(.92) translateY(14px);}to{opacity:1;transform:scale(1) translateY(0);}}</style>
+
 <div class="ov" id="ov-onb-logo"><div class="modal">
   <div class="mh"><span>🎨 Ajouter votre logo</span><button class="btn btn-sm" onclick="closeOv('ov-onb-logo')">✕</button></div>
   <div class="fg">
@@ -4687,6 +4711,7 @@ document.head.appendChild(cabStyle);
 
   window.lunoOnboardingInit = function(user){
     user = user || currentUser();
+    if(typeof showWelcomeModal === 'function') showWelcomeModal(user);
     if(user && user.isDemo){
       const s = get();
       s.dismissed = true;
@@ -4718,6 +4743,46 @@ document.head.appendChild(cabStyle);
   }
   // Hook launchApp pour les logins ultérieurs (depuis le formulaire)
   setTimeout(() => wrap('launchApp', function(user){ try { window.lunoOnboardingInit(user); } catch(e){} }), 50);
+})();
+
+</script>
+
+<script>
+/* ══ WELCOME MODAL — première connexion post-inscription ══ */
+(function(){
+  function _ov(){ return document.getElementById('luno-welcome-ov'); }
+
+  window.showWelcomeModal = function(user){
+    if(localStorage.getItem('luno_onb_complete') !== '1') return;
+    if(user && user.isDemo) return;
+    const ov = _ov(); if(!ov) return;
+    const prenom = (user && (user.prenom || user.nom || user.societe)) || '';
+    const societe = (user && user.societe) || '';
+    const t = document.getElementById('wlc-title');
+    const s = document.getElementById('wlc-sub');
+    if(t) t.textContent = prenom ? 'Bonjour ' + prenom + ' 👋' : 'Bienvenue sur LUNO 👋';
+    if(s) s.innerHTML = societe
+      ? 'Votre espace <strong>' + societe + '</strong> est pr\xEAt.<br>La premi\xE8re \xE9tape : cr\xE9ez votre premi\xE8re facture.'
+      : 'Votre espace LUNO est pr\xEAt.<br>La premi\xE8re \xE9tape : cr\xE9ez votre premi\xE8re facture.';
+    ov.style.display = 'flex';
+  };
+
+  window.wlcPrimary = function(){
+    localStorage.removeItem('luno_onb_complete');
+    const ov = _ov(); if(ov) ov.style.display = 'none';
+    if(typeof nav === 'function'){
+      const el = document.querySelector('.ni[onclick*="\'factures\'"]');
+      if(el) nav('factures', el); else nav('factures');
+    }
+    setTimeout(function(){ if(typeof openFactureModal === 'function') openFactureModal(-1); }, 150);
+  };
+
+  window.wlcClose = function(){
+    localStorage.removeItem('luno_onb_complete');
+    const ov = _ov(); if(!ov) return;
+    ov.style.transition = 'opacity .25s'; ov.style.opacity = '0';
+    setTimeout(function(){ ov.style.display = 'none'; ov.style.opacity = ''; ov.style.transition = ''; }, 240);
+  };
 })();
 </script>
 
@@ -7902,11 +7967,6 @@ body.ux-focus .ux-focus-pill{ display: inline-flex; }
         const email = emailEl.value.trim().toLowerCase();
         const pwd = pwdEl.value;
         if(!email || !pwd){ if(errEl){ errEl.textContent='Email et mot de passe requis.'; errEl.style.display='block'; } return; }
-
-        // Comptes démo → fallback localStorage (pour ne pas casser les comptes de test existants)
-        if(email === 'test@test.fr' || email.includes('demo')){
-          return origLogin.apply(this, arguments);
-        }
 
         try {
           const { data, error } = await window.sb.auth.signInWithPassword({ email, password: pwd });
