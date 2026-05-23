@@ -11,7 +11,9 @@
     { "source": "/sasu-sas",        "destination": "/#sasu-sas", "permanent": true },
     { "source": "/sarl-eurl",       "destination": "/#sasu-sas", "permanent": true },
     { "source": "/sci-lmnp",        "destination": "/#sci-lmnp", "permanent": true },
-    { "source": "/cabinet-comptable", "destination": "/#cabinet-comptable", "permanent": true }
+    { "source": "/cabinet-comptable", "destination": "/#cabinet-comptable", "permanent": true },
+    { "source": "/aide",            "destination": "/#aide", "permanent": true },
+    { "source": "/documentation",   "destination": "/#aide", "permanent": true }
   ],
   "headers": [
     {
