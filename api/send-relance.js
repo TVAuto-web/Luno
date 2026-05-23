@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'ComptaPME Pro <onboarding@resend.dev>',
+        from: 'LUNO ENT <onboarding@resend.dev>',
         to: [to],
         subject,
         html,
