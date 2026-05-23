@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LUNO — Gestion comptable pour PME</title>
+<meta name="theme-color" content="#1f8a68">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon-192.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -257,6 +260,11 @@ section { padding: 100px 2rem; background: var(--paper); }
 .status-card li { color: var(--text); font-size: 13px; display: flex; gap: .45rem; }
 .status-card li::before { content: "✓"; color: var(--sage); font-weight: 800; }
 .status-pill { width: max-content; padding: 4px 10px; border-radius: 999px; background: var(--sage-light); color: var(--sage-dark); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .35px; }
+.help-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 3rem; }
+.help-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); border-radius: var(--rs); padding: 1.35rem; color: rgba(255,248,235,.78); }
+.help-card h3 { color: #fff8eb; font-size: 17px; margin-bottom: .5rem; }
+.help-card p { font-size: 14px; color: rgba(255,255,255,.64); line-height: 1.6; }
+.help-card a { margin-top: 1rem; color: var(--gold-light); display: inline-block; font-weight: 700; text-decoration: none; }
 
 /* ── FEATURES ── */
 #features { background: #102d26; color: rgba(255,255,255,.86); }
@@ -622,7 +630,7 @@ footer {
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .nav-links { display: none; }
-  .features-grid, .pricing-grid, .status-grid { grid-template-columns: 1fr; }
+  .features-grid, .pricing-grid, .status-grid, .help-grid { grid-template-columns: 1fr; }
   .feature-highlight, .why-grid, .footer-grid { grid-template-columns: 1fr; }
   .preview-body { grid-template-columns: 1fr; }
   .preview-sidebar { display: none; }
@@ -642,6 +650,7 @@ footer {
     <li><a href="#features">Fonctionnalités</a></li>
     <li><a href="#pourquoi">Pourquoi nous</a></li>
     <li><a href="#statuts">Statuts</a></li>
+    <li><a href="#aide">Aide</a></li>
     <li><a href="#tarifs">Tarifs</a></li>
     <li><a href="#faq">FAQ</a></li>
   </ul>
@@ -902,6 +911,33 @@ footer {
   </div>
 </section>
 
+<section id="aide" style="background:#102d26;color:rgba(255,255,255,.86);">
+  <div class="container">
+    <div class="reveal" style="text-align:center;">
+      <div class="section-tag" style="background:rgba(255,255,255,.08);color:var(--gold-light);">&#10022; Centre d'aide</div>
+      <h2 class="section-title" style="color:#fff8eb;">Demarrer sans <em style="color:var(--gold);">perdre de temps</em></h2>
+      <p class="section-sub" style="margin:0 auto;color:rgba(255,255,255,.64);">Les parcours essentiels sont guides : creer une facture, controler la TVA, exporter le FEC et preparer les donnees pour l'expert-comptable.</p>
+    </div>
+    <div class="help-grid reveal">
+      <div class="help-card">
+        <h3>Demarrage rapide</h3>
+        <p>Creation de compte, entreprise, premier client, premiere facture et configuration TVA.</p>
+        <a href="#" onclick="openLegal('documentation');return false;">Lire le guide</a>
+      </div>
+      <div class="help-card">
+        <h3>Controle comptable</h3>
+        <p>Journal, rapprochements, FEC, justificatifs et exports propres pour votre cabinet.</p>
+        <a href="/app">Ouvrir LUNO</a>
+      </div>
+      <div class="help-card">
+        <h3>Support</h3>
+        <p>Une base d'aide visible dans l'application et une adresse support dediee pour les demandes sensibles.</p>
+        <a href="mailto:support@useluno.fr">support@useluno.fr</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="tarifs">
   <div class="container">
     <div class="reveal" style="text-align:center;">
@@ -1085,6 +1121,7 @@ footer {
     <div class="footer-col">
       <h4>Produit</h4>
       <a href="#features">Fonctionnalités</a>
+      <a href="#aide">Centre d'aide</a>
       <a href="#tarifs">Tarifs</a>
       <a href="#faq">FAQ</a>
       <a href="#" onclick="openModal('register');return false;">Essai gratuit</a>
@@ -2308,6 +2345,7 @@ function switchLegal(id) { openLegal(id); }
 function closeLegal(e) {
   if (e.target.id === 'legal-modal') document.getElementById('legal-modal').classList.remove('open');
 }
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 </script>
 </body>
 </html>
