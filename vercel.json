@@ -5,7 +5,8 @@
     { "source": "/compta_app.html", "destination": "/app", "permanent": true },
     { "source": "/compta_app",      "destination": "/app", "permanent": true },
     { "source": "/compta-app",      "destination": "/app", "permanent": true },
-    { "source": "/pricing",         "destination": "/pricing.html", "permanent": false }
+    { "source": "/pricing",         "destination": "/#tarifs", "permanent": true },
+    { "source": "/pricing.html",    "destination": "/#tarifs", "permanent": true }
   ],
   "headers": [
     {
