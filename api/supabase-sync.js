@@ -46,6 +46,54 @@ async function firstCompanyId(userId) {
   return rows?.[0]?.company_id || null;
 }
 
+async function ensureCompanyId(user) {
+  const existing = await firstCompanyId(user.id);
+  if (existing) return existing;
+
+  const meta = user.user_metadata || {};
+  const societe = meta.societe || meta.org_name || 'Mon entreprise';
+  await supabaseFetch('/rest/v1/profiles?on_conflict=id', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+    body: JSON.stringify([{
+      id: user.id,
+      email: user.email,
+      prenom: meta.prenom || '',
+      nom: meta.nom || '',
+      societe,
+      siren: meta.siren || null,
+      profile_type: meta.profile_type || 'entreprise',
+      ui_mode: 'simple',
+    }]),
+  });
+
+  const companies = await supabaseFetch('/rest/v1/companies', {
+    method: 'POST',
+    body: JSON.stringify([{
+      owner_id: user.id,
+      nom: societe,
+      siren: meta.siren || null,
+      siret: meta.siret || null,
+      email: user.email,
+      exercice: String(new Date().getFullYear()),
+    }]),
+  });
+  const companyId = companies?.[0]?.id;
+  if (!companyId) throw new Error('Entreprise Supabase impossible a creer');
+
+  await supabaseFetch('/rest/v1/memberships?on_conflict=company_id,user_id', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+    body: JSON.stringify([{ company_id: companyId, user_id: user.id, role: 'owner' }]),
+  });
+  await supabaseFetch('/rest/v1/subscriptions?on_conflict=user_id', {
+    method: 'POST',
+    headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+    body: JSON.stringify([{ user_id: user.id, plan: 'gratuit', status: 'active' }]),
+  }).catch(() => null);
+  return companyId;
+}
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -54,8 +102,8 @@ export default async function handler(req, res) {
   try {
     const user = await currentUser(req);
     const companyId = req.method === 'GET'
-      ? (req.query?.companyId || await firstCompanyId(user.id))
-      : (req.body?.companyId || await firstCompanyId(user.id));
+      ? (req.query?.companyId || await ensureCompanyId(user))
+      : (req.body?.companyId || await ensureCompanyId(user));
     if (!companyId) return res.status(404).json({ error: 'Aucune entreprise Supabase rattachee a cet utilisateur' });
 
     if (req.method === 'GET') {
