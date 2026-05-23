@@ -1,15 +1,11 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
-  "functions": {
-    "api/send-relance.js": { "runtime": "nodejs20.x" }
-  },
   "redirects": [
     { "source": "/compta_app.html", "destination": "/app", "permanent": true },
     { "source": "/compta_app",      "destination": "/app", "permanent": true },
     { "source": "/compta-app",      "destination": "/app", "permanent": true },
-    { "source": "/pricing",         "destination": "/pricing.html", "permanent": false },
-    { "source": "/pricing.html",    "destination": "/pricing.html", "permanent": false }
+    { "source": "/pricing",         "destination": "/pricing.html", "permanent": false }
   ],
   "headers": [
     {
