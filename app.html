@@ -6550,7 +6550,7 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
     btn.className = 'ux-icon-btn';
     btn.title = 'Personnaliser mon entreprise';
     btn.innerHTML = '⚙';
-    btn.onclick = window.uxSettingsOpen;
+    btn.onclick = function(){ if(typeof window.uxSettingsOpen === 'function') window.uxSettingsOpen(); };
     // Insert before the bell (ux-bell-btn)
     const bell = document.getElementById('ux-bell-btn');
     if(bell) toolbar.insertBefore(btn, bell);
