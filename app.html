@@ -37,6 +37,7 @@
   --gr2: #0E6B50;
   --gr3: rgba(29,158,117,0.10);
   --gr4: rgba(29,158,117,0.20);
+  --on-gr: #ffffff;
 
   /* — iOS system palette */
   --bl:  #0071E3;
@@ -83,6 +84,7 @@
   --gr2: #25A244;
   --gr3: rgba(50,215,75,0.12);
   --gr4: rgba(50,215,75,0.22);
+  --on-gr: #06140A;
   --bl:  #0A84FF;
   --bl2: rgba(10,132,255,0.14);
   --rd:  #FF453A;
@@ -96,6 +98,39 @@
   --sh-md: 0 4px 20px rgba(0,0,0,.4), 0 0 0 0.5px rgba(255,255,255,.06);
   --sh-lg: 0 12px 48px rgba(0,0,0,.55), 0 2px 8px rgba(0,0,0,.25), 0 0 0 0.5px rgba(255,255,255,.07);
   --sh-xl: 0 32px 96px rgba(0,0,0,.65), 0 8px 24px rgba(0,0,0,.3);
+}
+
+/* ── THEME ONYX — noir premium, accent emerald ── */
+[data-theme="onyx"] {
+  --bg0:    #0A0A0A;
+  --bg1:    #111111;
+  --bg2:    rgba(255,255,255,0.06);
+  --bg3:    rgba(255,255,255,0.03);
+  --bg-glass:  rgba(14,14,14,0.94);
+  --bg-glass2: rgba(10,10,10,0.82);
+  --tx0: #E6E6E6;
+  --tx1: rgba(230,230,230,0.58);
+  --tx2: rgba(230,230,230,0.28);
+  --bd:  rgba(255,255,255,0.08);
+  --bd2: rgba(255,255,255,0.14);
+  --gr:  #10B981;
+  --gr2: #059669;
+  --gr3: rgba(16,185,129,0.13);
+  --gr4: rgba(16,185,129,0.24);
+  --on-gr: #03130F;
+  --bl:  #3B82F6;
+  --bl2: rgba(59,130,246,0.14);
+  --rd:  #F87171;
+  --rd2: rgba(248,113,113,0.14);
+  --am:  #FBBF24;
+  --am2: rgba(251,191,36,0.14);
+  --pu:  #A78BFA;
+  --pu2: rgba(167,139,250,0.14);
+  --sh-xs: 0 1px 3px rgba(0,0,0,.5),  0 0 0 0.5px rgba(255,255,255,.04);
+  --sh-sm: 0 2px 10px rgba(0,0,0,.6), 0 0 0 0.5px rgba(255,255,255,.05);
+  --sh-md: 0 4px 24px rgba(0,0,0,.7), 0 0 0 0.5px rgba(255,255,255,.06);
+  --sh-lg: 0 12px 52px rgba(0,0,0,.8), 0 2px 10px rgba(0,0,0,.4), 0 0 0 0.5px rgba(255,255,255,.06);
+  --sh-xl: 0 32px 100px rgba(0,0,0,.9), 0 8px 28px rgba(0,0,0,.5);
 }
 
 /* ── Reset & Base ──────────────────────────── */
@@ -464,7 +499,7 @@ body {
 .btn:hover { background: var(--bg2); }
 .btn:active { transform: scale(.98); }
 .btn-gr {
-  background: var(--gr); color: #fff;
+  background: var(--gr); color: var(--on-gr, #fff);
   border-color: var(--gr);
   box-shadow: 0 1px 4px rgba(29,158,117,.25);
 }
@@ -746,6 +781,63 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
   border-color: rgba(255,255,255,.10);
 }
 
+/* ── THEME ONYX — overrides composants ── */
+[data-theme="onyx"] .sidebar       { background: rgba(6,6,6,0.93); }
+[data-theme="onyx"] .ni:hover      { background: rgba(255,255,255,.05); }
+[data-theme="onyx"] .ni.on         { background: rgba(16,185,129,0.15) !important; color: #10B981 !important; }
+[data-theme="onyx"] .modal         { background: rgba(10,10,10,0.97); border-color: rgba(255,255,255,.08); }
+[data-theme="onyx"] .notif         { background: rgba(12,12,12,0.96); border-color: rgba(255,255,255,.08); }
+[data-theme="onyx"] .upsell-box    { background: rgba(10,10,10,0.97); border-color: rgba(255,255,255,.08); }
+[data-theme="onyx"] .auth-box      { border-color: rgba(255,255,255,.10); }
+[data-theme="onyx"] .btn-gr,
+[data-theme="onyx"] button.btn-gr {
+  color: var(--on-gr, #03130F);
+  box-shadow: 0 0 0 1px rgba(16,185,129,.20), 0 8px 20px rgba(16,185,129,.12);
+}
+[data-theme="onyx"] .btn:not(.btn-gr):not(.btn-bl):not(.btn-rd):not(.btn-am) {
+  background: rgba(255,255,255,.045);
+  border-color: rgba(255,255,255,.12);
+}
+[data-theme="onyx"] .btn:not(.btn-gr):not(.btn-bl):not(.btn-rd):not(.btn-am):hover {
+  background: rgba(255,255,255,.08);
+}
+
+/* ── THEME CHIPS — sélecteur visuel ── */
+.theme-chips {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.theme-chip {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--bd);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 11px; font-weight: 500; color: var(--tx1);
+  transition: border-color .15s, background .15s;
+  background: var(--bg0);
+  min-width: 64px;
+}
+.theme-chip:hover { border-color: var(--bd2); color: var(--tx0); }
+.theme-chip.on    { border-color: var(--gr); color: var(--gr); background: var(--gr3); }
+.tc-preview {
+  width: 40px; height: 24px;
+  border-radius: 6px;
+}
+.theme-select-row {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 10px;
+  align-items: end;
+}
+.theme-preview-dot {
+  width: 42px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--bd2);
+  background: linear-gradient(135deg, var(--bg1) 0 48%, var(--gr) 48% 72%, var(--bg0) 72%);
+  box-shadow: var(--sh-xs);
+}
+
 /* ── FEATURE HELPERS ────────────────────────── */
 .prog-bar { height: 5px; background: var(--bg2); border-radius: 100px; overflow: hidden; margin: .4rem 0; }
 .prog-fill { height: 100%; border-radius: 100px; transition: width .5s cubic-bezier(.4,0,.2,1); }
@@ -782,7 +874,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
 <!-- ════ AUTH ════ -->
 <div id="auth-wrap">
   <div style="position:absolute;top:1rem;right:1rem;">
-    <button class="t-btn" onclick="toggleTheme()" id="theme-btn-auth">🌙 Mode sombre</button>
+    <button class="t-btn" onclick="cycleTheme()" id="theme-btn-auth">🌙 Sombre</button>
   </div>
   <div class="auth-box">
     <div class="auth-logo">
@@ -936,7 +1028,7 @@ input::placeholder, textarea::placeholder { color: var(--tx2); }
       <span id="mode-toggle-label" style="font-weight:600;color:var(--tx1);">Mode simplifié</span>
       <span style="color:var(--tx2);font-size:13px;">⇄</span>
     </div>
-    <button class="t-btn" onclick="toggleTheme()" id="theme-btn">🌙 Mode sombre</button>
+    <button class="t-btn" onclick="cycleTheme()" id="theme-btn">🌙 Sombre</button>
     <div class="t-user">
       <div class="t-av" id="av">?</div>
       <span id="uname">—</span>
@@ -2115,13 +2207,39 @@ function openOv(id){E(id).classList.add('open');}
 function closeOv(id){E(id).classList.remove('open');}
 
 // ══ THEME ══
-let dark=false;
-function toggleTheme(){
-  dark=!dark;
-  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
-  E('theme-btn').textContent=dark?'☀️ Mode clair':'🌙 Mode sombre';
-  notif(dark?'Mode sombre activé ✨':'Mode clair activé ☀️');
+const THEMES = ['light','onyx'];
+const THEME_LABELS = { light:'Base LUNO', onyx:'Onyx' };
+let currentTheme = THEMES.includes(localStorage.getItem('luno_theme')) ? localStorage.getItem('luno_theme') : 'light';
+
+function applyTheme(t, opts) {
+  t = THEMES.includes(t) ? t : 'light';
+  currentTheme = t;
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('luno_theme', t);
+  const lbl = THEME_LABELS[t];
+  const btn = E('theme-btn'); if(btn) btn.textContent = 'Theme : ' + lbl;
+  const btnAuth = E('theme-btn-auth'); if(btnAuth) btnAuth.textContent = 'Theme : ' + lbl;
+  const select = E('ux-theme-select'); if(select) select.value = t;
+  document.querySelectorAll('.theme-chip').forEach(c =>
+    c.classList.toggle('on', c.dataset.v === t)
+  );
+  if(!opts || !opts.silent) notif('Theme ' + lbl + ' active');
 }
+function cycleTheme() {
+  const idx = (THEMES.indexOf(currentTheme) + 1) % THEMES.length;
+  applyTheme(THEMES[idx]);
+}
+// Init au chargement (silencieux — pas de toast)
+(function(){
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  const lbl = THEME_LABELS[currentTheme];
+  const btn = E('theme-btn'); if(btn) btn.textContent = 'Theme : ' + lbl;
+  const btnAuth = E('theme-btn-auth'); if(btnAuth) btnAuth.textContent = 'Theme : ' + lbl;
+  const select = E('ux-theme-select'); if(select) select.value = currentTheme;
+  document.querySelectorAll('.theme-chip').forEach(c =>
+    c.classList.toggle('on', c.dataset.v === currentTheme)
+  );
+})();
 
 // ══════════════════════════════════════════════════════
 //  AUTHENTIFICATION & ABONNEMENTS (localStorage partagé)
@@ -6034,6 +6152,16 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
     </div>
     <div class="ux-settings-body">
       <div class="ux-settings-section on" id="ux-sec-apparence">
+        <div class="fld" style="margin-bottom:1rem;">
+          <label style="margin-bottom:8px;display:block;">THEME</label>
+          <div class="theme-select-row">
+            <select id="ux-theme-select" onchange="applyTheme(this.value)">
+              <option value="light">Base LUNO</option>
+              <option value="onyx">Onyx</option>
+            </select>
+            <div class="theme-preview-dot" aria-hidden="true"></div>
+          </div>
+        </div>
         <div class="fld">
           <label>Couleur de marque (CTAs, en-têtes documents)</label>
           <div class="ux-color-row">
@@ -6440,6 +6568,10 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
     document.getElementById('ux-doc-footer').value = s.docFooter || '';
     document.getElementById('ux-currency').value = s.currency || 'EUR';
     document.getElementById('ux-decimal').value = s.decimal || 'comma';
+    const theme = THEMES.includes(s.theme) ? s.theme : currentTheme;
+    const themeSelect = document.getElementById('ux-theme-select');
+    if(themeSelect) themeSelect.value = theme;
+    if(theme !== currentTheme) applyTheme(theme, { silent: true });
     fillCompanySettingsForm(window.lunoCompanySettings());
     uxBrandPreview();
     uxDocPreview();
@@ -6505,8 +6637,10 @@ tbody tr:only-child td[colspan]{ color: var(--tx1, #62604b) !important; font-siz
       docHeader:  docHeader,
       docFooter:  document.getElementById('ux-doc-footer').value.trim(),
       currency:   document.getElementById('ux-currency').value,
-      decimal:    document.getElementById('ux-decimal').value
+      decimal:    document.getElementById('ux-decimal').value,
+      theme:      document.getElementById('ux-theme-select')?.value || currentTheme
     };
+    applyTheme(s.theme, { silent: true });
     saveUserField('settings', s);
     saveCompanySettings(company);
     applyBrandColor(s.brandColor);
@@ -6711,6 +6845,7 @@ body.has-brand .btn.btn-gr,
 body.has-brand button.btn-gr {
   background: var(--ux-brand, #1D9E75) !important;
   border-color: var(--ux-brand, #1D9E75) !important;
+  color: var(--on-gr, #fff) !important;
 }
 body.has-brand .btn.btn-gr:hover,
 body.has-brand button.btn-gr:hover { filter: brightness(1.08); }
