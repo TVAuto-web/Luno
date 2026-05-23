@@ -6,6 +6,46 @@ function cors(res) {
 
 const json = (res, status, body) => res.status(status).json(body);
 
+const CATEGORY_RULES = [
+  [/urssaf|imp[oô]t|d[gf]fip|taxe|cfe|tva/i, ['Impots & taxes', 0, 0.94]],
+  [/loyer|bail|foncia|seger|immobilier/i, ['Loyer', 20, 0.9]],
+  [/amazon|fournisseur|materiel|office|bureau|achat/i, ['Achats fournisseurs', 20, 0.86]],
+  [/google ads|meta ads|facebook|publicit|marketing/i, ['Marketing', 20, 0.88]],
+  [/salaire|paie|dsn/i, ['Salaires', 0, 0.93]],
+  [/frais|commission|agios|cotisation carte/i, ['Frais bancaires', 0, 0.9]],
+  [/remboursement|refund|avoir/i, ['Remboursements', 0, 0.78]],
+  [/facture|reglement|paiement|virement client|client/i, ['Ventes', 20, 0.82]],
+];
+
+function enrichTransaction(txn) {
+  const label = txn.lib || txn.label || '';
+  let category = txn.category || '';
+  let tvaRate = 0;
+  let confidence = category ? 0.82 : 0.54;
+  if (!category) {
+    const found = CATEGORY_RULES.find(([re]) => re.test(label));
+    if (found) {
+      category = found[1][0];
+      tvaRate = found[1][1];
+      confidence = found[1][2];
+    } else {
+      category = 'A classer';
+    }
+  } else {
+    tvaRate = /vente|achat|marketing|loyer/i.test(category) ? 20 : 0;
+  }
+  const amount = Number(txn.mnt || txn.amount || 0);
+  const tvaAmount = tvaRate ? Math.round(Math.abs(amount) * (tvaRate / (100 + tvaRate)) * 100) / 100 : 0;
+  return {
+    ...txn,
+    category,
+    catData: { cat: category, confidence },
+    tvaRate,
+    tvaAmount,
+    status: category === 'A classer' || confidence < 0.75 ? 'to_review' : 'classified',
+  };
+}
+
 function bridgeHeaders() {
   const clientId = process.env.BRIDGE_CLIENT_ID;
   const clientSecret = process.env.BRIDGE_CLIENT_SECRET;
@@ -35,14 +75,14 @@ function normalizeBridgeAccount(account = {}) {
 
 function normalizeBridgeTransaction(txn = {}) {
   const amount = Number(txn.amount || 0);
-  return {
+  return enrichTransaction({
     id: String(txn.id || txn.transaction_id || ''),
     date: (txn.date || txn.booking_date || txn.transaction_date || new Date().toISOString()).slice(0, 10),
     lib: txn.clean_description || txn.description || txn.wording || 'Transaction bancaire',
     mnt: amount,
     category: txn.category?.name || txn.category_name || '',
     provider: 'bridge',
-  };
+  });
 }
 
 async function bridgeSync(body) {
@@ -110,7 +150,7 @@ async function powensSync(body) {
     const txData = await txResponse.json().catch(() => ({}));
     if (!txResponse.ok) continue;
     const rawTxns = txData.transactions || txData.results || [];
-    rawTxns.forEach(txn => transactions.push({
+    rawTxns.forEach(txn => transactions.push(enrichTransaction({
       id: String(txn.id || ''),
       date: (txn.date || txn.rdate || new Date().toISOString()).slice(0, 10),
       lib: txn.wording || txn.original_wording || 'Transaction bancaire',
@@ -119,7 +159,7 @@ async function powensSync(body) {
       accountId: account.id,
       bankName: account.bank,
       provider: 'powens',
-    }));
+    })));
   }
 
   return { status: 200, body: { provider: 'powens', accounts, transactions } };
