@@ -49,6 +49,7 @@ function validateInvoice(invoice, seller, buyer) {
   const issues = [];
   const warnings = [];
 
+  const status = invoice.eStatus || invoice.e_status || invoice.statut_electronique || 'emise';
   if (!invoice.num) issues.push('Numero de facture manquant');
   if (!invoice.date) issues.push('Date d emission manquante');
   if (!invoice.due) warnings.push('Date d echeance manquante');
@@ -56,15 +57,23 @@ function validateInvoice(invoice, seller, buyer) {
   if (!seller.siren && !seller.siret) warnings.push('SIREN/SIRET emetteur manquant');
   if (!seller.address || !seller.postcode || !seller.city) warnings.push('Adresse emetteur incomplete');
   if (!buyer.name) issues.push('Nom du client manquant');
+  if (!buyer.siren && !buyer.siret) warnings.push('SIREN/SIRET client absent - adressage PA/PDP a verifier');
   if (!buyer.address || !buyer.postcode || !buyer.city) warnings.push('Adresse client incomplete');
   if (!Number(invoice.ht)) issues.push('Montant HT manquant');
   if (Number(invoice.tva) > 0 && !seller.vat) warnings.push('TVA collectee mais numero TVA emetteur absent');
+  if (['transmise', 'recue'].includes(status) && !buyer.siret) warnings.push('Statut avance sans identifiant SIRET destinataire');
 
   return {
     ok: issues.length === 0,
     issues,
     warnings,
     profile: 'Factur-X BASIC WL / CII XML',
+    reform2026: {
+      structuredData: true,
+      needsApprovedPlatform: true,
+      status,
+      readyForPartnerTransmission: issues.length === 0 && !!(buyer.siren || buyer.siret),
+    },
   };
 }
 
@@ -162,12 +171,84 @@ function buildFacturXXml(invoice, seller, buyer) {
 `;
 }
 
+function parseTag(xml, tag) {
+  const re = new RegExp(`<[^:>]*:?${tag}[^>]*>([\\s\\S]*?)<\\/[^:>]*:?${tag}>`, 'i');
+  const match = String(xml || '').match(re);
+  return match ? match[1].replace(/<[^>]+>/g, '').trim() : '';
+}
+
+function parseReceivedInvoice(xml) {
+  const id = parseTag(xml, 'ID') || `RX-${Date.now()}`;
+  const dateRaw = parseTag(xml, 'DateTimeString');
+  const ht = Number(parseTag(xml, 'TaxBasisTotalAmount') || parseTag(xml, 'LineTotalAmount') || 0);
+  const tvaA = Number(parseTag(xml, 'TaxTotalAmount') || 0);
+  const ttc = Number(parseTag(xml, 'GrandTotalAmount') || ht + tvaA);
+  const names = [...String(xml || '').matchAll(/<ram:Name>([\s\S]*?)<\/ram:Name>/g)].map(m => m[1].replace(/<[^>]+>/g, '').trim());
+  return {
+    num: id,
+    date: /^\d{8}$/.test(dateRaw) ? `${dateRaw.slice(0, 4)}-${dateRaw.slice(4, 6)}-${dateRaw.slice(6, 8)}` : new Date().toISOString().slice(0, 10),
+    fournisseur: names[0] || 'Fournisseur electronique',
+    desc: names[names.length - 1] || 'Facture electronique recue',
+    ht,
+    tvaA,
+    tva: ht ? Math.round((tvaA / ht) * 10000) / 100 : 20,
+    ttc,
+    st: 'en attente',
+    eStatus: 'recue',
+    source: 'factur-x',
+  };
+}
+
+async function lookupDirectory(query) {
+  const q = digits(query).length >= 9 ? digits(query) : String(query || '').trim();
+  if (!q) throw new Error('SIRET ou nom requis');
+  const url = digits(q).length >= 9
+    ? `https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(q)}&per_page=1`
+    : `https://recherche-entreprises.api.gouv.fr/search?q=${encodeURIComponent(q)}&per_page=5`;
+  const response = await fetch(url, { headers: { Accept: 'application/json' } });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.message || 'Recherche annuaire indisponible');
+  const results = (data.results || []).map(item => ({
+    nom: item.nom_complet || item.nom_raison_sociale || item.siege?.nom_commercial || '',
+    siren: item.siren || '',
+    siret: item.siege?.siret || item.matching_etablissements?.[0]?.siret || '',
+    activite: item.activite_principale || '',
+    categorie: item.categorie_entreprise || '',
+    adresse: item.siege?.adresse || '',
+    cp: item.siege?.code_postal || '',
+    ville: item.siege?.libelle_commune || '',
+    etat: item.etat_administratif || '',
+    eInvoiceReady: !!(item.siren || item.siege?.siret),
+  }));
+  return { query, results, source: 'recherche-entreprises.api.gouv.fr' };
+}
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return json(res, 405, { error: 'Methode non autorisee' });
 
   const body = req.body || {};
+  if (body.mode === 'directory') {
+    try {
+      return json(res, 200, await lookupDirectory(body.query || body.siret || body.siren || body.name));
+    } catch (err) {
+      return json(res, 502, { error: err.message || 'Annuaire entreprise indisponible' });
+    }
+  }
+  if (body.mode === 'receive') {
+    const received = parseReceivedInvoice(body.xml || body.content || '');
+    return json(res, 200, { ok: true, invoice: received, compliance: { ok: true, issues: [], warnings: [], profile: 'Factur-X received XML' } });
+  }
+  if (body.mode === 'partner-status') {
+    const configured = !!(process.env.EINVOICE_PARTNER_URL || process.env.PA_PARTNER_URL || process.env.PDP_PARTNER_URL);
+    return json(res, 200, {
+      configured,
+      label: configured ? (process.env.EINVOICE_PARTNER_NAME || process.env.PA_PARTNER_NAME || 'Partenaire PA/PDP configure') : 'Partenaire PA/PDP a choisir',
+      redirectUrl: process.env.EINVOICE_PARTNER_URL || process.env.PA_PARTNER_URL || process.env.PDP_PARTNER_URL || null,
+      note: configured ? 'LUNO peut preparer la transmission partenaire.' : 'Export structure pret, transmission officielle uniquement via plateforme agreee.',
+    });
+  }
   const invoice = body.invoice || body.facture || {};
   const seller = normalizeParty(body.seller || body.company || {}, 'Emetteur');
   const buyer = normalizeParty(body.buyer || body.client || {}, 'Client');
